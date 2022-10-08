@@ -1,9 +1,9 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import mongoose, { Document, mongo } from 'mongoose';
+import mongoose, { Document } from 'mongoose';
 
 export type TodoDocument = Todo & Document;
 
-@Schema({ timestamps: { createdAt: 'createdAt' }, autoIndex: true })
+@Schema({ timestamps: { createdAt: 'createdAt' } })
 export class Todo {
   @Prop()
   _id: string;
