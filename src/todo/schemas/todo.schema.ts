@@ -3,25 +3,25 @@ import mongoose, { Document } from 'mongoose';
 
 export type TodoDocument = Todo & Document;
 
-@Schema({ timestamps: { createdAt: 'createdAt' } })
+@Schema({ collection: 'todos' })
 export class Todo {
   @Prop()
   _id: string;
 
-  @Prop({ default: new Date(), type: mongoose.Schema.Types.Date })
+  @Prop({ default: new Date(), type: Date })
   date: Date;
 
-  @Prop({ type: mongoose.Schema.Types.String, required: true })
+  @Prop({ type: String, required: true })
   todo: string;
 
-  @Prop({ type: mongoose.Schema.Types.Number })
+  @Prop({ type: Number })
   duration: number;
 
-  @Prop({ type: mongoose.Schema.Types.Boolean, required: true, default: false })
+  @Prop({ type: Boolean, required: true, default: false })
   done: boolean;
-
-  @Prop({ type: mongoose.Schema.Types.String })
-  category: string;
+  // 수능 영어 단어 => 이처럼 여러 가지 카테고리가 중복될 수 있지 않을까?
+  @Prop({ type: [String] })
+  category: string[];
 }
 
 export const TodoSchema = SchemaFactory.createForClass(Todo);
