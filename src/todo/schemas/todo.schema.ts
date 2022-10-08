@@ -5,9 +5,6 @@ export type TodoDocument = Todo & Document;
 
 @Schema({ collection: 'todos' })
 export class Todo {
-  @Prop()
-  _id: string;
-
   @Prop({ default: new Date(), type: Date })
   date: Date;
 
