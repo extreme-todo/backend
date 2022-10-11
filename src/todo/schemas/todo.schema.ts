@@ -5,8 +5,7 @@ export type TodoDocument = Todo & Document;
 
 @Schema({ collection: 'todos' })
 export class Todo {
-  @Prop()
-  _id: string;
+  _id: mongoose.Types.ObjectId;
 
   @Prop({ default: new Date(), type: mongoose.Schema.Types.Date })
   date: Date;
