@@ -25,7 +25,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
     }),
     TodoModule,
   ],
-  controllers: [AppController, TodoController],
-  providers: [AppService, TodoService],
+  controllers: [AppController],
+  providers: [AppService],
 })
 export class AppModule {}

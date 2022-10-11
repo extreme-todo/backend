@@ -1,32 +1,50 @@
-import { Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpStatus,
+  Param,
+  Patch,
+  Post,
+  Res,
+} from '@nestjs/common';
+import mongoose from 'mongoose';
+import { AddTodoDto } from './dto/add-todo.dto';
+import { UpdateTodoDto } from './dto/update-todo.dto';
 import { TodoService } from './todo.service';
 
-@Controller('todo')
+@Controller('api/todo')
 export default class TodoController {
   constructor(private readonly todoService: TodoService) {}
 
-  @Get('/')
-  getOneTodo(): string {
-    return 'hello';
+  @Post('/')
+  addTodo(@Body() todoData: AddTodoDto): string {
+    const newTodo = this.todoService.addTodo(todoData);
+    return 'yes...';
   }
 
-  @Post('/')
-  addTodo(): string {
-    return 'new';
+  @Get('/:id')
+  async getOneTodo(@Param('id') todoId: string) {
+    const todo = await this.todoService.getOneTodo(todoId);
+    return todo;
   }
 
   @Delete('/:id')
-  deleteTodo(@Param('id') todoId: number): string {
-    return `delete ${todoId}`;
+  async deleteTodo(@Param('id') todoId: string) {
+    return await this.todoService.deleteTodo(todoId);
   }
 
   @Patch('/:id')
-  patchTodo(@Param('id') todoId: number) {
-    return `patch ${todoId}`;
+  async updateTodo(
+    @Param('id') todoId: string,
+    @Body() updateData: UpdateTodoDto,
+  ) {
+    return await this.todoService.updateTodo(todoId, updateData);
   }
 
   @Patch('/:id/done')
-  doTodo(@Param('id') todoId: number): string {
-    return `do ${todoId}`;
+  async doTodo(@Param('id') todoId: string) {
+    return await this.todoService.doTodo(todoId);
   }
 }
