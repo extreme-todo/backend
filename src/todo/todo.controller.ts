@@ -7,8 +7,10 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   Res,
 } from '@nestjs/common';
+import { isBoolean } from 'class-validator';
 import mongoose from 'mongoose';
 import { AddTodoDto } from './dto/add-todo.dto';
 import { UpdateTodoDto } from './dto/update-todo.dto';
@@ -46,5 +48,11 @@ export default class TodoController {
   @Patch('/:id/done')
   async doTodo(@Param('id') todoId: string) {
     return await this.todoService.doTodo(todoId);
+  }
+
+  // TODO : 테스트 코드 짜야 되는데, 일단 그 전에 localhost:8000 들어갔을 때에도 반응이 없음
+  @Get('/api/todos?done')
+  async getList(@Query('done') isDone: boolean) {
+    return await this.todoService.getList(isDone);
   }
 }

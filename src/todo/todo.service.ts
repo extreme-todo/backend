@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import mongoose, { Model } from 'mongoose';
+import { Model } from 'mongoose';
 import { AddTodoDto } from './dto/add-todo.dto';
 import { UpdateTodoDto } from './dto/update-todo.dto';
-import { Todo, TodoDocument, TodoSchema } from './schemas/todo.schema';
+import { Todo, TodoDocument } from './schemas/todo.schema';
 
 @Injectable()
 export class TodoService {
@@ -35,5 +35,9 @@ export class TodoService {
     const res = await this.todoModel.findByIdAndUpdate(id, { done: true });
     console.log(res);
     return res;
+  }
+
+  async getList(isDone: boolean) {
+    return console.log(isDone);
   }
 }
