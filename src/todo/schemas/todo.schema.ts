@@ -3,9 +3,17 @@ import mongoose, { Document } from 'mongoose';
 
 export type TodoDocument = Todo & Document;
 
+export interface ITodo {
+  date: Date;
+  todo: string;
+  duration: number;
+  done: boolean;
+  category: string[];
+}
+
 @Schema({ collection: 'todos' })
 export class Todo {
-  _id: mongoose.Types.ObjectId;
+  // _id: mongoose.Types.ObjectId;
 
   @Prop({ default: new Date(), type: mongoose.Schema.Types.Date })
   date: Date;
