@@ -51,7 +51,7 @@ export default class TodoController {
   }
 
   // TODO : 테스트 코드 짜야 되는데, 일단 그 전에 localhost:8000 들어갔을 때에도 반응이 없음
-  @Get('/api/todos?done')
+  @Get()
   async getList(@Query('done') isDone: boolean) {
     return await this.todoService.getList(isDone);
   }
