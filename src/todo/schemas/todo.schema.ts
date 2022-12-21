@@ -12,8 +12,8 @@ export interface ITodo {
 
 @Schema({ collection: 'todos' })
 export class Todo {
-  // @Prop({ type: mongoose.Schema.Types.ObjectId })
-  // _id: mongoose.Types.ObjectId;
+  @Prop({ type: mongoose.Schema.Types.ObjectId })
+  id: mongoose.Types.ObjectId;
 
   @Prop({ default: new Date(), type: mongoose.Schema.Types.Date })
   date: Date;

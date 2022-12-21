@@ -36,4 +36,21 @@ describe('TodoService', () => {
   it('should be defined', () => {
     expect(service).toBeDefined();
   });
+
+  describe('getList', () => {
+    // given
+    let isDone: boolean;
+    let todoList: Todo[];
+    beforeEach(() => {
+      isDone = Boolean(Math.floor(Math.random() * 2));
+      todoList = 
+    });
+    // when
+    describe('when getList is called', () => {
+      // then
+      it('then it should return todoList that the done value matches', () => {
+        expect();
+      });
+    });
+  });
 });
