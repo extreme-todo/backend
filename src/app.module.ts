@@ -1,9 +1,10 @@
-import { Module } from '@nestjs/common';
+import { Module, ValidationPipe } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { TodoModule } from './todo/todo.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { APP_PIPE } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -22,6 +23,16 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
     TodoModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_PIPE,
+      useValue: new ValidationPipe({
+        whitelist: true,
+        forbidNonWhitelisted: true,
+        transform: true,
+      }),
+    },
+  ],
 })
 export class AppModule {}
