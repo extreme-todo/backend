@@ -14,7 +14,7 @@ import { TodoService } from './todo.service';
 
 @Controller('api/todos')
 export default class TodoController {
-  constructor(private readonly todoService: TodoService) {}
+  constructor(private todoService: TodoService) {}
 
   @Post('/')
   addTodo(@Body() todoData: AddTodoDto): string {
@@ -23,26 +23,26 @@ export default class TodoController {
   }
 
   @Get('/:id')
-  async getOneTodo(@Param('id') todoId: string) {
+  async getOneTodo(@Param('id') todoId: number) {
     const todo = await this.todoService.getOneTodo(todoId);
     return todo;
   }
 
   @Delete('/:id')
-  async deleteTodo(@Param('id') todoId: string) {
+  async deleteTodo(@Param('id') todoId: number) {
     return await this.todoService.deleteTodo(todoId);
   }
 
   @Patch('/:id')
   async updateTodo(
-    @Param('id') todoId: string,
+    @Param('id') todoId: number,
     @Body() updateData: UpdateTodoDto,
   ) {
     return await this.todoService.updateTodo(todoId, updateData);
   }
 
   @Patch('/:id/done')
-  async doTodo(@Param('id') todoId: string) {
+  async doTodo(@Param('id') todoId: number) {
     return await this.todoService.doTodo(todoId);
   }
 

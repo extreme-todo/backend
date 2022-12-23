@@ -1,44 +1,63 @@
-import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { AddTodoDto } from './dto/add-todo.dto';
 import { UpdateTodoDto } from './dto/update-todo.dto';
-import { ITodo, Todo, TodoDocument } from './schemas/todo.schema';
+import { Todo } from './entities/todo.entity';
+
+export interface ITodo {
+  todo: string;
+  duration: number;
+  done: boolean;
+  category: string;
+}
 
 @Injectable()
 export class TodoService {
-  constructor(@InjectModel(Todo.name) private todoModel: Model<TodoDocument>) {}
+  constructor(@InjectRepository(Todo) private repo: Repository<Todo>) {}
 
-  async addTodo(todoData: AddTodoDto) {
-    const res = new this.todoModel(todoData);
-    return await res.save();
+  addTodo(addTodoDto: AddTodoDto) {
+    const newTodo = this.repo.create(addTodoDto);
+    return this.repo.save(newTodo);
   }
 
-  async getOneTodo(id: string) {
-    const todo = await this.todoModel.find({ _id: id });
-    console.log(todo);
+  getOneTodo(id: number) {
+    if (!id) {
+      console.log('id가 없습니다.');
+      return null;
+    }
+    const todo = this.repo.findOne({ where: { id } });
     return todo;
   }
 
-  async deleteTodo(id: string) {
-    const res = await this.todoModel.findOneAndDelete({ _id: id });
-    return res;
+  async deleteTodo(id: number) {
+    const todo = await this.getOneTodo(id);
+    if (!todo) {
+      throw new NotFoundException('Todo not found');
+    }
+    return this.repo.remove(todo);
   }
 
-  async updateTodo(id: string, updateData: UpdateTodoDto) {
-    const res = await this.todoModel.findByIdAndUpdate(id, updateData);
-    console.log(res);
-    return res;
+  async updateTodo(id: number, updateTodo: UpdateTodoDto) {
+    const todo = await this.getOneTodo(id);
+    if (!todo) {
+      throw new NotFoundException('Todo not found');
+    }
+    Object.assign(todo, updateTodo);
+    return this.repo.save(todo);
   }
 
-  async doTodo(id: string) {
-    const res = await this.todoModel.findByIdAndUpdate(id, { done: true });
-    console.log(res);
-    return res;
+  async doTodo(id: number) {
+    const todo = await this.getOneTodo(id);
+    if (!todo) {
+      throw new NotFoundException('Todo not found');
+    }
+    todo.done = true;
+    return this.repo.save(todo);
   }
 
-  async getList(isDone: boolean): Promise<ITodo[]> {
-    const res = await this.todoModel.find({ done: isDone });
-    return res;
+  getList(isDone: boolean): Promise<ITodo[]> {
+    const todoList = this.repo.find({ where: { done: isDone } });
+    return todoList;
   }
 }

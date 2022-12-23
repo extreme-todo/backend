@@ -1,20 +1,21 @@
-import { IsBoolean, IsDate, IsEnum, IsNumber, IsString } from 'class-validator';
+import { Transform } from 'class-transformer';
+import { IsBoolean, IsDate, IsNumber, IsString } from 'class-validator';
 
 export type Category = 'code' | 'math' | 'english';
 
 export class AddTodoDto {
   @IsDate()
-  readonly date: Date;
+  date: Date;
 
   @IsString()
-  readonly todo: string;
+  todo: string;
 
   @IsNumber()
-  readonly duration: number;
+  duration: number;
 
   @IsBoolean()
-  readonly done: boolean;
+  done: boolean;
 
-  @IsString()
-  readonly category: Category;
+  @Transform(({ value }) => JSON.stringify(value))
+  category: string;
 }

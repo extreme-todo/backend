@@ -1,10 +1,11 @@
 import { Module, ValidationPipe } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { MongooseModule } from '@nestjs/mongoose';
 import { TodoModule } from './todo/todo.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_PIPE } from '@nestjs/core';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { Todo } from './todo/entities/todo.entity';
 
 @Module({
   imports: [
@@ -13,12 +14,28 @@ import { APP_PIPE } from '@nestjs/core';
       envFilePath: '.env',
     }),
     // TODO : forRootAsync에 async가 들어가는데, async가 21번째 줄에 또 들어간다. 없어도 되지 않을까?
-    MongooseModule.forRootAsync({
-      imports: [ConfigModule],
-      useFactory: async (config: ConfigService) => ({
-        uri: config.get('MONGO_URL'),
-      }),
-      inject: [ConfigService],
+    TypeOrmModule.forRootAsync({
+      // inject: [ConfigService],
+      // useFactory는 환경변수 정보를 포함하고 있는 configService의 인스턴스를 가진다.
+      useFactory: () => {
+        return {
+          type: 'mysql',
+          // host: '127.0.0.1:3306',
+          // host: 'andong-gyuui-MacBookPro.local',
+          host: 'localhost',
+          port: 3306,
+          username: 'root',
+          password: 'root',
+          database: 'extreme',
+          entities: [Todo],
+          synchronize: true,
+          // url: process.env.DATABASE_URL,
+          // migrationsRun: true,
+          // ssl: {
+          //   rejectUnauthorized: true,
+          // },
+        };
+      },
     }),
     TodoModule,
   ],
