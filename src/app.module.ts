@@ -21,8 +21,6 @@ import { UserModule } from './user/user.module';
       useFactory: (config: ConfigService) => {
         return {
           type: 'mysql',
-          // host: '127.0.0.1:3306',
-          // host: 'andong-gyuui-MacBookPro.local',
           host: config.get('DB_HOST'),
           port: config.get('DB_PORT'),
           username: config.get('DB_USERNAME'),
@@ -49,7 +47,6 @@ import { UserModule } from './user/user.module';
       useValue: new ValidationPipe({
         whitelist: true,
         forbidNonWhitelisted: true,
-        transform: true,
       }),
     },
   ],
