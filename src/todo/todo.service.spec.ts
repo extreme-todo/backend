@@ -1,36 +1,21 @@
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { MongooseModule } from '@nestjs/mongoose';
-import { Test, TestingModule } from '@nestjs/testing';
-import { Todo, TodoSchema } from './entities/todo.entity';
-import TodoController from './todo.controller';
-import { TodoModule } from './todo.module';
+import { Test } from '@nestjs/testing';
+import { getRepositoryToken } from '@nestjs/typeorm';
+import { Todo } from './entities/todo.entity';
+import { mockTodoRepo } from './mock-todo.repository';
 import { TodoService } from './todo.service';
 
 describe('TodoService', () => {
   let service: TodoService;
 
   beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      imports: [
-        ConfigModule.forRoot({
-          isGlobal: true,
-          envFilePath: '.env',
-        }),
-        MongooseModule.forRootAsync({
-          imports: [ConfigModule],
-          useFactory: async (config: ConfigService) => ({
-            uri: config.get('MONGO_URL'),
-          }),
-          inject: [ConfigService],
-        }),
-        MongooseModule.forFeature([{ name: Todo.name, schema: TodoSchema }]),
-        TodoModule,
+    const module = await Test.createTestingModule({
+      providers: [
+        TodoService,
+        { provide: getRepositoryToken(Todo), useValue: mockTodoRepo },
       ],
-      controllers: [TodoController],
-      providers: [TodoService],
     }).compile();
 
-    service = module.get<TodoService>(TodoService);
+    service = module.get(TodoService);
   });
 
   it('should be defined', () => {
@@ -38,19 +23,10 @@ describe('TodoService', () => {
   });
 
   describe('getList', () => {
-    // given
-    let isDone: boolean;
-    let todoList: Todo[];
-    beforeEach(() => {
-      isDone = Boolean(Math.floor(Math.random() * 2));
-      todoList = 
-    });
-    // when
-    describe('when getList is called', () => {
-      // then
-      it('then it should return todoList that the done value matches', () => {
-        expect();
-      });
+    const isDone = true;
+    it('should be fine', async () => {
+      const getTodoList = await service.getList(isDone);
+      expect(getTodoList).toHaveLength(2);
     });
   });
 });
