@@ -30,7 +30,7 @@ export default class TodoController {
 
   @Delete('/:id')
   async deleteTodo(@Param('id') todoId: number) {
-    return await this.todoService.deleteTodo(todoId);
+    return this.todoService.deleteTodo(todoId);
   }
 
   @Patch('/:id')
@@ -38,16 +38,16 @@ export default class TodoController {
     @Param('id') todoId: number,
     @Body() updateData: UpdateTodoDto,
   ) {
-    return await this.todoService.updateTodo(todoId, updateData);
+    return this.todoService.updateTodo(todoId, updateData);
   }
 
   @Patch('/:id/done')
   async doTodo(@Param('id') todoId: number) {
-    return await this.todoService.doTodo(todoId);
+    return this.todoService.doTodo(todoId);
   }
 
   @Get()
   async getList(@Query('done') isDone: boolean) {
-    return await this.todoService.getList(isDone);
+    return this.todoService.getList(isDone);
   }
 }
