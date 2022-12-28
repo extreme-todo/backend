@@ -13,9 +13,6 @@ export class AddTodoDto {
   @IsNumber()
   duration: number;
 
-  @IsBoolean()
-  done: boolean;
-
   @Transform(({ value }) => JSON.stringify(value))
   category: string;
 }
