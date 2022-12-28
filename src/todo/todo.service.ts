@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { AddTodoDto } from './dto/add-todo.dto';
@@ -21,12 +25,11 @@ export class TodoService {
     return this.repo.save(newTodo);
   }
 
-  getOneTodo(id: number) {
-    if (!id) {
-      console.log('id가 없습니다.');
-      return null;
-    }
+  async getOneTodo(id: number) {
     const todo = this.repo.findOne({ where: { id } });
+    if (!todo) {
+      throw new NotFoundException('Todo not found');
+    }
     return todo;
   }
 
