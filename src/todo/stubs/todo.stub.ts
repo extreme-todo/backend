@@ -1,4 +1,6 @@
 import { Todo } from 'src/todo/entities/todo.entity';
+import { AddTodoDto } from '../dto/add-todo.dto';
+import { UpdateTodoDto } from '../dto/update-todo.dto';
 
 export const todoStub = (): Todo[] => {
   return [
@@ -27,4 +29,20 @@ export const todoStub = (): Todo[] => {
       category: '["study", "math"]',
     },
   ];
+};
+
+export const addTodoStub = (): AddTodoDto => {
+  return {
+    date: new Date('Dec 30, 2022 18:00:30'),
+    todo: 'Go to school',
+    duration: 3000,
+    category: JSON.stringify(['study']),
+  };
+};
+
+export const updateTodoStub = (): UpdateTodoDto => {
+  return {
+    duration: 7000,
+    todo: 'updated',
+  };
 };
