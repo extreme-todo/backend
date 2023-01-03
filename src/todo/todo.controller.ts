@@ -12,7 +12,7 @@ import { AddTodoDto } from './dto/add-todo.dto';
 import { UpdateTodoDto } from './dto/update-todo.dto';
 import { TodoService } from './todo.service';
 
-@Controller('api/todos')
+@Controller('todos')
 export default class TodoController {
   constructor(private todoService: TodoService) {}
 
