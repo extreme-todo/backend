@@ -15,7 +15,6 @@ export interface ISetting {
   extrememode: boolean;
 }
 
-// DISCUSSION : TotalFocusTime이랑 TotalRestTime에 이거 쓸 거 같음
 // const timeStamp = {
 //   today: { type: Number, default: 0 },
 //   yesterday: { type: Number, default: 0 },
@@ -37,7 +36,6 @@ export class User {
   username: string;
 
   // TODO : todo를 @OneToMany로 연결해야 함
-  // QUESTION : String으로 JSON.stringify 처리 해줘야 하게..ㅆ지?
   @Column()
   todo: Todo[];
 
