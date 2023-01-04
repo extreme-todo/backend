@@ -1,21 +1,21 @@
-// import { Prop, raw, Schema } from '@nestjs/mongoose';
-// import mongoose from 'mongoose';
-// import { Todo } from './todo.entity';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Todo } from '../../todo/entities/todo.entity';
 
-// export interface ITimeStamp {
-//   today: number;
-//   yesterday: number;
-//   thisWeek: number;
-//   lastWeek: number;
-//   thisMonth: number;
-//   lastMonth: number;
-// }
+export interface ITimeStamp {
+  today: number;
+  yesterday: number;
+  thisWeek: number;
+  lastWeek: number;
+  thisMonth: number;
+  lastMonth: number;
+}
 
-// export interface ISetting {
-//   darkmode: boolean;
-//   extrememode: boolean;
-// }
+export interface ISetting {
+  darkmode: boolean;
+  extrememode: boolean;
+}
 
+// DISCUSSION : TotalFocusTime이랑 TotalRestTime에 이거 쓸 거 같음
 // const timeStamp = {
 //   today: { type: Number, default: 0 },
 //   yesterday: { type: Number, default: 0 },
@@ -25,28 +25,31 @@
 //   lastMonth: { type: Number, default: 0 },
 // };
 
-// @Schema({ collection: 'users' })
-// export class user {
-//   @Prop({ type: String, required: true })
-//   email: string;
+@Entity()
+export class User {
+  @PrimaryGeneratedColumn()
+  id: number;
 
-//   @Prop({ type: String, required: true })
-//   username: string;
+  @Column()
+  email: string;
 
-//   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Todo' }] })
-//   todo: Todo[];
+  @Column()
+  username: string;
 
-//   @Prop(raw(timeStamp))
-//   totalFocusTime: ITimeStamp;
+  // TODO : todo를 @OneToMany로 연결해야 함
+  // QUESTION : String으로 JSON.stringify 처리 해줘야 하게..ㅆ지?
+  @Column()
+  todo: Todo[];
 
-//   @Prop(raw(timeStamp))
-//   totalRestTime: ITimeStamp;
+  // TODO : totalFocusTime을 @OneToOne로 연결해야 함
+  @Column()
+  totalFocusTime: ITimeStamp;
 
-//   @Prop(
-//     raw({
-//       darkmode: { type: Boolean },
-//       extrememode: { type: Boolean, default: false },
-//     }),
-//   )
-//   setting: ISetting;
-// }
+  // TODO : totalRestTime을 @OneToOne로 연결해야 함
+  @Column()
+  totalRestTime: ITimeStamp;
+
+  // TODO : setting을 @OneToOne로 연결해야 함
+  @Column()
+  setting: ISetting;
+}
