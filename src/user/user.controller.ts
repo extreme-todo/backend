@@ -1,12 +1,19 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Redirect } from '@nestjs/common';
 import { UserService } from './user.service';
 
 @Controller('api/users')
 export class UserController {
   constructor(private userService: UserService) {}
+
   @Get('login')
+  @Redirect('', 301)
   async googleSignUp() {
-    console.log('hello');
-    return this.userService.googleLoginApi();
+    const res = await this.userService.googleLoginApi();
+    return { url: res };
+  }
+
+  @Get('callback/google')
+  async googleCallback() {
+    return this.userService.googleCallback();
   }
 }
