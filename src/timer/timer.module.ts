@@ -1,9 +1,13 @@
 import { Module } from '@nestjs/common';
 import { TimerService } from './timer.service';
 import { TimerController } from './timer.controller';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { TotalFocusTime } from './entities/total-focus-time.entity';
+import { TotalRestTime } from './entities/total-rest-time.entity';
 
 @Module({
+  imports: [TypeOrmModule.forFeature([TotalFocusTime, TotalRestTime])],
   providers: [TimerService],
-  controllers: [TimerController]
+  controllers: [TimerController],
 })
 export class TimerModule {}
