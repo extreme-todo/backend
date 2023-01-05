@@ -24,24 +24,35 @@ export class RestService {
   async addTime(user: User, time: number) {
     const restTime = await this.repo.findOne({ where: { user } });
     restTime.today += time;
+    restTime.thisWeek += time;
+    restTime.thisMonth += time;
     return this.repo.save(restTime);
   }
 
   async updateDay() {
-    return this.repo.createQueryBuilder().update();
+    await this.repo
+      .createQueryBuilder()
+      .update()
+      .set({ yesterday: () => 'today', today: 0 })
+      .execute();
+    console.log('updated daily rest time');
   }
 
-  async updateWeek(user: User) {
-    const restTime = await this.repo.findOne({ where: { user } });
-    restTime.lastWeek = restTime.thisWeek;
-    restTime.thisWeek = 0;
-    return this.repo.save(restTime);
+  async updateWeek() {
+    await this.repo
+      .createQueryBuilder()
+      .update()
+      .set({ lastWeek: () => 'thisWeek', thisWeek: 0 })
+      .execute();
+    console.log('updated weekly rest time');
   }
 
-  async updateMonth(user: User) {
-    const restTime = await this.repo.findOne({ where: { user } });
-    restTime.lastMonth = restTime.thisMonth;
-    restTime.thisMonth = 0;
-    return this.repo.save(restTime);
+  async updateMonth() {
+    await this.repo
+      .createQueryBuilder()
+      .update()
+      .set({ lastMonth: () => 'thisMonth', thisMonth: 0 })
+      .execute();
+    console.log('updated monthly rest time');
   }
 }

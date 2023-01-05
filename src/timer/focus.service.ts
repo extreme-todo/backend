@@ -24,24 +24,35 @@ export class FocusService {
   async addTime(user: User, time: number) {
     const focusTime = await this.repo.findOne({ where: { user } });
     focusTime.today += time;
+    focusTime.thisWeek += time;
+    focusTime.thisMonth += time;
     return this.repo.save(focusTime);
   }
 
   async updateDay() {
-    return this.repo.createQueryBuilder().update();
+    await this.repo
+      .createQueryBuilder()
+      .update()
+      .set({ yesterday: () => 'today', today: 0 })
+      .execute();
+    console.log('updated daily focus time');
   }
 
-  async updateWeek(user: User) {
-    const focusTime = await this.repo.findOne({ where: { user } });
-    focusTime.lastWeek = focusTime.thisWeek;
-    focusTime.thisWeek = 0;
-    return this.repo.save(focusTime);
+  async updateWeek() {
+    await this.repo
+      .createQueryBuilder()
+      .update()
+      .set({ lastWeek: () => 'thisWeek', thisWeek: 0 })
+      .execute();
+    console.log('updated weekly focus time');
   }
 
-  async updateMonth(user: User) {
-    const focusTime = await this.repo.findOne({ where: { user } });
-    focusTime.lastMonth = focusTime.thisMonth;
-    focusTime.thisMonth = 0;
-    return this.repo.save(focusTime);
+  async updateMonth() {
+    await this.repo
+      .createQueryBuilder()
+      .update()
+      .set({ lastMonth: () => 'thisMonth', thisMonth: 0 })
+      .execute();
+    console.log('updated monthly focus time');
   }
 }
