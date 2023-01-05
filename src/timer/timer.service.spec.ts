@@ -47,7 +47,7 @@ describe('TimerService', () => {
   describe('update FocusTime', () => {
     it('특정 uid가 오늘 1분 더 집중한 경우', async () => {
       const focused = 60000;
-      const res = service.updateFocusTime(focused);
+      const res = await service.updateFocusTime(focused, user);
       expect(res.today).toEqual(focused);
     });
   });
@@ -55,7 +55,7 @@ describe('TimerService', () => {
   describe('update RestTime', () => {
     it('특정 uid가 오늘 1분 더 휴식한 경우', async () => {
       const focused = 60000;
-      const res = service.updateFocusTime(focused);
+      const res = await service.updateFocusTime(focused, user);
       expect(res.today).toEqual(focused);
     });
   });
@@ -65,7 +65,7 @@ describe('TimerService', () => {
       expect(service.updateDay()).toBeCalled();
     });
     it('매주 월요일 오전 5시 업데이트', async () => {
-      expect(service.updateWeek().toBeDefined());
+      expect(service.updateWeek()).toBeCalled();
     });
     it('매달 1일 오전 5시 업데이트', async () => {
       expect(service.updateMonth()).toBeCalled();
