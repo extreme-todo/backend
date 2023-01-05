@@ -16,13 +16,14 @@ export class FocusService {
     return this.repo.save(focusTime);
   }
 
-  async findTime(user: User) {
+  async getTime(user: User) {
     const focusTime = this.repo.findOne({ where: { user } });
     return focusTime;
   }
 
   async addTime(user: User, time: number) {
     const focusTime = await this.repo.findOne({ where: { user } });
+    focusTime.total += time;
     focusTime.today += time;
     focusTime.thisWeek += time;
     focusTime.thisMonth += time;
