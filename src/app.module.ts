@@ -8,9 +8,14 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Todo } from './todo/entities/todo.entity';
 import { UserModule } from './user/user.module';
 import { TimerModule } from './timer/timer.module';
+import { ScheduleModule } from '@nestjs/schedule';
+import { User } from './user/entities/user.entity';
+import { TotalFocusTime } from './timer/entities/total-focus-time.entity';
+import { TotalRestTime } from './timer/entities/total-rest-time.entity';
 
 @Module({
   imports: [
+    ScheduleModule.forRoot(),
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: `.env.${process.env.NODE_ENV}`,
@@ -27,7 +32,7 @@ import { TimerModule } from './timer/timer.module';
           username: config.get('DB_USERNAME'),
           password: config.get('DB_PASSWORD'),
           database: config.get('DB_DATABASE'),
-          entities: [Todo],
+          entities: [Todo, User, TotalFocusTime, TotalRestTime],
           synchronize: true,
           // url: process.env.DATABASE_URL,
           // migrationsRun: true,
