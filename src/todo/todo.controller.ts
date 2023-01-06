@@ -1,6 +1,7 @@
 import { Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
 import { TodoService } from './todo.service';
 
+// TODO : AuthGuard 필요함!
 @Controller('todo')
 export default class TodoController {
   constructor(private readonly todoService: TodoService) {}
