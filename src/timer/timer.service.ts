@@ -3,6 +3,7 @@ import { FocusService } from './focus.service';
 import { RestService } from './rest.service';
 import { User } from 'src/user/entities/user.entity';
 import { Cron } from '@nestjs/schedule';
+import { GetProgressResponse } from './dto/get-progress-response.dto';
 
 @Injectable()
 export class TimerService {
@@ -40,6 +41,15 @@ export class TimerService {
 
   async updateRestTime(rest: number, user: User) {
     return await this.restService.addTime(user, rest);
+  }
+
+  async getProgress(user: User) {
+    const focusTime = await this.focusService.getTime(user);
+    return {
+      daily: focusTime.today - focusTime.yesterday,
+      weekly: focusTime.thisWeek - focusTime.lastWeek,
+      monthly: focusTime.thisMonth - focusTime.lastMonth,
+    } as GetProgressResponse;
   }
 
   // execute every 5am

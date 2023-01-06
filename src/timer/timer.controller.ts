@@ -20,8 +20,10 @@ export class TimerController {
     return this.timerService.getTotalRestTime(fakeUser);
   }
 
+  // TODO: AuthGuard 등으로 가져온 유저를 사용할 예정
   @Get('progress')
   getProgress() {
-    // TODO: 추이 로직 작성
+    const fakeUser = { email: 'asd@asd.asd', username: 'asd' } as User;
+    return this.timerService.getProgress(fakeUser);
   }
 }
