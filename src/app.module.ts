@@ -1,12 +1,13 @@
 import { Module, ValidationPipe } from '@nestjs/common';
+import { TodoModule } from './todo/todo.module';
+import { UserModule } from './user/user.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { TodoModule } from './todo/todo.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_PIPE } from '@nestjs/core';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Todo } from './todo/entities/todo.entity';
-import { UserModule } from './user/user.module';
+import { User } from './user/entities/user.entity';
 
 @Module({
   imports: [
@@ -26,7 +27,7 @@ import { UserModule } from './user/user.module';
           username: config.get('DB_USERNAME'),
           password: config.get('DB_PASSWORD'),
           database: config.get('DB_DATABASE'),
-          entities: [Todo],
+          entities: [Todo, User],
           synchronize: true,
           // url: process.env.DATABASE_URL,
           // migrationsRun: true,

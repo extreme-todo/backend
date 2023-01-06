@@ -1,5 +1,4 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
-import { Todo } from '../../todo/entities/todo.entity';
 
 export interface ITimeStamp {
   today: number;
@@ -36,18 +35,22 @@ export class User {
   username: string;
 
   // TODO : todo를 @OneToMany로 연결해야 함
+  // FIXME : Todo[]였는데 mysql 때문에 string으로 일단 바꿈. 후에 Translate 처리 해야함
   @Column()
-  todo: Todo[];
+  todo: string;
 
   // TODO : totalFocusTime을 @OneToOne로 연결해야 함
+  // FIXME : ITimeStamp였는데 mysql 때문에 string으로 일단 바꿈. 후에 Translate 처리 해야함
   @Column()
-  totalFocusTime: ITimeStamp;
+  totalFocusTime: string;
 
   // TODO : totalRestTime을 @OneToOne로 연결해야 함
+  // FIXME : ITimeStamp였는데 mysql 때문에 string으로 일단 바꿈. 후에 Translate 처리 해야함
   @Column()
-  totalRestTime: ITimeStamp;
+  totalRestTime: string;
 
   // TODO : setting을 @OneToOne로 연결해야 함
+  // FIXME : ITimeStamp였는데 mysql 때문에 string으로 일단 바꿈. 후에 Translate 처리 해야함
   @Column()
-  setting: ISetting;
+  setting: string;
 }
