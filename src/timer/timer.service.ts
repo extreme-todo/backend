@@ -53,7 +53,7 @@ export class TimerService {
   }
 
   // execute every 5am
-  @Cron('0 10 * * * *')
+  @Cron('0 0 5 * * *')
   async updateDay() {
     await this.focusService.updateDay();
     await this.restService.updateDay();
