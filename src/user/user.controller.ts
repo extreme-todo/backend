@@ -1,4 +1,4 @@
-import { Controller, Get, Redirect } from '@nestjs/common';
+import { Controller, Get, Query, Redirect } from '@nestjs/common';
 import { UserService } from './user.service';
 
 @Controller('api/users')
@@ -13,7 +13,7 @@ export class UserController {
   }
 
   @Get('callback/google')
-  async googleCallback() {
-    return this.userService.googleCallback();
+  async googleCallback(@Query() authCode: string) {
+    return this.userService.googleCallback(authCode);
   }
 }

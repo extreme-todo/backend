@@ -6,18 +6,29 @@ import { google } from 'googleapis';
 export class UserService {
   constructor(private config: ConfigService) {}
 
+  // #CLIENT_ID: string = this.config.get('OAUTH_ID');
+  // #CLIENT_PW: string = this.config.get('CLIENT_PW');
+  // #REDIRECT_URL: string = this.config.get('REDIRECT_URL');
+  // #oauth2Client: OAuth2Client = new google.auth.OAuth2(
+  //   this.CLIENT_ID,
+  //   this.CLIENT_PW,
+  //   this.REDIRECT_URL,
+  // );
+
   googleLoginApi() {
     const CLIENT_ID = this.config.get('OAUTH_ID');
-    const CLIENT_PW = this.config.get('OAUTH_PW');
+    const CLIENT_PW = this.config.get('CLIENT_PW');
     const REDIRECT_URL = this.config.get('REDIRECT_URL');
-
     const oauth2Client = new google.auth.OAuth2(
       CLIENT_ID,
       CLIENT_PW,
       REDIRECT_URL,
     );
 
-    const scopes = ['https://www.googleapis.com/auth/contacts.readonly'];
+    const scopes = [
+      'https://www.googleapis.com/auth/userinfo.email',
+      'https://www.googleapis.com/auth/userinfo.profile',
+    ];
 
     const authUrl = oauth2Client.generateAuthUrl({
       access_type: 'offline',
@@ -26,22 +37,25 @@ export class UserService {
       include_granted_scopes: false,
     });
 
-    // QUESTION : 내가 아래 과정을 해야 하는 건지 google이 알아서 해준다는 건지 모르겠네.. 아래 내용이 되어 있는데, 내가 해석하기엔 일단 사용자가 permission을 하면 구글은 우리가 query parameter로 정해둔 redirect URL로 redirect를 해준다고 한다. 이 다음 과정은 <Retrieve access token>이다.
-    /* 
-      <Retrieve authorization code>
-      Once a user has given permissions on the consent page, Google will redirect the page to the redirect URL you have provided with a code query parameter.
-    */
-    /* 
-      이걸 통해서 코드를 받고 나면 그 코드를 /콜백주소?code={code}로 redirect 하는 듯
-    */
-    // const authCode = await fetch(
-    //   `/oauthcallback?code=${authCode}`,
-    // );
-
     return authUrl;
   }
 
-  googleCallback() {
-    console.log('여기 도착했어요!');
+  async googleCallback(authCode: string) {
+    const CLIENT_ID = this.config.get('OAUTH_ID');
+    const CLIENT_PW = this.config.get('CLIENT_PW');
+    const REDIRECT_URL = this.config.get('REDIRECT_URL');
+    const oauth2Client = new google.auth.OAuth2(
+      CLIENT_ID,
+      CLIENT_PW,
+      REDIRECT_URL,
+    );
+
+    // TODO : token 없을 때 or 오지 않았을 때 예외처리 해주기
+    const { tokens } = await oauth2Client.getToken(authCode);
+    console.log('🌟🌟🌟🌟 tokens :: ', tokens);
+
+    // auth credentials에서 어떤 것을 설정해 둔 것으로 보임..
+    oauth2Client.setCredentials(tokens);
+    // console.log(userAuth);
   }
 }
