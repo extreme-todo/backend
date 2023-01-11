@@ -1,5 +1,13 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { Todo } from '../../todo/entities/todo.entity';
+import { TotalRestTime } from 'src/timer/entities/total-rest-time.entity';
+import { TotalFocusTime } from 'src/timer/entities/total-focus-time.entity';
 
 export interface ITimeStamp {
   today: number;
@@ -38,18 +46,24 @@ export class User {
 
   // TODO : todo를 @OneToMany로 연결해야 함
   // QUESTION : String으로 JSON.stringify 처리 해줘야 하게..ㅆ지?
-  @Column()
-  todo: Todo[];
+  // FIXME : 배열은 'mysql' 데이터베이스에서 사용할 수 없는 데이터라는 오류 발생
+  // @Column()
+  // todo: Todo[];
 
-  // TODO : totalFocusTime을 @OneToOne로 연결해야 함
-  @Column()
-  totalFocusTime: ITimeStamp;
+  @OneToOne((type) => TotalFocusTime, (totalFocusTime) => totalFocusTime.user, {
+    cascade: true,
+  })
+  @JoinColumn()
+  totalFocusTime: TotalFocusTime;
 
-  // TODO : totalRestTime을 @OneToOne로 연결해야 함
-  @Column()
-  totalRestTime: ITimeStamp;
+  @OneToOne((type) => TotalRestTime, (totalRestTime) => totalRestTime.user, {
+    cascade: true,
+  })
+  @JoinColumn()
+  totalRestTime: TotalRestTime;
 
   // TODO : setting을 @OneToOne로 연결해야 함
-  @Column()
-  setting: ISetting;
+  // FIXME : 오브젝트는 'mysql' 데이터베이스에서 사용할 수 없는 데이터라는 오류 발생
+  // @Column()
+  // setting: ISetting;
 }
