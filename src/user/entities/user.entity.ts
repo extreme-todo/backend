@@ -1,19 +1,26 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { Todo } from '../../todo/entities/todo.entity';
+import { Setting } from 'src/setting/entities/setting.entity';
 
-export interface ITimeStamp {
-  today: number;
-  yesterday: number;
-  thisWeek: number;
-  lastWeek: number;
-  thisMonth: number;
-  lastMonth: number;
-}
+// export interface ITimeStamp {
+//   today: number;
+//   yesterday: number;
+//   thisWeek: number;
+//   lastWeek: number;
+//   thisMonth: number;
+//   lastMonth: number;
+// }
 
-export interface ISetting {
-  darkmode: boolean;
-  extrememode: boolean;
-}
+// export interface ISetting {
+//   darkmode: boolean;
+//   extrememode: boolean;
+// }
 
 // DISCUSSION : TotalFocusTime이랑 TotalRestTime에 이거 쓸 거 같음
 // const timeStamp = {
@@ -38,18 +45,20 @@ export class User {
 
   // TODO : todo를 @OneToMany로 연결해야 함
   // QUESTION : String으로 JSON.stringify 처리 해줘야 하게..ㅆ지?
-  @Column()
-  todo: Todo[];
+  // @Column()
+  // todo: Todo[];
 
-  // TODO : totalFocusTime을 @OneToOne로 연결해야 함
-  @Column()
-  totalFocusTime: ITimeStamp;
+  // // TODO : totalFocusTime을 @OneToOne로 연결해야 함
+  // @Column()
+  // totalFocusTime: ITimeStamp;
 
-  // TODO : totalRestTime을 @OneToOne로 연결해야 함
-  @Column()
-  totalRestTime: ITimeStamp;
+  // // TODO : totalRestTime을 @OneToOne로 연결해야 함
+  // @Column()
+  // totalRestTime: ITimeStamp;
 
-  // TODO : setting을 @OneToOne로 연결해야 함
-  @Column()
-  setting: ISetting;
+  @OneToOne((type) => Setting, (setting) => setting.user, {
+    cascade: true,
+  })
+  @JoinColumn()
+  setting: Setting;
 }

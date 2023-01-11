@@ -7,8 +7,9 @@ import { APP_PIPE } from '@nestjs/core';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Todo } from './todo/entities/todo.entity';
 import { UserModule } from './user/user.module';
-import { User } from './user/entities/user.entity';
 import { SettingModule } from './setting/setting.module';
+import { User } from './user/entities/user.entity';
+import { Setting } from './setting/entities/setting.entity';
 
 @Module({
   imports: [
@@ -28,7 +29,7 @@ import { SettingModule } from './setting/setting.module';
           username: config.get('DB_USERNAME'),
           password: config.get('DB_PASSWORD'),
           database: config.get('DB_DATABASE'),
-          entities: [Todo],
+          entities: [Todo, User, Setting],
           synchronize: true,
           // url: process.env.DATABASE_URL,
           // migrationsRun: true,
