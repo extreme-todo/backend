@@ -7,6 +7,8 @@ import { APP_PIPE } from '@nestjs/core';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Todo } from './todo/entities/todo.entity';
 import { UserModule } from './user/user.module';
+import { User } from './user/entities/user.entity';
+import { SettingModule } from './setting/setting.module';
 
 @Module({
   imports: [
@@ -38,6 +40,7 @@ import { UserModule } from './user/user.module';
     }),
     TodoModule,
     UserModule,
+    SettingModule,
   ],
   controllers: [AppController],
   providers: [
