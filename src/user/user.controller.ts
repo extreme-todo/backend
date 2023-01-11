@@ -6,14 +6,12 @@ export class UserController {
   constructor(private userService: UserService) {}
 
   @Get('login')
-  @Redirect('', 301)
-  async googleSignUp() {
-    const res = await this.userService.googleLoginApi();
-    return { url: res };
+  googleSignUp() {
+    return this.userService.googleLoginApi();
   }
 
-  @Get('callback/google')
-  async googleCallback(@Query() authCode: string) {
-    return this.userService.googleCallback(authCode);
-  }
+  // @Get('callback/google')
+  // googleCallback(@Query() authCode: string) {
+  //   return this.userService.googleCallback(authCode);
+  // }
 }

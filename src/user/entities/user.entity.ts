@@ -53,4 +53,7 @@ export class User {
   // FIXME : ITimeStamp였는데 mysql 때문에 string으로 일단 바꿈. 후에 Translate 처리 해야함
   @Column()
   setting: string;
+
+  @Column()
+  refresh: string;
 }
