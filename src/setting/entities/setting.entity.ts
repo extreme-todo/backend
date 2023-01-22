@@ -1,5 +1,7 @@
-import { User } from 'src/user/entities/user.entity';
+import { User } from '../../user/entities/user.entity';
 import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+
+export type ColorMode = 'light' | 'dark' | 'auto';
 
 @Entity()
 export class Setting {
@@ -7,7 +9,7 @@ export class Setting {
   id: number;
 
   @Column({ default: 'auto' })
-  colorMode: 'light' | 'dark' | 'auto';
+  colorMode: ColorMode;
 
   @Column({ default: true })
   extremeMode: boolean;

@@ -6,7 +6,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Todo } from '../../todo/entities/todo.entity';
-import { Setting } from 'src/setting/entities/setting.entity';
+import { Setting } from '../../setting/entities/setting.entity';
 
 // export interface ITimeStamp {
 //   today: number;
