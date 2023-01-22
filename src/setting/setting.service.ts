@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../user/entities/user.entity';
 import { Repository } from 'typeorm';
@@ -16,14 +16,22 @@ export class SettingService {
   }
 
   async reset(user: User): Promise<Setting> {
-    const setting = await this.repo.findOne({ where: { user } });
+    const setting = await this.find(user);
     setting.colorMode = 'auto';
     setting.extremeMode = true;
     return await this.repo.save(setting);
   }
 
-  async update(user: User, data: UpdateSettingDto): Promise<Setting> {
+  async find(user: User): Promise<Setting> {
     const setting = await this.repo.findOne({ where: { user } });
+    if (!setting) {
+      throw new NotFoundException('Setting not found');
+    }
+    return setting;
+  }
+
+  async update(user: User, data: UpdateSettingDto): Promise<Setting> {
+    const setting = await this.find(user);
     setting.colorMode = data.colorMode;
     setting.extremeMode = data.extremeMode;
     return await this.repo.save(setting);

@@ -1,17 +1,18 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { SettingService } from './setting.service';
 import { User } from '../user/entities/user.entity';
-import { Repository } from 'typeorm';
 import { Setting } from './entities/setting.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { mockSettingRepo } from './mock-setting.repository';
+import { NotFoundException } from '@nestjs/common';
 
 describe('SettingService', () => {
   let service: SettingService;
-  const fakeSettingRepo = mockSettingRepo;
+  let fakeSettingRepo = mockSettingRepo;
   const fakeUser = { email: 'asd@asd.asd', username: 'asdasd', id: 1 } as User;
 
   beforeEach(async () => {
+    fakeSettingRepo = { ...mockSettingRepo };
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         SettingService,
@@ -24,6 +25,17 @@ describe('SettingService', () => {
 
   it('should be defined', () => {
     expect(service).toBeDefined();
+  });
+
+  describe('설정 조회', () => {
+    it('설정 조회', async () => {
+      const setting = await service.find(fakeUser);
+      expect(setting).toBeDefined();
+    });
+    it('설정 조회 실패', async () => {
+      fakeSettingRepo.findOne = () => null;
+      await expect(service.find(fakeUser)).rejects.toThrow(NotFoundException);
+    });
   });
 
   describe('설정변경', () => {
