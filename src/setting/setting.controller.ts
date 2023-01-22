@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Patch } from '@nestjs/common';
+import { Body, Controller, Get, Put } from '@nestjs/common';
 import { User } from 'src/user/entities/user.entity';
 import { UpdateSettingDto } from './dto/update-setting.dto';
 import { SettingService } from './setting.service';
@@ -14,7 +14,7 @@ export class SettingController {
   }
 
   // TODO: AuthGuard 등으로 가져온 유저를 사용할 예정
-  @Patch('/')
+  @Put('/')
   udpateSetting(@Body() data: UpdateSettingDto) {
     const fakeUser = { email: 'asd@asd.asd', username: 'asd', id: 1 } as User;
     return this.settingService.update(fakeUser, data);
