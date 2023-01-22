@@ -1,14 +1,22 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { SettingService } from './setting.service';
-import { User } from 'src/user/entities/user.entity';
+import { User } from '../user/entities/user.entity';
+import { Repository } from 'typeorm';
+import { Setting } from './entities/setting.entity';
+import { getRepositoryToken } from '@nestjs/typeorm';
+import { mockSettingRepo } from './mock-setting.repository';
 
 describe('SettingService', () => {
   let service: SettingService;
+  const fakeSettingRepo = mockSettingRepo;
   const fakeUser = { email: 'asd@asd.asd', username: 'asdasd', id: 1 } as User;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [SettingService],
+      providers: [
+        SettingService,
+        { provide: getRepositoryToken(Setting), useValue: fakeSettingRepo },
+      ],
     }).compile();
 
     service = module.get<SettingService>(SettingService);
@@ -49,12 +57,12 @@ describe('SettingService', () => {
     it('설정 데이터 추가', async () => {
       const currMode = await service.init(fakeUser);
       expect(currMode.extremeMode).toEqual(true);
-      expect(currMode.colorMode).toEqual(false);
+      expect(currMode.colorMode).toEqual('auto');
     });
     it('설정 리셋', async () => {
       const currMode = await service.reset(fakeUser);
       expect(currMode.extremeMode).toEqual(true);
-      expect(currMode.colorMode).toEqual(false);
+      expect(currMode.colorMode).toEqual('auto');
     });
   });
 });
