@@ -5,13 +5,15 @@ import { UserService } from './user.service';
 export class UserController {
   constructor(private userService: UserService) {}
 
-  @Get('login')
+  @Get('callback/google/start')
+  @Redirect('', 302)
   googleSignUp() {
-    return this.userService.googleLoginApi();
+    const url = this.userService.googleLoginApi();
+    return { url };
   }
 
-  // @Get('callback/google')
-  // googleCallback(@Query() authCode: string) {
-  //   return this.userService.googleCallback(authCode);
-  // }
+  @Get('callback/google/finish')
+  googleCallback(@Query() authCode: string) {
+    return this.userService.googleCallback(authCode);
+  }
 }
