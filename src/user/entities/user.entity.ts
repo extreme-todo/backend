@@ -14,15 +14,6 @@ export interface ISetting {
   extrememode: boolean;
 }
 
-// const timeStamp = {
-//   today: { type: Number, default: 0 },
-//   yesterday: { type: Number, default: 0 },
-//   thisWeek: { type: Number, default: 0 },
-//   lastWeek: { type: Number, default: 0 },
-//   thisMonth: { type: Number, default: 0 },
-//   lastMonth: { type: Number, default: 0 },
-// };
-
 @Entity()
 export class User {
   @PrimaryGeneratedColumn()
@@ -34,26 +25,31 @@ export class User {
   @Column()
   username: string;
 
+  @Column()
+  refresh: string;
+
+  // QUESTION : 어차피 mysql이라서 translate도 못하고 stringify 해서 처리해야 하지 않나? 그리고 Time친구들 {}로 초기화 해도 상관없겠지?..
+
   // TODO : todo를 @OneToMany로 연결해야 함
   // FIXME : Todo[]였는데 mysql 때문에 string으로 일단 바꿈. 후에 Translate 처리 해야함
-  @Column()
+  @Column({ default: '[]' })
   todo: string;
 
   // TODO : totalFocusTime을 @OneToOne로 연결해야 함
   // FIXME : ITimeStamp였는데 mysql 때문에 string으로 일단 바꿈. 후에 Translate 처리 해야함
-  @Column()
+  @Column({ default: '{}' })
   totalFocusTime: string;
 
   // TODO : totalRestTime을 @OneToOne로 연결해야 함
   // FIXME : ITimeStamp였는데 mysql 때문에 string으로 일단 바꿈. 후에 Translate 처리 해야함
-  @Column()
+  @Column({
+    default:
+      '{today: 0,yesterday: 0,thisWeek: 0,lastWeek: 0,thisMonth: 0,lastMonth: 0,}',
+  })
   totalRestTime: string;
 
   // TODO : setting을 @OneToOne로 연결해야 함
   // FIXME : ITimeStamp였는데 mysql 때문에 string으로 일단 바꿈. 후에 Translate 처리 해야함
-  @Column()
+  @Column({ default: '{darkmode: false,extrememode: true,}' })
   setting: string;
-
-  @Column()
-  refresh: string;
 }
