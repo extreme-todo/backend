@@ -90,11 +90,8 @@ export class UserService {
     // 기존 유저이면 로그인 처리 끝
     // QUESTION : refresh token의 expire이 없다면 굳이 새롭게 재발급 되었는지 확인해서 할 필요.. 가 있긴 하겠다. 설령 누군가 어플리케이션 승인을 해제했다가 재승인을 하면 refresh token을 재 저장해야 한다.
     if (isExistUser) {
-      console.log('⛔️⛔️⛔️ 여기는 오면 안되는데..');
       if (tokens.refresh_token) {
-        console.log('🔑🔑🔑 새로운 refresh 토큰!!');
         const newRefresh = { refresh: tokens.refresh_token };
-        console.log(isExistUser.refresh, ' ::: ', newRefresh);
         Object.assign(isExistUser, newRefresh);
         this.repo.save(isExistUser);
       }
