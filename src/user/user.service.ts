@@ -1,10 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import axios from 'axios';
 import { Credentials } from 'google-auth-library';
 import { google } from 'googleapis';
 import { Repository } from 'typeorm';
+import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './entities/user.entity';
 
 interface IUserdata {
@@ -59,12 +60,22 @@ export class UserService {
     return this.login(tokens);
   }
 
+  private async findOne(email: string) {
+    return await this.repo.findOne({
+      where: { email: email },
+    });
+  }
+
+  private async createUser(userinfo: CreateUserDto) {
+    return await this.repo.save(userinfo);
+  }
+
   // token으로 로그인 처리해주기
   private async login(tokens: Credentials) {
     // 토큰이 없을 때 예외처리
     // TODO : 이 과정에서 어떻게 해야 하나? 아예 그럴 경우가 없는 것인가?
     if (!tokens) {
-      throw new Error('token이 없습니다.');
+      throw new NotFoundException('tokens not found');
     }
 
     const { data: userinfo }: Awaited<Promise<IUserdata>> = await axios.get(
@@ -77,9 +88,7 @@ export class UserService {
     );
 
     // 기존 유저인가요?
-    const isExistUser = await this.repo.findOne({
-      where: { email: userinfo.email },
-    });
+    const isExistUser = await this.findOne(userinfo.email);
 
     const loginUser = {
       username: userinfo.name,
@@ -104,8 +113,8 @@ export class UserService {
       email: userinfo.email,
       refresh: tokens.refresh_token,
     };
-    console.log(newUserInfo);
-    this.repo.save(newUserInfo);
+
+    this.createUser(newUserInfo);
     return loginUser;
   }
 }
