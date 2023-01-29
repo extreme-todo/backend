@@ -60,8 +60,8 @@ export class UserService {
     return this.login(tokens);
   }
 
-  private async findOne(email: string) {
-    return await this.repo.findOne({
+  findOne(email: string) {
+    return this.repo.findOne({
       where: { email: email },
     });
   }
