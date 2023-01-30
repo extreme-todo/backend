@@ -7,6 +7,6 @@ export class UserController {
   @Get('login')
   async googleSignUp() {
     console.log('hello');
-    return this.userService.googleLoginApi();
+    // return this.userService.googleLoginApi();
   }
 }

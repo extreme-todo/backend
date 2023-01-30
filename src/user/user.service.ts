@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import qs from 'qs';
-import {} from 'gapi';
+// import {} from 'gapi';
 
 @Injectable()
 export class UserService {
