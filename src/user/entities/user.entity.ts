@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Category } from 'src/category/entities/category.entity';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Todo } from '../../todo/entities/todo.entity';
 
 export interface ITimeStamp {
@@ -35,19 +36,6 @@ export class User {
   @Column()
   username: string;
 
-  // TODO : todo를 @OneToMany로 연결해야 함
-  @Column()
-  todo: Todo[];
-
-  // TODO : totalFocusTime을 @OneToOne로 연결해야 함
-  @Column()
-  totalFocusTime: ITimeStamp;
-
-  // TODO : totalRestTime을 @OneToOne로 연결해야 함
-  @Column()
-  totalRestTime: ITimeStamp;
-
-  // TODO : setting을 @OneToOne로 연결해야 함
-  @Column()
-  setting: ISetting;
+  @OneToMany(() => Category, (report) => report.author)
+  categories: Category[];
 }
