@@ -8,6 +8,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Todo } from './todo/entities/todo.entity';
 import { UserModule } from './user/user.module';
 import { CategoryModule } from './category/category.module';
+import { User } from './user/entities/user.entity';
+import { Category } from './category/entities/category.entity';
 
 @Module({
   imports: [
@@ -27,7 +29,7 @@ import { CategoryModule } from './category/category.module';
           username: config.get('DB_USERNAME'),
           password: config.get('DB_PASSWORD'),
           database: config.get('DB_DATABASE'),
-          entities: [Todo],
+          entities: [Todo, User, Category],
           synchronize: true,
           // url: process.env.DATABASE_URL,
           // migrationsRun: true,
