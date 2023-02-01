@@ -1,6 +1,25 @@
 import { Todo } from 'src/todo/entities/todo.entity';
+import { User } from 'src/user/entities/user.entity';
 import { AddTodoDto } from '../dto/add-todo.dto';
 import { UpdateTodoDto } from '../dto/update-todo.dto';
+
+export const fakeUserHasNoTodo = {
+  id: 0,
+  email: 'fakeUser@email.com',
+  username: 'fakeUser'
+} as User
+
+export const fakeUserHasATodo = {
+  id: 1,
+  email: 'fakeUser1@email.com',
+  username: 'fakeUser1'
+} as User
+
+const fakeUser2 = {
+  id: 2,
+  email: 'fakeUser2@email.com',
+  username: 'fakeUser2'
+} as User
 
 export const todoStub = (): Todo[] => {
   return [
@@ -10,6 +29,7 @@ export const todoStub = (): Todo[] => {
       todo: 'Go to grocery store',
       duration: 60 * 60,
       done: true,
+      user: fakeUserHasATodo,
       category: '["chore", "family affair"]',
     },
     {
@@ -18,6 +38,7 @@ export const todoStub = (): Todo[] => {
       todo: 'Go to Gym',
       duration: 60 * 60,
       done: false,
+      user: fakeUser2,
       category: '["health"]',
     },
     {
@@ -26,6 +47,7 @@ export const todoStub = (): Todo[] => {
       todo: 'Go to institute',
       duration: 60 * 60 * 2,
       done: true,
+      user: fakeUser2,
       category: '["study", "math"]',
     },
   ];
