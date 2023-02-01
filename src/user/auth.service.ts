@@ -88,4 +88,45 @@ export class AuthService {
     this.userService.createUser(newUserInfo);
     return loginUser;
   }
+
+  // id_tokens 토큰 검증
+  async verifiedIdToken(email: string, token: string) {
+    try {
+      await this.#oauth2Client.verifyIdToken({ idToken: token });
+      const user = await this.userService.findUser(email);
+      return {
+        userdata: user,
+        id_token: token,
+      };
+    } catch (err) {
+      if (err.message.startsWith('Invalid token signature')) {
+        throw new BadRequestException('invalid id tokens');
+      } else if (err.message.startsWith('Token used too late')) {
+        // 토큰 재발급!
+        const newUserInfo = await this.refreshTokens(email);
+        return newUserInfo;
+      } else {
+        // 그 외의 경우 에러처리(아예 권한이 없는 경우?.. 토큰이 없거나 등등)
+        throw new UnauthorizedException('unauthorized user');
+      }
+    }
+  }
+
+  // 토큰 재발급받기
+  private async refreshTokens(email: string) {
+    const user = await this.userService.findUser(email);
+    this.#oauth2Client.setCredentials({ refresh_token: user.refresh });
+    try {
+      const { credentials } = await this.#oauth2Client.refreshAccessToken();
+      user.access = credentials.access_token;
+      this.userService.createUser(user);
+      const userinfo = {
+        userdata: user,
+        id_token: credentials.id_token,
+      };
+      return userinfo;
+    } catch (err) {
+      throw new BadRequestException('invalid refreshTokens');
+    }
+  }
 }
