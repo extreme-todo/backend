@@ -1,21 +1,11 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { google } from 'googleapis';
 import { UserService } from './user.service';
-import axios from 'axios';
-import { Credentials } from 'google-auth-library';
-
-interface IUserdata {
-  data: {
-    sub: string;
-    name: string;
-    given_name: string;
-    picture: string;
-    email: string;
-    email_verified: boolean;
-    locale: string;
-  };
-}
 
 @Injectable()
 export class AuthService {
@@ -39,6 +29,7 @@ export class AuthService {
       'https://www.googleapis.com/auth/userinfo.email',
       'https://www.googleapis.com/auth/userinfo.profile',
     ];
+
     const url = this.#oauth2Client.generateAuthUrl({
       access_type: 'offline',
       scope: scopes,
@@ -54,25 +45,15 @@ export class AuthService {
     // QUESTION : 'setCredentials' :: Sets the auth credentials. 이거 뭔지 찾아보기..
     this.#oauth2Client.setCredentials(tokens);
 
-    return this.login(tokens);
-  }
-
-  // token으로 로그인 처리해주기
-  private async login(tokens: Credentials) {
-    // 토큰이 없을 때 예외처리
-    // TODO : 이 과정에서 어떻게 해야 하나? 아예 그럴 경우가 없는 것인가?
+    // token으로 로그인 처리해주기
     if (!tokens) {
       throw new BadRequestException('tokens not found');
     }
 
-    const { data: userinfo }: Awaited<Promise<IUserdata>> = await axios.get(
-      `https://www.googleapis.com/oauth2/v3/userinfo`,
-      {
-        headers: {
-          Authorization: `Bearer ${tokens.access_token}`,
-        },
-      },
-    );
+    const idtoken = await this.#oauth2Client.verifyIdToken({
+      idToken: tokens.id_token,
+    });
+    const userinfo = idtoken.getPayload();
 
     // 기존 유저인가요?
     const isExistUser = await this.userService.findUser(userinfo.email);
@@ -80,15 +61,17 @@ export class AuthService {
     const loginUser = {
       username: userinfo.name,
       email: userinfo.email,
-      token: tokens.access_token,
+      token: tokens.id_token,
     };
 
     // 기존 유저이면 로그인 처리 끝
-    // QUESTION : refresh token의 expire이 없다면 굳이 새롭게 재발급 되었는지 확인해서 할 필요.. 가 있긴 하겠다. 설령 누군가 어플리케이션 승인을 해제했다가 재승인을 하면 refresh token을 재 저장해야 한다.
     if (isExistUser) {
       if (tokens.refresh_token) {
-        const newRefresh = { refresh: tokens.refresh_token };
-        Object.assign(isExistUser, newRefresh);
+        isExistUser.refresh = tokens.refresh_token;
+        this.userService.createUser(isExistUser);
+      }
+      if (tokens.access_token) {
+        isExistUser.access = tokens.access_token;
         this.userService.createUser(isExistUser);
       }
       return loginUser;
@@ -99,6 +82,7 @@ export class AuthService {
       username: userinfo.name,
       email: userinfo.email,
       refresh: tokens.refresh_token,
+      access: tokens.access_token,
     };
 
     this.userService.createUser(newUserInfo);
