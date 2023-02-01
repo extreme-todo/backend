@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Todo } from 'src/todo/entities/todo.entity';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 export interface ITimeStamp {
   today: number;
@@ -33,10 +34,8 @@ export class User {
 
   // QUESTION : 어차피 mysql이라서 translate도 못하고 stringify 해서 처리해야 하지 않나? 그리고 Time친구들 {}로 초기화 해도 상관없겠지?..
 
-  // TODO : todo를 @OneToMany로 연결해야 함
-  // FIXME : Todo[]였는데 mysql 때문에 string으로 일단 바꿈. 후에 Translate 처리 해야함
-  @Column({ default: '[]' })
-  todo: string;
+  @OneToMany(() => Todo, (todo) => todo.user)
+  todo: Todo[];
 
   // TODO : totalFocusTime을 @OneToOne로 연결해야 함
   // FIXME : ITimeStamp였는데 mysql 때문에 string으로 일단 바꿈. 후에 Translate 처리 해야함
