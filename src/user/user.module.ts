@@ -13,6 +13,6 @@ import { VerifiedMiddleware } from 'src/middlewares/verified.middleware';
 })
 export class UserModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(VerifiedMiddleware).forRoutes('*');
+    consumer.apply(VerifiedMiddleware).exclude('/api/users/(.*)').forRoutes('*');
   }
 }
