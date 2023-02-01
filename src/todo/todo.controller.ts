@@ -12,8 +12,7 @@ import { AddTodoDto } from './dto/add-todo.dto';
 import { UpdateTodoDto } from './dto/update-todo.dto';
 import { TodoService } from './todo.service';
 
-// TODO : AuthGuard 필요함!
-@Controller('todos')
+@Controller('api/todos')
 export default class TodoController {
   constructor(private todoService: TodoService) {}
 
@@ -48,7 +47,7 @@ export default class TodoController {
   }
 
   @Get()
-  async getList(@Query('done') isDone: boolean) {
+  getList(@Query('done') isDone: boolean) {
     return this.todoService.getList(isDone);
   }
 }

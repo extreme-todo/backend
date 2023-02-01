@@ -9,13 +9,6 @@ import { AddTodoDto } from './dto/add-todo.dto';
 import { UpdateTodoDto } from './dto/update-todo.dto';
 import { Todo } from './entities/todo.entity';
 
-export interface ITodo {
-  todo: string;
-  duration: number;
-  done: boolean;
-  category: string;
-}
-
 @Injectable()
 export class TodoService {
   constructor(@InjectRepository(Todo) private repo: Repository<Todo>) {}
@@ -59,8 +52,7 @@ export class TodoService {
     return this.repo.save(todo);
   }
 
-  getList(isDone: boolean): Promise<ITodo[]> {
-    const todoList = this.repo.find({ where: { done: isDone } });
-    return todoList;
+  async getList(isDone: boolean): Promise<Todo[]> {
+    return this.repo.find({ where: { done: isDone } });
   }
 }
