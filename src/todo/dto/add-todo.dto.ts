@@ -1,10 +1,11 @@
 import { Transform } from 'class-transformer';
-import { IsBoolean, IsDate, IsNumber, IsString } from 'class-validator';
+import { IsBoolean, IsDate, IsNumber, IsObject, IsString } from 'class-validator';
 
 export type Category = 'code' | 'math' | 'english';
 
 export class AddTodoDto {
   @IsDate()
+  @Transform(({value}) => new Date(value))
   date: Date;
 
   @IsString()
@@ -15,4 +16,7 @@ export class AddTodoDto {
 
   @Transform(({ value }) => JSON.stringify(value))
   category: string;
+
+  @IsObject()
+  userinfo: Object;
 }

@@ -1,4 +1,4 @@
-import { IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsNumber, IsObject, IsOptional, IsString } from 'class-validator';
 
 export class UpdateTodoDto {
   @IsOptional()
@@ -8,4 +8,7 @@ export class UpdateTodoDto {
   @IsOptional()
   @IsString()
   todo: string;
+
+  @IsObject()
+  userinfo: Object;
 }
