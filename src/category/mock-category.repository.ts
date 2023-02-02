@@ -13,9 +13,10 @@ export const mockCategoryRepo = {
 
     if (options?.where) {
       const keys = Object.keys(options.where);
-      let res: Category[] = { ...categories };
+      let res: Category[] = [ ...categories ];
       keys.forEach((key) => {
         res = res.filter((el) => el[key] === options.where[key]);
+        // console.log(key, res)
       });
       return res;
     }
@@ -27,9 +28,10 @@ export const mockCategoryRepo = {
 
     if (options?.where) {
       const keys = Object.keys(options.where);
-      let res: Category[] = { ...categories };
+      let res: Category[] = [ ...categories ];
       keys.forEach((key) => {
         res = res.filter((el) => el[key] === options.where[key]);
+        console.log(key, res)
       });
       return res[0];
     }

@@ -1,5 +1,5 @@
-import { Todo } from 'src/todo/entities/todo.entity';
-import { User } from 'src/user/entities/user.entity';
+import { Todo } from '../../todo/entities/todo.entity';
+import { User } from '../../user/entities/user.entity';
 import {
   Column,
   Entity,

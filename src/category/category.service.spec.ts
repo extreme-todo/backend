@@ -43,25 +43,25 @@ describe('CategoryService', () => {
   describe('string[]을 받아 Category[]를 리턴', () => {
     it('이미 등록된 카테고리 2개를 입력한 경우', async () => {
       const input = categoryStub()
-        .slice(1)
+        .slice(0,2)
         .map((x) => x.name);
-      const categories = await service.search(fakeUser, input);
+      const categories = await service.findOrCreateCategories(fakeUser, input);
       expect(categories).toEqual(categoryStub());
     });
     it('미등록 카테고리 2개만 입력한 경우', async () => {
       const input = ['study', 'work'];
-      const categories = await service.search(fakeUser, input);
+      const categories = await service.findOrCreateCategories(fakeUser, input);
       expect(categories).toHaveLength(2);
     });
     it('등록된 카테고리 2개와 미등록 카테고리 2개를 입력한 경우', async () => {
       const input = [
         ...categoryStub()
-          .slice(1)
+          .slice(0,2)
           .map((x) => x.name),
         'study',
         'work',
       ];
-      const categories = await service.search(fakeUser, input);
+      const categories = await service.findOrCreateCategories(fakeUser, input);
       expect(categories).toHaveLength(4);
     });
   });
@@ -76,7 +76,7 @@ describe('CategoryService', () => {
     it('미등록 카테고리인 경우', async () => {
       const input = 'study';
       const category = await service.find(input);
-      expect(category).toBeNull();
+      expect(category).toBeUndefined();
     });
   });
 
@@ -89,6 +89,7 @@ describe('CategoryService', () => {
     });
     it('등록된 카테고리인 경우 오류 발생', async () => {
       const input = 'math';
+      fakeRepository.create = () => {throw new Error()}
       await expect(service.create(fakeUser, input)).rejects.toThrow(
         BadRequestException,
       );
