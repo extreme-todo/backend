@@ -1,4 +1,4 @@
-import { Todo } from 'src/todo/entities/todo.entity';
+import { Todo } from '../../todo/entities/todo.entity';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 export interface ITimeStamp {
