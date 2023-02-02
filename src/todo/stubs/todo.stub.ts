@@ -30,7 +30,7 @@ export const todoStub = (): Todo[] => {
       duration: 60 * 60,
       done: true,
       user: fakeUserHasATodo,
-      category: '["chore", "family affair"]',
+      categories: null,
     },
     {
       id: 2,
@@ -39,7 +39,7 @@ export const todoStub = (): Todo[] => {
       duration: 60 * 60,
       done: false,
       user: fakeUser2,
-      category: '["health"]',
+      categories: null,
     },
     {
       id: 3,
@@ -48,7 +48,7 @@ export const todoStub = (): Todo[] => {
       duration: 60 * 60 * 2,
       done: true,
       user: fakeUser2,
-      category: '["study", "math"]',
+      categories: null,
     },
   ];
 };

@@ -23,7 +23,7 @@ export class Todo {
   @JoinColumn()
   user: User;
 
-  @ManyToMany(() => Category, (category) => category.todos)
+  @ManyToMany(() => Category, (category) => category.todos, { nullable: true })
   @JoinColumn()
   categories: Category[];
 }
