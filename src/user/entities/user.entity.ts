@@ -1,6 +1,7 @@
 import { Todo } from '../../todo/entities/todo.entity';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
+
 export interface ITimeStamp {
   today: number;
   yesterday: number;
@@ -31,9 +32,7 @@ export class User {
 
   @Column()
   access: string;
-
-  // QUESTION : 어차피 mysql이라서 translate도 못하고 stringify 해서 처리해야 하지 않나? 그리고 Time친구들 {}로 초기화 해도 상관없겠지?..
-
+  
   @OneToMany(() => Todo, (todo) => todo.user)
   todo: Todo[];
 
