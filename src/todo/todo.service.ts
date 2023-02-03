@@ -2,8 +2,10 @@ import {
   BadRequestException,
   Injectable,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { User } from 'src/user/entities/user.entity';
 import { Repository } from 'typeorm';
 import { AddTodoDto } from './dto/add-todo.dto';
 import { UpdateTodoDto } from './dto/update-todo.dto';
@@ -13,29 +15,33 @@ import { Todo } from './entities/todo.entity';
 export class TodoService {
   constructor(@InjectRepository(Todo) private repo: Repository<Todo>) {}
 
-  addTodo(addTodoDto: AddTodoDto) {
+  async addTodo(addTodoDto: AddTodoDto, user: User) {
     const newTodo = this.repo.create(addTodoDto);
-    return this.repo.save(newTodo);
+    newTodo.user = user;
+    return await this.repo.save(newTodo);
   }
 
-  async getOneTodo(id: number) {
-    const todo = this.repo.findOne({ where: { id } });
+  async getOneTodo(id: number, user: User) {
+    const todo = await this.repo.findOne({ where: { id }, relations: { user: true } });
     if (!todo) {
       throw new NotFoundException('Todo not found');
+    }
+    if(todo.user?.id !== user.id){
+      throw new UnauthorizedException('User has no permission')
     }
     return todo;
   }
 
-  async deleteTodo(id: number) {
-    const todo = await this.getOneTodo(id);
+  async deleteTodo(id: number, user: User) {
+    const todo = await this.getOneTodo(id, user);
     if (!todo) {
       throw new NotFoundException('Todo not found');
     }
     return this.repo.remove(todo);
   }
 
-  async updateTodo(id: number, updateTodo: UpdateTodoDto) {
-    const todo = await this.getOneTodo(id);
+  async updateTodo(id: number, updateTodo: UpdateTodoDto, user: User) {
+    const todo = await this.getOneTodo(id, user);
     if (!todo) {
       throw new NotFoundException('Todo not found');
     }
@@ -43,8 +49,8 @@ export class TodoService {
     return this.repo.save(todo);
   }
 
-  async doTodo(id: number) {
-    const todo = await this.getOneTodo(id);
+  async doTodo(id: number, user: User) {
+    const todo = await this.getOneTodo(id, user);
     if (!todo) {
       throw new NotFoundException('Todo not found');
     }
@@ -52,7 +58,7 @@ export class TodoService {
     return this.repo.save(todo);
   }
 
-  async getList(isDone: boolean): Promise<Todo[]> {
-    return this.repo.find({ where: { done: isDone } });
+  async getList(isDone: boolean, user: User): Promise<Todo[]> {
+    return await this.repo.find({ where: { done: isDone, user } });
   }
 }

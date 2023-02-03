@@ -7,7 +7,11 @@ import {
   Patch,
   Post,
   Query,
+  UseGuards,
 } from '@nestjs/common';
+import { AuthGuard } from 'src/guards/auth.guard';
+import { CurrentUser } from 'src/user/decorators/current-user.decorator';
+import { User } from 'src/user/entities/user.entity';
 import { AddTodoDto } from './dto/add-todo.dto';
 import { UpdateTodoDto } from './dto/update-todo.dto';
 import { TodoService } from './todo.service';
@@ -17,37 +21,43 @@ export default class TodoController {
   constructor(private todoService: TodoService) {}
 
   @Post('/')
-  addTodo(@Body() todoData: AddTodoDto): string {
-    const newTodo = this.todoService.addTodo(todoData);
-    return 'yes...';
+  @UseGuards(AuthGuard)
+  async addTodo(@Body() todoData: AddTodoDto, @CurrentUser() userdata: User) {
+    await this.todoService.addTodo(todoData, userdata);
+    return 'Successfully created a todo';
   }
 
   @Get('/:id')
-  async getOneTodo(@Param('id') todoId: number) {
-    const todo = await this.todoService.getOneTodo(todoId);
+  @UseGuards(AuthGuard)
+  async getOneTodo(@Param('id') todoId: number, @CurrentUser() userdata: User) {
+    const todo = await this.todoService.getOneTodo(todoId, userdata);
     return todo;
   }
 
   @Delete('/:id')
-  async deleteTodo(@Param('id') todoId: number) {
-    return this.todoService.deleteTodo(todoId);
+  @UseGuards(AuthGuard)
+  async deleteTodo(@Param('id') todoId: number, @CurrentUser() userdata: User) {
+    return this.todoService.deleteTodo(todoId, userdata);
   }
 
   @Patch('/:id')
+  @UseGuards(AuthGuard)
   async updateTodo(
     @Param('id') todoId: number,
-    @Body() updateData: UpdateTodoDto,
+    @Body() updateData: UpdateTodoDto, @CurrentUser() userdata: User
   ) {
-    return this.todoService.updateTodo(todoId, updateData);
+    return this.todoService.updateTodo(todoId, updateData, userdata);
   }
 
   @Patch('/:id/done')
-  async doTodo(@Param('id') todoId: number) {
-    return this.todoService.doTodo(todoId);
+  @UseGuards(AuthGuard)
+  async doTodo(@Param('id') todoId: number, @CurrentUser() userdata: User) {
+    return this.todoService.doTodo(todoId, userdata);
   }
 
-  @Get()
-  getList(@Query('done') isDone: boolean) {
-    return this.todoService.getList(isDone);
+  @Get('/')
+  @UseGuards(AuthGuard)
+  getList(@Query('done') isDone: boolean, @CurrentUser() userdata: User) {
+    return this.todoService.getList(isDone, userdata);
   }
 }
