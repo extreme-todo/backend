@@ -8,9 +8,9 @@ export class UpdateTodoDto {
   @IsOptional()
   @IsString()
   todo: string;
-
+  
   @IsOptional()
-  @IsString({each: true})
+  @IsString({ each: true })
   categories: string[];
 
   @IsObject()
