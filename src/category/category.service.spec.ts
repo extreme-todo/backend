@@ -43,7 +43,7 @@ describe('CategoryService', () => {
   describe('string[]을 받아 Category[]를 리턴', () => {
     it('이미 등록된 카테고리 2개를 입력한 경우', async () => {
       const input = categoryStub()
-        .slice(0,2)
+        .slice(0, 2)
         .map((x) => x.name);
       const categories = await service.findOrCreateCategories(fakeUser, input);
       expect(categories).toEqual(categoryStub());
@@ -56,7 +56,7 @@ describe('CategoryService', () => {
     it('등록된 카테고리 2개와 미등록 카테고리 2개를 입력한 경우', async () => {
       const input = [
         ...categoryStub()
-          .slice(0,2)
+          .slice(0, 2)
           .map((x) => x.name),
         'study',
         'work',
@@ -89,7 +89,9 @@ describe('CategoryService', () => {
     });
     it('등록된 카테고리인 경우 오류 발생', async () => {
       const input = 'math';
-      fakeRepository.create = () => {throw new Error()}
+      fakeRepository.create = () => {
+        throw new Error();
+      };
       await expect(service.create(fakeUser, input)).rejects.toThrow(
         BadRequestException,
       );
