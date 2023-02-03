@@ -3,11 +3,25 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { Todo } from './entities/todo.entity';
 import { mockTodoRepo } from './mock-todo.repository';
 import { TodoService } from './todo.service';
-import { addTodoStub, fakeUserHasATodo, fakeUserHasNoTodo, todoStub, updateTodoStub } from './stubs/todo.stub';
+import {
+  addTodoStub,
+  fakeUserHasATodo,
+  fakeUserHasNoTodo,
+  todoStub,
+  updateTodoStub,
+} from './stubs/todo.stub';
 import { NotFoundException } from '@nestjs/common';
+import { CategoryService } from '../category/category.service';
+import { User } from '../user/entities/user.entity';
+import { Category } from 'src/category/entities/category.entity';
 
 describe('TodoService', () => {
   let service: TodoService;
+  const fakeCategoryService = {
+    findOrCreateCategories(user: User, categories: string[]) {
+      return categories.map((x) => ({ name: x, author: user } as Category));
+    },
+  };
   const existingId = todoStub()[0].id;
   const notExistingId = 123;
   let mockRepo;
@@ -17,6 +31,7 @@ describe('TodoService', () => {
     const module = await Test.createTestingModule({
       providers: [
         TodoService,
+        { provide: CategoryService, useValue: fakeCategoryService },
         { provide: getRepositoryToken(Todo), useValue: mockRepo },
       ],
     }).compile();
@@ -30,7 +45,10 @@ describe('TodoService', () => {
 
   describe('addTodo', () => {
     it('새로운 투두 생성', async () => {
-      const res = service.addTodo(addTodoStub(fakeUserHasNoTodo), fakeUserHasNoTodo);
+      const res = service.addTodo(
+        addTodoStub(fakeUserHasNoTodo),
+        fakeUserHasNoTodo,
+      );
       expect(res).toBeDefined();
     });
   });
@@ -42,9 +60,9 @@ describe('TodoService', () => {
       expect(res.id).toEqual(existingId);
     });
     it('해당 todo id가 존재하지 않는 경우 NotFound', async () => {
-      await expect(service.getOneTodo(notExistingId, fakeUserHasNoTodo)).rejects.toThrow(
-        NotFoundException,
-      );
+      await expect(
+        service.getOneTodo(notExistingId, fakeUserHasNoTodo),
+      ).rejects.toThrow(NotFoundException);
     });
   });
 
@@ -54,22 +72,30 @@ describe('TodoService', () => {
       expect(res.id).toEqual(existingId);
     });
     it('해당 todo id가 존재하지 않는 경우 NotFound', async () => {
-      await expect(service.deleteTodo(notExistingId, fakeUserHasNoTodo)).rejects.toThrow(
-        NotFoundException,
-      );
+      await expect(
+        service.deleteTodo(notExistingId, fakeUserHasNoTodo),
+      ).rejects.toThrow(NotFoundException);
     });
   });
 
   describe('updateTodo', () => {
     it('존재하는 id에 해당하는 투두 업데이트', async () => {
-      const res = await service.updateTodo(existingId, updateTodoStub(fakeUserHasATodo), fakeUserHasATodo);
+      const res = await service.updateTodo(
+        existingId,
+        updateTodoStub(fakeUserHasATodo),
+        fakeUserHasATodo,
+      );
       expect(res.id).toEqual(existingId);
       expect(res.todo).toEqual('updated');
       expect(res.duration).toEqual(7000);
     });
     it('존재하지 않는 id 업데이트시 NotFound', async () => {
       await expect(
-        service.updateTodo(notExistingId, updateTodoStub(fakeUserHasNoTodo), fakeUserHasNoTodo),
+        service.updateTodo(
+          notExistingId,
+          updateTodoStub(fakeUserHasNoTodo),
+          fakeUserHasNoTodo,
+        ),
       ).rejects.toThrow(NotFoundException);
     });
   });
@@ -80,9 +106,9 @@ describe('TodoService', () => {
       expect(res.done).toEqual(true);
     });
     it('존재하지 않는 id 완료시 NotFound', async () => {
-      await expect(service.doTodo(notExistingId, fakeUserHasNoTodo)).rejects.toThrow(
-        NotFoundException,
-      );
+      await expect(
+        service.doTodo(notExistingId, fakeUserHasNoTodo),
+      ).rejects.toThrow(NotFoundException);
     });
   });
 

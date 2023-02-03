@@ -58,7 +58,7 @@ export const addTodoStub = (user: User): AddTodoDto => {
     date: new Date('Dec 30, 2022 18:00:30'),
     todo: 'Go to school',
     duration: 3000,
-    category: JSON.stringify(['study']),
+    categories: ['study'],
     userinfo: {email: user.email, id_token: 'faketoken'}
   };
 };
@@ -67,6 +67,7 @@ export const updateTodoStub = (user: User): UpdateTodoDto => {
   return {
     duration: 7000,
     todo: 'updated',
-    userinfo: {email: user.email, id_token: 'faketoken'}
+    userinfo: {email: user.email, id_token: 'faketoken'},
+    categories: ['study'],
   };
 };
