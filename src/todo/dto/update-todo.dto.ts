@@ -1,4 +1,4 @@
-import { IsNumber, IsObject, IsOptional, IsString } from 'class-validator';
+import { IsArray, IsNumber, IsObject, IsOptional, IsString } from 'class-validator';
 
 export class UpdateTodoDto {
   @IsOptional()
@@ -8,6 +8,10 @@ export class UpdateTodoDto {
   @IsOptional()
   @IsString()
   todo: string;
+  
+  @IsOptional()
+  @IsString({ each: true })
+  categories: string[];
 
   @IsObject()
   userinfo: Object;

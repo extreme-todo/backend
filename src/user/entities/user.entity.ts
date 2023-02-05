@@ -1,3 +1,5 @@
+import { Category } from '../../category/entities/category.entity';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Todo } from '../../todo/entities/todo.entity';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
@@ -31,9 +33,12 @@ export class User {
 
   @Column()
   access: string;
-
+  
   @OneToMany(() => Todo, (todo) => todo.user)
   todo: Todo[];
+
+  @OneToMany(() => Category, (category) => category.author)
+  categories: Category[];
 
   // TODO : totalFocusTime을 @OneToOne로 연결해야 함
   // FIXME : ITimeStamp였는데 mysql 때문에 string으로 일단 바꿈. 후에 Translate 처리 해야함

@@ -7,7 +7,9 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_PIPE } from '@nestjs/core';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Todo } from './todo/entities/todo.entity';
+import { CategoryModule } from './category/category.module';
 import { User } from './user/entities/user.entity';
+import { Category } from './category/entities/category.entity';
 
 @Module({
   imports: [
@@ -27,7 +29,7 @@ import { User } from './user/entities/user.entity';
           username: config.get('DB_USERNAME'),
           password: config.get('DB_PASSWORD'),
           database: config.get('DB_DATABASE'),
-          entities: [Todo, User],
+          entities: [Todo, User, Category],
           synchronize: true,
           // url: process.env.DATABASE_URL,
           // migrationsRun: true,
@@ -39,6 +41,7 @@ import { User } from './user/entities/user.entity';
     }),
     TodoModule,
     UserModule,
+    CategoryModule,
   ],
   controllers: [AppController],
   providers: [
