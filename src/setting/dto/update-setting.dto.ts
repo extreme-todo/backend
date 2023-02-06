@@ -1,4 +1,4 @@
-import { IsBoolean, IsString } from 'class-validator';
+import { IsBoolean, IsObject, IsString } from 'class-validator';
 import { ColorMode } from '../entities/setting.entity';
 
 export class UpdateSettingDto {
@@ -7,4 +7,7 @@ export class UpdateSettingDto {
 
   @IsBoolean()
   extremeMode: boolean;
+
+  @IsObject()
+  userinfo: object;
 }

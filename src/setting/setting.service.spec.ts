@@ -43,6 +43,7 @@ describe('SettingService', () => {
       const currMode = await service.update(fakeUser, {
         colorMode: 'dark',
         extremeMode: true,
+        userinfo: {}
       });
       expect(currMode.colorMode).toEqual('dark');
       expect(currMode.extremeMode).toEqual(true);
@@ -51,6 +52,7 @@ describe('SettingService', () => {
       const currMode = await service.update(fakeUser, {
         colorMode: 'light',
         extremeMode: false,
+        userinfo: {}
       });
       expect(currMode.colorMode).toEqual('light');
       expect(currMode.extremeMode).toEqual(false);
@@ -59,6 +61,7 @@ describe('SettingService', () => {
       const currMode = await service.update(fakeUser, {
         colorMode: 'auto',
         extremeMode: true,
+        userinfo: {}
       });
       expect(currMode.colorMode).toEqual('auto');
       expect(currMode.extremeMode).toEqual(true);
