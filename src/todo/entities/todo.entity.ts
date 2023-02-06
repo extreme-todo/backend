@@ -1,11 +1,13 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Category } from '../../category/entities/category.entity';
+import { User } from '../../user/entities/user.entity';
+import { Column, Entity, JoinColumn, ManyToOne, ManyToMany, PrimaryGeneratedColumn, JoinTable } from 'typeorm';
 
 @Entity()
 export class Todo {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ type: 'timestamp' })
   date: Date;
 
   @Column()
@@ -17,7 +19,11 @@ export class Todo {
   @Column({ default: false })
   done: boolean;
 
-  // TODO : 수능 영어 단어 => 이처럼 여러 가지 카테고리가 중복될 수 있지 않을까?
-  @Column()
-  category: string;
+  @ManyToOne(() => User, (user) => user.todo)
+  @JoinColumn()
+  user: User;
+
+  @ManyToMany(() => Category, { nullable: true, eager: true })
+  @JoinTable()
+  categories: Category[];
 }

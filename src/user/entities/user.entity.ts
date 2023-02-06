@@ -2,59 +2,50 @@ import {
   Column,
   Entity,
   JoinColumn,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Todo } from '../../todo/entities/todo.entity';
 import { Setting } from '../../setting/entities/setting.entity';
-
-// export interface ITimeStamp {
-//   today: number;
-//   yesterday: number;
-//   thisWeek: number;
-//   lastWeek: number;
-//   thisMonth: number;
-//   lastMonth: number;
-// }
-
-// export interface ISetting {
-//   darkmode: boolean;
-//   extrememode: boolean;
-// }
-
-// DISCUSSION : TotalFocusTime이랑 TotalRestTime에 이거 쓸 거 같음
-// const timeStamp = {
-//   today: { type: Number, default: 0 },
-//   yesterday: { type: Number, default: 0 },
-//   thisWeek: { type: Number, default: 0 },
-//   lastWeek: { type: Number, default: 0 },
-//   thisMonth: { type: Number, default: 0 },
-//   lastMonth: { type: Number, default: 0 },
-// };
+import { TotalRestTime } from 'src/timer/entities/total-rest-time.entity';
+import { TotalFocusTime } from 'src/timer/entities/total-focus-time.entity';
+import { Category } from '../../category/entities/category.entity';
 
 @Entity()
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ unique: true })
   email: string;
 
   @Column()
   username: string;
 
-  // TODO : todo를 @OneToMany로 연결해야 함
-  // QUESTION : String으로 JSON.stringify 처리 해줘야 하게..ㅆ지?
-  // @Column()
-  // todo: Todo[];
+  @Column()
+  refresh: string;
 
-  // // TODO : totalFocusTime을 @OneToOne로 연결해야 함
-  // @Column()
-  // totalFocusTime: ITimeStamp;
+  @Column()
+  access: string;
 
-  // // TODO : totalRestTime을 @OneToOne로 연결해야 함
-  // @Column()
-  // totalRestTime: ITimeStamp;
+  @OneToMany(() => Todo, (todo) => todo.user)
+  todo: Todo[];
+
+  @OneToMany(() => Category, (category) => category.author)
+  categories: Category[];
+
+  @OneToOne((type) => TotalFocusTime, (totalFocusTime) => totalFocusTime.user, {
+    cascade: true,
+  })
+  @JoinColumn()
+  totalFocusTime: TotalFocusTime;
+
+  @OneToOne((type) => TotalRestTime, (totalRestTime) => totalRestTime.user, {
+    cascade: true,
+  })
+  @JoinColumn()
+  totalRestTime: TotalRestTime;
 
   @OneToOne((type) => Setting, (setting) => setting.user, {
     cascade: true,

@@ -1,18 +1,25 @@
 import { Module, ValidationPipe } from '@nestjs/common';
+import { TodoModule } from './todo/todo.module';
+import { UserModule } from './user/user.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { TodoModule } from './todo/todo.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_PIPE } from '@nestjs/core';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Todo } from './todo/entities/todo.entity';
-import { UserModule } from './user/user.module';
 import { SettingModule } from './setting/setting.module';
 import { User } from './user/entities/user.entity';
 import { Setting } from './setting/entities/setting.entity';
+import { TimerModule } from './timer/timer.module';
+import { ScheduleModule } from '@nestjs/schedule';
+import { TotalFocusTime } from './timer/entities/total-focus-time.entity';
+import { TotalRestTime } from './timer/entities/total-rest-time.entity';
+import { CategoryModule } from './category/category.module';
+import { Category } from './category/entities/category.entity';
 
 @Module({
   imports: [
+    ScheduleModule.forRoot(),
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: `.env.${process.env.NODE_ENV}`,
@@ -29,7 +36,7 @@ import { Setting } from './setting/entities/setting.entity';
           username: config.get('DB_USERNAME'),
           password: config.get('DB_PASSWORD'),
           database: config.get('DB_DATABASE'),
-          entities: [Todo, User, Setting],
+          entities: [Todo, User, Setting, Category, TotalFocusTime, TotalRestTime],
           synchronize: true,
           // url: process.env.DATABASE_URL,
           // migrationsRun: true,
@@ -42,6 +49,8 @@ import { Setting } from './setting/entities/setting.entity';
     TodoModule,
     UserModule,
     SettingModule,
+    TimerModule,
+    CategoryModule,
   ],
   controllers: [AppController],
   providers: [
