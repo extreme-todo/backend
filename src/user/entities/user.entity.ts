@@ -2,12 +2,14 @@ import {
   Column,
   Entity,
   JoinColumn,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Todo } from '../../todo/entities/todo.entity';
 import { TotalRestTime } from 'src/timer/entities/total-rest-time.entity';
 import { TotalFocusTime } from 'src/timer/entities/total-focus-time.entity';
+import { Category } from '../../category/entities/category.entity';
 
 export interface ITimeStamp {
   today: number;
@@ -23,32 +25,28 @@ export interface ISetting {
   extrememode: boolean;
 }
 
-// DISCUSSION : TotalFocusTime이랑 TotalRestTime에 이거 쓸 거 같음
-// const timeStamp = {
-//   today: { type: Number, default: 0 },
-//   yesterday: { type: Number, default: 0 },
-//   thisWeek: { type: Number, default: 0 },
-//   lastWeek: { type: Number, default: 0 },
-//   thisMonth: { type: Number, default: 0 },
-//   lastMonth: { type: Number, default: 0 },
-// };
-
 @Entity()
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ unique: true })
   email: string;
 
   @Column()
   username: string;
 
-  // TODO : todo를 @OneToMany로 연결해야 함
-  // QUESTION : String으로 JSON.stringify 처리 해줘야 하게..ㅆ지?
-  // FIXME : 배열은 'mysql' 데이터베이스에서 사용할 수 없는 데이터라는 오류 발생
-  // @Column()
-  // todo: Todo[];
+  @Column()
+  refresh: string;
+
+  @Column()
+  access: string;
+
+  @OneToMany(() => Todo, (todo) => todo.user)
+  todo: Todo[];
+
+  @OneToMany(() => Category, (category) => category.author)
+  categories: Category[];
 
   @OneToOne((type) => TotalFocusTime, (totalFocusTime) => totalFocusTime.user, {
     cascade: true,
@@ -63,7 +61,7 @@ export class User {
   totalRestTime: TotalRestTime;
 
   // TODO : setting을 @OneToOne로 연결해야 함
-  // FIXME : 오브젝트는 'mysql' 데이터베이스에서 사용할 수 없는 데이터라는 오류 발생
-  // @Column()
-  // setting: ISetting;
+  // FIXME : ITimeStamp였는데 mysql 때문에 string으로 일단 바꿈. 후에 Translate 처리 해야함
+  @Column({ default: '{darkmode: false,extrememode: true,}' })
+  setting: string;
 }
