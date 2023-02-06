@@ -7,23 +7,10 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Todo } from '../../todo/entities/todo.entity';
+import { Setting } from '../../setting/entities/setting.entity';
 import { TotalRestTime } from 'src/timer/entities/total-rest-time.entity';
 import { TotalFocusTime } from 'src/timer/entities/total-focus-time.entity';
 import { Category } from '../../category/entities/category.entity';
-
-export interface ITimeStamp {
-  today: number;
-  yesterday: number;
-  thisWeek: number;
-  lastWeek: number;
-  thisMonth: number;
-  lastMonth: number;
-}
-
-export interface ISetting {
-  darkmode: boolean;
-  extrememode: boolean;
-}
 
 @Entity()
 export class User {
@@ -60,8 +47,9 @@ export class User {
   @JoinColumn()
   totalRestTime: TotalRestTime;
 
-  // TODO : setting을 @OneToOne로 연결해야 함
-  // FIXME : ITimeStamp였는데 mysql 때문에 string으로 일단 바꿈. 후에 Translate 처리 해야함
-  @Column({ default: '{darkmode: false,extrememode: true,}' })
-  setting: string;
+  @OneToOne((type) => Setting, (setting) => setting.user, {
+    cascade: true,
+  })
+  @JoinColumn()
+  setting: Setting;
 }

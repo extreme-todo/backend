@@ -6,9 +6,10 @@ import { User } from './entities/user.entity';
 import { AuthService } from './auth.service';
 import { VerifiedMiddleware } from 'src/middlewares/verified.middleware';
 import { TimerModule } from 'src/timer/timer.module';
+import { SettingModule } from 'src/setting/setting.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User]), TimerModule],
+  imports: [TypeOrmModule.forFeature([User]), TimerModule, SettingModule],
   providers: [UserService, AuthService],
   controllers: [UserController],
 })
