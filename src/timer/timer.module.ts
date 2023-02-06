@@ -11,5 +11,6 @@ import { RestService } from './rest.service';
   imports: [TypeOrmModule.forFeature([TotalFocusTime, TotalRestTime])],
   providers: [TimerService, FocusService, RestService],
   controllers: [TimerController],
+  exports: [TimerService],
 })
 export class TimerModule {}

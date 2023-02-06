@@ -1,29 +1,28 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, UseGuards } from '@nestjs/common';
 import { TimerService } from './timer.service';
 import { User } from 'src/user/entities/user.entity';
+import { CurrentUser } from 'src/user/decorators/current-user.decorator';
+import { AuthGuard } from 'src/guards/auth.guard';
 
-@Controller('timer')
+@Controller('api/timer')
 export class TimerController {
   constructor(private timerService: TimerService) {}
 
-  // TODO: AuthGuard 등으로 가져온 유저를 사용할 예정
   @Get('total_focus')
-  getTotalFocusTime() {
-    const fakeUser = { email: 'asd@asd.asd', username: 'asd' } as User;
-    return this.timerService.getTotalFocusTime(fakeUser);
+  @UseGuards(AuthGuard)
+  getTotalFocusTime(@CurrentUser() user: User) {
+    return this.timerService.getTotalFocusTime(user);
   }
 
-  // TODO: AuthGuard 등으로 가져온 유저를 사용할 예정
   @Get('total_rest')
-  getTotalRestTime() {
-    const fakeUser = { email: 'asd@asd.asd', username: 'asd' } as User;
-    return this.timerService.getTotalRestTime(fakeUser);
+  @UseGuards(AuthGuard)
+  getTotalRestTime(@CurrentUser() user: User) {
+    return this.timerService.getTotalRestTime(user);
   }
 
-  // TODO: AuthGuard 등으로 가져온 유저를 사용할 예정
   @Get('progress')
-  getProgress() {
-    const fakeUser = { email: 'asd@asd.asd', username: 'asd' } as User;
-    return this.timerService.getProgress(fakeUser);
+  @UseGuards(AuthGuard)
+  getProgress(@CurrentUser() user: User) {
+    return this.timerService.getProgress(user);
   }
 }
