@@ -5,9 +5,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { AuthService } from './auth.service';
 import { VerifiedMiddleware } from 'src/middlewares/verified.middleware';
+import { TimerModule } from 'src/timer/timer.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User])],
+  imports: [TypeOrmModule.forFeature([User]), TimerModule],
   providers: [UserService, AuthService],
   controllers: [UserController],
 })

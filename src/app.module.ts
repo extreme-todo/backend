@@ -7,12 +7,17 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_PIPE } from '@nestjs/core';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Todo } from './todo/entities/todo.entity';
+import { TimerModule } from './timer/timer.module';
+import { ScheduleModule } from '@nestjs/schedule';
+import { TotalFocusTime } from './timer/entities/total-focus-time.entity';
+import { TotalRestTime } from './timer/entities/total-rest-time.entity';
 import { CategoryModule } from './category/category.module';
 import { User } from './user/entities/user.entity';
 import { Category } from './category/entities/category.entity';
 
 @Module({
   imports: [
+    ScheduleModule.forRoot(),
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: `.env.${process.env.NODE_ENV}`,
@@ -29,7 +34,7 @@ import { Category } from './category/entities/category.entity';
           username: config.get('DB_USERNAME'),
           password: config.get('DB_PASSWORD'),
           database: config.get('DB_DATABASE'),
-          entities: [Todo, User, Category],
+          entities: [Todo, User, Category, TotalFocusTime, TotalRestTime],
           synchronize: true,
           // url: process.env.DATABASE_URL,
           // migrationsRun: true,
@@ -41,6 +46,7 @@ import { Category } from './category/entities/category.entity';
     }),
     TodoModule,
     UserModule,
+    TimerModule,
     CategoryModule,
   ],
   controllers: [AppController],

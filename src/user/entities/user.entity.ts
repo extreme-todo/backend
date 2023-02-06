@@ -1,7 +1,15 @@
-import { Category } from '../../category/entities/category.entity';
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  OneToMany,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { Todo } from '../../todo/entities/todo.entity';
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { TotalRestTime } from 'src/timer/entities/total-rest-time.entity';
+import { TotalFocusTime } from 'src/timer/entities/total-focus-time.entity';
+import { Category } from '../../category/entities/category.entity';
 
 export interface ITimeStamp {
   today: number;
@@ -33,25 +41,24 @@ export class User {
 
   @Column()
   access: string;
-  
+
   @OneToMany(() => Todo, (todo) => todo.user)
   todo: Todo[];
 
   @OneToMany(() => Category, (category) => category.author)
   categories: Category[];
 
-  // TODO : totalFocusTime을 @OneToOne로 연결해야 함
-  // FIXME : ITimeStamp였는데 mysql 때문에 string으로 일단 바꿈. 후에 Translate 처리 해야함
-  @Column({ default: '{}' })
-  totalFocusTime: string;
-
-  // TODO : totalRestTime을 @OneToOne로 연결해야 함
-  // FIXME : ITimeStamp였는데 mysql 때문에 string으로 일단 바꿈. 후에 Translate 처리 해야함
-  @Column({
-    default:
-      '{today: 0,yesterday: 0,thisWeek: 0,lastWeek: 0,thisMonth: 0,lastMonth: 0,}',
+  @OneToOne((type) => TotalFocusTime, (totalFocusTime) => totalFocusTime.user, {
+    cascade: true,
   })
-  totalRestTime: string;
+  @JoinColumn()
+  totalFocusTime: TotalFocusTime;
+
+  @OneToOne((type) => TotalRestTime, (totalRestTime) => totalRestTime.user, {
+    cascade: true,
+  })
+  @JoinColumn()
+  totalRestTime: TotalRestTime;
 
   // TODO : setting을 @OneToOne로 연결해야 함
   // FIXME : ITimeStamp였는데 mysql 때문에 string으로 일단 바꿈. 후에 Translate 처리 해야함
