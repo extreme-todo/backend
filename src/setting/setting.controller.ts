@@ -1,22 +1,23 @@
-import { Body, Controller, Get, Put } from '@nestjs/common';
+import { Body, Controller, Get, Put, UseGuards } from '@nestjs/common';
+import { AuthGuard } from 'src/guards/auth.guard';
+import { CurrentUser } from 'src/user/decorators/current-user.decorator';
 import { User } from 'src/user/entities/user.entity';
 import { UpdateSettingDto } from './dto/update-setting.dto';
 import { SettingService } from './setting.service';
 
-@Controller('setting')
+@Controller('api/setting')
 export class SettingController {
-  constructor(private settingService: SettingService) {}
-  // TODO: AuthGuard 등으로 가져온 유저를 사용할 예정
+  constructor(private settingService: SettingService){}
+
   @Get('/')
-  getSetting() {
-    const fakeUser = { email: 'asd@asd.asd', username: 'asd', id: 1 } as User;
-    return this.settingService.find(fakeUser);
+  @UseGuards(AuthGuard)
+  getSetting(@CurrentUser() user: User) {
+    return this.settingService.find(user);
   }
 
-  // TODO: AuthGuard 등으로 가져온 유저를 사용할 예정
   @Put('/')
-  udpateSetting(@Body() data: UpdateSettingDto) {
-    const fakeUser = { email: 'asd@asd.asd', username: 'asd', id: 1 } as User;
-    return this.settingService.update(fakeUser, data);
+  @UseGuards(AuthGuard)
+  udpateSetting(@CurrentUser() user: User, @Body() data: UpdateSettingDto) {
+    return this.settingService.update(user, data);
   }
 }
