@@ -15,6 +15,7 @@ export class UserService {
   }
 
   createUser(userinfo: CreateUserDto) {
-    return this.repo.save(userinfo);
+    const newUser = this.repo.create(userinfo);
+    return this.repo.save(newUser);
   }
 }
