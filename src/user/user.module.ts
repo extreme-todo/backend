@@ -12,7 +12,7 @@ import { VerifiedMiddleware } from 'src/middlewares/verified.middleware';
   controllers: [UserController],
 })
 export class UserModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer.apply(VerifiedMiddleware).forRoutes('*');
-  }
+  // configure(consumer: MiddlewareConsumer) {
+  //   consumer.apply(VerifiedMiddleware).forRoutes('*');
+  // }
 }
