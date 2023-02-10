@@ -5,14 +5,19 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { AuthService } from './auth.service';
 import { VerifiedMiddleware } from 'src/middlewares/verified.middleware';
+import { TimerModule } from 'src/timer/timer.module';
+import { SettingModule } from 'src/setting/setting.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User])],
+  imports: [TypeOrmModule.forFeature([User]), TimerModule, SettingModule],
   providers: [UserService, AuthService],
   controllers: [UserController],
 })
 export class UserModule {
-  // configure(consumer: MiddlewareConsumer) {
-  //   consumer.apply(VerifiedMiddleware).forRoutes('*');
-  // }
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(VerifiedMiddleware)
+      .exclude('/api/users/(.*)')
+      .forRoutes('*');
+  }
 }
