@@ -42,6 +42,7 @@ export class AuthService {
   // authCode를 token으로 바꾸기
   async googleCallback(authCode: string) {
     const { tokens } = await this.#oauth2Client.getToken(authCode);
+
     // QUESTION : 'setCredentials' :: Sets the auth credentials. 이거 뭔지 찾아보기..
     this.#oauth2Client.setCredentials(tokens);
 
@@ -67,12 +68,14 @@ export class AuthService {
     // 기존 유저이면 로그인 처리 끝
     if (isExistUser) {
       if (tokens.refresh_token) {
-        isExistUser.refresh = tokens.refresh_token;
-        this.userService.createUser(isExistUser);
+        this.userService.updateUser(userinfo.email, {
+          refresh: tokens.refresh_token,
+        });
       }
       if (tokens.access_token) {
-        isExistUser.access = tokens.access_token;
-        this.userService.createUser(isExistUser);
+        this.userService.updateUser(userinfo.email, {
+          access: tokens.access_token,
+        });
       }
       return loginUser;
     }
@@ -106,6 +109,8 @@ export class AuthService {
         const newUserInfo = await this.refreshTokens(email);
         return newUserInfo;
       } else {
+        console.log('⛔️⛔️⛔️ err', err);
+        console.log('⛔️⛔️⛔️ err message', err.message);
         // 그 외의 경우 에러처리(아예 권한이 없는 경우?.. 토큰이 없거나 등등)
         throw new UnauthorizedException('unauthorized user');
       }
@@ -119,7 +124,7 @@ export class AuthService {
     try {
       const { credentials } = await this.#oauth2Client.refreshAccessToken();
       user.access = credentials.access_token;
-      this.userService.createUser(user);
+      this.userService.updateUser(email, { access: user.access });
       const userinfo = {
         userdata: user,
         id_token: credentials.id_token,
