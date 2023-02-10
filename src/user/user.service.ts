@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { SettingService } from 'src/setting/setting.service';
 import { TimerService } from 'src/timer/timer.service';
@@ -14,16 +14,26 @@ export class UserService {
     private settingService: SettingService,
   ) {}
 
-  findUser(email: string) {
-    return this.repo.findOne({
+  async findUser(email: string) {
+    return await this.repo.findOne({
       where: { email: email },
     });
   }
 
   async createUser(userinfo: CreateUserDto) {
-    const newUser = await this.repo.save(userinfo);
+    const newUser = this.repo.create(userinfo);
+    await this.repo.save(newUser);
     await this.timerService.initTimer(newUser);
     await this.settingService.init(newUser);
     return newUser;
+  }
+
+  async updateUser(email: string, attrs: Partial<User>) {
+    const user = await this.findUser(email);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    Object.assign(user, attrs);
+    return this.repo.save(user);
   }
 }
