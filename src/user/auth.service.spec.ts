@@ -148,18 +148,18 @@ describe('AuthService', () => {
       },
       createUser(userinfo: CreateUserDto) {
         const newUser = {
-          id: 6,
           email: userinfo.email,
           username: userinfo.username,
           refresh: userinfo.refresh,
           access: userinfo.access,
-          todo: `[{id: 1,date: new Date('Dec 27, 2022 18:00:30'),todo: 'Go to grocery store',duration: 60 * 60,done: true,category: '["chore", "family affair"]',},{id: 2,date: new Date('Dec 29, 2022 18:00:30'),todo: 'Go to Gym',duration: 60 * 60,done: false,category: '["health"]',}]`,
-          totalFocusTime:
-            '{today: 123123123,yesterday: 123123123,thisWeek: 123123123,lastWeek: 123123123,thisMonth: 123123123,lastMonth: 123123123,}',
-          totalRestTime:
-            '{today: 123123123,yesterday: 123123123,thisWeek: 123123123,lastWeek: 123123123,thisMonth: 123123123,lastMonth: 123123123,}',
-          setting: '{darkmode: true,extrememode: true,}',
-        };
+          // todo: `[{id: 1,date: new Date('Dec 27, 2022 18:00:30'),todo: 'Go to grocery store',duration: 60 * 60,done: true,category: '["chore", "family affair"]',},{id: 2,date: new Date('Dec 29, 2022 18:00:30'),todo: 'Go to Gym',duration: 60 * 60,done: false,category: '["health"]',}]`,
+          // totalFocusTime:
+          //   '{today: 123123123,yesterday: 123123123,thisWeek: 123123123,lastWeek: 123123123,thisMonth: 123123123,lastMonth: 123123123,}',
+          // totalRestTime:
+          //   '{today: 123123123,yesterday: 123123123,thisWeek: 123123123,lastWeek: 123123123,thisMonth: 123123123,lastMonth: 123123123,}',
+          // setting: '{darkmode: true,extrememode: true,}',
+          // categories: '',
+        } as User;
         mockUsers.push(newUser);
         return Promise.resolve(newUser);
       },
