@@ -16,6 +16,7 @@ import { TotalFocusTime } from './timer/entities/total-focus-time.entity';
 import { TotalRestTime } from './timer/entities/total-rest-time.entity';
 import { CategoryModule } from './category/category.module';
 import { Category } from './category/entities/category.entity';
+import { RankingModule } from './ranking/ranking.module';
 
 @Module({
   imports: [
@@ -51,6 +52,7 @@ import { Category } from './category/entities/category.entity';
     SettingModule,
     TimerModule,
     CategoryModule,
+    RankingModule,
   ],
   controllers: [AppController],
   providers: [
