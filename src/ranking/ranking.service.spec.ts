@@ -1,11 +1,13 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { DeepPartial, FindOneOptions } from 'typeorm';
+import { DeepPartial, FindOneOptions, SaveOptions } from 'typeorm';
 import { RankingService } from './ranking.service';
 import { rankingStub } from './stubs/ranking.stub';
+import { Ranking } from './entities/ranking.entity';
+import { getRepositoryToken } from '@nestjs/typeorm';
 
 describe('RankingService', () => {
   let service: RankingService;
-  let mockRanking:Raking[];
+  let mockRanking:Ranking[];
   let mockRankRepo;
 
   beforeEach(async () => {
@@ -42,7 +44,10 @@ describe('RankingService', () => {
     }
 
     const module: TestingModule = await Test.createTestingModule({
-      providers: [RankingService],
+      providers: [
+        RankingService,
+        { provide: getRepositoryToken(Ranking), useValue: mockRankRepo}
+      ],
     }).compile();
 
     service = module.get<RankingService>(RankingService);
