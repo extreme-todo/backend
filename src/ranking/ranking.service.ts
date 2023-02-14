@@ -9,9 +9,29 @@ import { InjectRepository } from '@nestjs/typeorm';
 export class RankingService {
   constructor(@InjectRepository(Ranking) private repo: Repository<Ranking>) {}
 
-  updateRank() {}
+  async updateRank(category: Category, user: User, time: number) {
+    const rank = await this.repo.findOne({
+      where: {
+        category,
+        user: { id: user.id },
+      },
+    });
 
-  ranking() {}
+    if (!rank) {
+      const newRank = this.repo.create({
+        user,
+        category,
+        time,
+      });
+      return await this.repo.save(newRank);
+    }
+
+    Object.assign(rank, { time: rank.time + time });
+    return await this.repo.save(rank);
+  }
+
+  // search
+  ranking(category: Category, user: User) {}
 
   deleteRank() {}
 }

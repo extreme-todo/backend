@@ -63,7 +63,7 @@ describe('RankingService', () => {
       const beforeRanking = mockRanking[0];
       const beforeTime = beforeRanking.time;
 
-      await expect(service.updateRank(beforeRanking.category,beforeRanking.user)).toBeGreaterThan(beforeTime);
+      await expect(service.updateRank(beforeRanking.category,beforeRanking.user,beforeTime)).toBeGreaterThan(beforeTime);
     });
   });
 
