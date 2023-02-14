@@ -1,12 +1,12 @@
 import { Todo } from '../../todo/entities/todo.entity';
-import { User } from '../../user/entities/user.entity';
 import {
   Column,
   Entity,
   ManyToMany,
-  ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { Ranking } from 'src/ranking/entities/ranking.entity';
 
 @Entity()
 export class Category {
@@ -19,6 +19,6 @@ export class Category {
   @ManyToMany(() => Todo, (todo) => todo.categories)
   todos: Todo[];
 
-  @ManyToOne(() => User, (user) => user.categories)
-  author: User;
+  @OneToMany(() => Ranking, (ranking) => ranking.category)
+  ranking: Ranking[];
 }

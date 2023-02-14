@@ -7,7 +7,7 @@ import {
   IsString,
 } from 'class-validator';
 
-export type Category = 'code' | 'math' | 'english';
+// export type Category = 'code' | 'math' | 'english';
 
 export class AddTodoDto {
   @IsDate()
