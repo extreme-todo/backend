@@ -11,6 +11,7 @@ import { Setting } from '../../setting/entities/setting.entity';
 import { TotalRestTime } from 'src/timer/entities/total-rest-time.entity';
 import { TotalFocusTime } from 'src/timer/entities/total-focus-time.entity';
 import { Category } from '../../category/entities/category.entity';
+import { Ranking } from 'src/ranking/entities/ranking.entity';
 
 @Entity()
 export class User {
@@ -32,24 +33,25 @@ export class User {
   @OneToMany(() => Todo, (todo) => todo.user)
   todo: Todo[];
 
-  @OneToMany(() => Category, (category) => category.author)
-  categories: Category[];
-
-  @OneToOne((type) => TotalFocusTime, (totalFocusTime) => totalFocusTime.user, {
+  @OneToOne(() => TotalFocusTime, (totalFocusTime) => totalFocusTime.user, {
     cascade: true,
   })
   @JoinColumn()
   totalFocusTime: TotalFocusTime;
 
-  @OneToOne((type) => TotalRestTime, (totalRestTime) => totalRestTime.user, {
+  @OneToOne(() => TotalRestTime, (totalRestTime) => totalRestTime.user, {
     cascade: true,
   })
   @JoinColumn()
   totalRestTime: TotalRestTime;
 
-  @OneToOne((type) => Setting, (setting) => setting.user, {
+  @OneToOne(() => Setting, (setting) => setting.user, {
     cascade: true,
   })
   @JoinColumn()
   setting: Setting;
+
+  @OneToMany(() => Ranking, (ranking) => ranking.user)
+  @JoinColumn()
+  ranking: Ranking[];
 }
