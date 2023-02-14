@@ -4,6 +4,7 @@ import { Category } from 'src/category/entities/category.entity';
 import { Ranking } from './entities/ranking.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Cron } from '@nestjs/schedule';
 
 @Injectable()
 export class RankingService {
@@ -30,10 +31,10 @@ export class RankingService {
     return await this.repo.save(rank);
   }
 
-  async ranking(category: Category, user: User) {
+  async ranking(category: string, user: User) {
     const userRank = await this.repo.findOne({
       where: {
-        category,
+        category: { name: category },
         user: { id: user.id },
       },
     });
@@ -102,7 +103,8 @@ export class RankingService {
     return result;
   }
 
-  async deleteRank() {
+  @Cron('0 0 5 * * 1')
+  private async deleteRank() {
     return await this.repo.clear();
   }
 }

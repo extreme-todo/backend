@@ -13,10 +13,6 @@ describe('RankingService', () => {
   beforeEach(async () => {
     mockRanking = rankingStub();
     mockRankRepo = {
-      clear(): Promise<void> {
-        mockRanking = [];
-        return null;
-      },
       findOne(options?: FindOneOptions<Ranking>) {
         if (options?.where) {
           const keys = Object.keys(options.where);
@@ -96,14 +92,6 @@ describe('RankingService', () => {
       );
 
       expect(resultRank).toBeDefined();
-    });
-  });
-
-  // 랭킹 정보 삭제할 때... 시간...
-  describe('deleteRank', () => {
-    it('', async () => {
-      await service.deleteRank();
-      expect(mockRanking.length).toEqual(0);
     });
   });
 });
