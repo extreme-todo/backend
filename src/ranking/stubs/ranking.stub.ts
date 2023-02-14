@@ -1,5 +1,6 @@
 import { Category } from 'src/category/entities/category.entity';
 import { User } from 'src/user/entities/user.entity';
+import { Ranking } from '../entities/ranking.entity';
 
 export const rankingStub = (): Ranking[] => {
   return [

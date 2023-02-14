@@ -102,5 +102,7 @@ export class RankingService {
     return result;
   }
 
-  deleteRank() {}
+  async deleteRank() {
+    return await this.repo.clear();
+  }
 }
