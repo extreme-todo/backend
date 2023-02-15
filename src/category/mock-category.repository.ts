@@ -17,9 +17,6 @@ export const mockCategoryRepo = {
       keys.forEach((key) => {
         if (key !== 'author')
           res = res.filter((el) => el[key] === options.where[key]);
-        else {
-          res = res.filter((el) => el.author.id === options.where[key].id);
-        }
       });
       return res;
     }
@@ -45,4 +42,16 @@ export const mockCategoryRepo = {
   save(entity: Category, options?: SaveOptions) {
     return Promise.resolve(entity);
   },
+  createQueryBuilder: jest.fn(() => {
+    return {
+      where: jest.fn().mockReturnThis(),
+      leftJoin: jest.fn().mockReturnThis(),
+      select: jest.fn().mockReturnThis(),
+      groupBy: jest.fn().mockReturnThis(),
+      getRawMany: jest.fn().mockResolvedValue([
+        { id: 1, name: 'fakeCategory1' },
+        { id: 2, name: 'fakeCategory2' },
+      ]),
+    };
+  }),
 };
