@@ -18,8 +18,8 @@ import { Category } from 'src/category/entities/category.entity';
 describe('TodoService', () => {
   let service: TodoService;
   const fakeCategoryService = {
-    findOrCreateCategories(user: User, categories: string[]) {
-      return categories.map((x) => ({ name: x, author: user } as Category));
+    findOrCreateCategories(categories: string[]) {
+      return categories.map((x) => ({ name: x } as Category));
     },
   };
   const existingId = todoStub()[0].id;
@@ -56,7 +56,6 @@ describe('TodoService', () => {
   describe('getOneTodo', () => {
     it('존재하는 id에 해당하는 투두 출력', async () => {
       const res = await service.getOneTodo(existingId, fakeUserHasATodo);
-      console.log(res);
       expect(res.id).toEqual(existingId);
     });
     it('해당 todo id가 존재하지 않는 경우 NotFound', async () => {
