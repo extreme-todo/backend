@@ -21,11 +21,9 @@ export class TodoService {
 
   async addTodo(addTodoDto: AddTodoDto, user: User) {
     const categories = await this.categoryService.findOrCreateCategories(
-      user,
       addTodoDto.categories,
     );
     const newTodo = this.repo.create({ ...addTodoDto, categories, user });
-    console.log(newTodo);
     return await this.repo.save(newTodo);
   }
 
@@ -58,7 +56,6 @@ export class TodoService {
     }
     if (updateTodo?.categories) {
       const newCategories = await this.categoryService.findOrCreateCategories(
-        user,
         updateTodo.categories,
       );
       Object.assign(todo, { ...updateTodo, categories: newCategories });

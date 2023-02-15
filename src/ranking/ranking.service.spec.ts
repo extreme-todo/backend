@@ -87,7 +87,7 @@ describe('RankingService', () => {
     it('주어진 유저의 주어진 카테고리에 해당하는 시간을 반환', async () => {
       const searchRank = mockRanking[0];
       const resultRank = await service.ranking(
-        searchRank.category,
+        searchRank.category.name,
         searchRank.user,
       );
 

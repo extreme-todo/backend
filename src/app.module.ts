@@ -17,6 +17,7 @@ import { TotalRestTime } from './timer/entities/total-rest-time.entity';
 import { CategoryModule } from './category/category.module';
 import { Category } from './category/entities/category.entity';
 import { RankingModule } from './ranking/ranking.module';
+import { Ranking } from './ranking/entities/ranking.entity';
 
 @Module({
   imports: [
@@ -37,7 +38,15 @@ import { RankingModule } from './ranking/ranking.module';
           username: config.get('DB_USERNAME'),
           password: config.get('DB_PASSWORD'),
           database: config.get('DB_DATABASE'),
-          entities: [Todo, User, Setting, Category, TotalFocusTime, TotalRestTime],
+          entities: [
+            Todo,
+            User,
+            Setting,
+            Category,
+            TotalFocusTime,
+            TotalRestTime,
+            Ranking,
+          ],
           synchronize: true,
           // url: process.env.DATABASE_URL,
           // migrationsRun: true,

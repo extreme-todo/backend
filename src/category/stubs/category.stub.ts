@@ -24,14 +24,14 @@ export const categoryStub = (): Category[] => {
     {
       id: 1,
       name: 'math',
-      author: fakeUserHasACategory_1,
       todos: [],
+      ranking: [],
     },
     {
       id: 2,
       name: 'english',
-      author: fakeUserHasACategory_2,
       todos: [],
+      ranking: [],
     },
   ];
 };

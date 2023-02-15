@@ -28,15 +28,10 @@ describe('CategoryService', () => {
     service = module.get<CategoryService>(CategoryService);
   });
 
-  describe('작성한 카테고리 목록 조회', () => {
-    it('카테고리를 하나도 작성하지 않은 경우', async () => {
+  describe('사용한 카테고리 목록 조회', () => {
+    it('카테고리 목록 조회', async () => {
       const categories = await service.myCategories(fakeUser);
-      expect(categories).toEqual([]);
-    });
-    it('작성한 카테고리가 1개 있는 경우', async () => {
-      const categories = await service.myCategories(fakeUser1);
       expect(categories).toBeDefined();
-      expect(categories).toHaveLength(1);
     });
   });
 
@@ -45,12 +40,12 @@ describe('CategoryService', () => {
       const input = categoryStub()
         .slice(0, 2)
         .map((x) => x.name);
-      const categories = await service.findOrCreateCategories(fakeUser, input);
+      const categories = await service.findOrCreateCategories(input);
       expect(categories).toEqual(categoryStub());
     });
     it('미등록 카테고리 2개만 입력한 경우', async () => {
       const input = ['study', 'work'];
-      const categories = await service.findOrCreateCategories(fakeUser, input);
+      const categories = await service.findOrCreateCategories(input);
       expect(categories).toHaveLength(2);
     });
     it('등록된 카테고리 2개와 미등록 카테고리 2개를 입력한 경우', async () => {
@@ -61,7 +56,7 @@ describe('CategoryService', () => {
         'study',
         'work',
       ];
-      const categories = await service.findOrCreateCategories(fakeUser, input);
+      const categories = await service.findOrCreateCategories(input);
       expect(categories).toHaveLength(4);
     });
   });
@@ -83,7 +78,7 @@ describe('CategoryService', () => {
   describe('string을 받아 새로운 Category 생성', () => {
     it('미등록 카테고리인 경우', async () => {
       const input = 'study';
-      const category = await service.create(fakeUser, input);
+      const category = await service.create(input);
       expect(category).toBeDefined();
       expect(category.name).toEqual(input);
     });
@@ -92,9 +87,7 @@ describe('CategoryService', () => {
       fakeRepository.create = () => {
         throw new Error();
       };
-      await expect(service.create(fakeUser, input)).rejects.toThrow(
-        BadRequestException,
-      );
+      await expect(service.create(input)).rejects.toThrow(BadRequestException);
     });
   });
 });
