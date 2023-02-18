@@ -14,6 +14,7 @@ import { NotFoundException } from '@nestjs/common';
 import { CategoryService } from '../category/category.service';
 import { User } from '../user/entities/user.entity';
 import { Category } from 'src/category/entities/category.entity';
+import { RankingService } from 'src/ranking/ranking.service';
 
 describe('TodoService', () => {
   let service: TodoService;
@@ -33,6 +34,12 @@ describe('TodoService', () => {
         TodoService,
         { provide: CategoryService, useValue: fakeCategoryService },
         { provide: getRepositoryToken(Todo), useValue: mockRepo },
+        {
+          provide: RankingService,
+          useValue: {
+            updateRank: jest.fn().mockResolvedValue({}),
+          },
+        },
       ],
     }).compile();
 

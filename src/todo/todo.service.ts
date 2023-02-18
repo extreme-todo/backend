@@ -11,12 +11,14 @@ import { Repository } from 'typeorm';
 import { AddTodoDto } from './dto/add-todo.dto';
 import { UpdateTodoDto } from './dto/update-todo.dto';
 import { Todo } from './entities/todo.entity';
+import { RankingService } from 'src/ranking/ranking.service';
 
 @Injectable()
 export class TodoService {
   constructor(
     @InjectRepository(Todo) private repo: Repository<Todo>,
     private categoryService: CategoryService,
+    private rankingService: RankingService
   ) {}
 
   async addTodo(addTodoDto: AddTodoDto, user: User) {
@@ -71,6 +73,11 @@ export class TodoService {
       throw new NotFoundException('Todo not found');
     }
     todo.done = true;
+    if(todo?.categories) {
+      todo.categories.forEach(async (category) => {
+        await this.rankingService.updateRank(category, user, todo.duration);
+      })
+    }
     return this.repo.save(todo);
   }
 
