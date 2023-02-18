@@ -39,61 +39,64 @@ export class RankingService {
       },
     });
 
-    const maxCategory = await this.repo
-      .createQueryBuilder()
+    const {max: maxCategory} = await this.repo
+      .createQueryBuilder('ranking')
       .select('MAX(ranking.time)', 'max')
-      .where('ranking.category = :category', { category })
-      .getRawOne();
+      .leftJoin('ranking.category', 'category')
+      .where('category.name = :category', { category })
+      .getRawOne()
 
-    const minCategory = await this.repo
-      .createQueryBuilder()
+    const {min: minCategory} = await this.repo
+      .createQueryBuilder('ranking')
       .select('MIN(ranking.time)', 'min')
-      .where('ranking.category = :category', { category })
+      .leftJoin('ranking.category', 'category')
+      .where('category.name = :category', { category })
       .getRawOne();
 
     const gap = Math.ceil((minCategory + maxCategory) / 10);
 
     let groupBy = await this.repo
-      .createQueryBuilder()
+      .createQueryBuilder('ranking')
       .select(`count(case when time < ${gap} then 1 end)`, `0~${gap}`)
-      .select(
+      .addSelect(
         `count(case when ${gap} <= time and time < ${gap * 2} then 1 end)`,
         `${gap}~${gap * 2}`,
       )
-      .select(
+      .addSelect(
         `count(case when ${gap * 2} <= time and time < ${gap * 3} then 1 end)`,
         `${gap * 2}~${gap * 3}`,
       )
-      .select(
+      .addSelect(
         `count(case when ${gap * 3} <= time and time < ${gap * 4} then 1 end)`,
         `${gap * 3}~${gap * 4}`,
       )
-      .select(
+      .addSelect(
         `count(case when ${gap * 4} <= time and time < ${gap * 5} then 1 end)`,
         `${gap * 4}~${gap * 5}`,
       )
-      .select(
+      .addSelect(
         `count(case when ${gap * 5} <= time and time < ${gap * 6} then 1 end)`,
         `${gap * 5}~${gap * 6}`,
       )
-      .select(
+      .addSelect(
         `count(case when ${gap * 6} <= time and time < ${gap * 7} then 1 end)`,
         `${gap * 6}~${gap * 7}`,
       )
-      .select(
+      .addSelect(
         `count(case when ${gap * 7} <= time and time < ${gap * 8} then 1 end)`,
         `${gap * 7}~${gap * 8}`,
       )
-      .select(
+      .addSelect(
         `count(case when ${gap * 8} <= time and time < ${gap * 9} then 1 end)`,
         `${gap * 8}~${gap * 9}`,
       )
-      .select(
+      .addSelect(
         `count(case when ${gap * 9} <= time and time < ${gap * 10} then 1 end)`,
         `${gap * 9}~${gap * 10}`,
       )
-      .where(`category = :category`, { category })
-      .groupBy(`category`)
+      .leftJoin('ranking.category', 'category')
+      .where(`category.name = :category`, { category })
+      .groupBy(`category.name`)
       .getRawMany();
 
     const result = {

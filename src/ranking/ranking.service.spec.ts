@@ -45,8 +45,10 @@ describe('RankingService', () => {
         return {
           where: jest.fn().mockReturnThis(),
           select: jest.fn().mockReturnThis(),
+          addSelect: jest.fn().mockReturnThis(),
           groupBy: jest.fn().mockReturnThis(),
-          getRawOne: jest.fn(),
+          leftJoin: jest.fn().mockReturnThis(),
+          getRawOne: jest.fn().mockResolvedValue({ max: 123, min: 123 }),
           getRawMany: jest.fn(),
         };
       }),

@@ -1,6 +1,7 @@
 import {
   Column,
   Entity,
+  JoinColumn,
   ManyToMany,
   ManyToOne,
   OneToMany,
@@ -18,6 +19,7 @@ export class Ranking {
   @ManyToOne(() => Category, (category) => category.ranking, {
     cascade: true,
   })
+  @JoinColumn()
   category: Category;
 
   @ManyToOne(() => User, (user) => user.ranking, {
