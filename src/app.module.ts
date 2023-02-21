@@ -1,4 +1,4 @@
-import { Module, ValidationPipe } from '@nestjs/common';
+import { MiddlewareConsumer, Module, ValidationPipe } from '@nestjs/common';
 import { TodoModule } from './todo/todo.module';
 import { UserModule } from './user/user.module';
 import { AppController } from './app.controller';
@@ -18,6 +18,7 @@ import { CategoryModule } from './category/category.module';
 import { Category } from './category/entities/category.entity';
 import { RankingModule } from './ranking/ranking.module';
 import { Ranking } from './ranking/entities/ranking.entity';
+import { VerifiedMiddleware } from './middlewares/verified.middleware';
 
 @Module({
   imports: [
@@ -75,4 +76,11 @@ import { Ranking } from './ranking/entities/ranking.entity';
     },
   ],
 })
-export class AppModule {}
+export class AppModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(VerifiedMiddleware)
+      .exclude('/api/users/callback/google/(.*)')
+      .forRoutes('*');
+  }
+}
