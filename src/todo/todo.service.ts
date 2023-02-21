@@ -89,7 +89,7 @@ export class TodoService {
   }
 
   @Cron('0 0 5 * * 1')
-  async removeTodo() {
+  async removeTodos() {
     const staleTodos = await this.repo
       .createQueryBuilder('todo')
       .select('*')

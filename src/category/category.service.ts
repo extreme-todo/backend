@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../user/entities/user.entity';
 import { Repository } from 'typeorm';
 import { Category } from './entities/category.entity';
-import { Todo } from 'src/todo/entities/todo.entity';
+import { Cron } from '@nestjs/schedule';
 
 @Injectable()
 export class CategoryService {
@@ -45,5 +45,19 @@ export class CategoryService {
     } catch (err) {
       throw new BadRequestException('Category already exists');
     }
+  }
+
+  @Cron('0 0 5 * * 1')
+  private async removeCategories() {
+    const stale = await this.repo.query(`
+      select res.id, res.name
+      from (select c.id, c.name, t.id as todoId from category c
+      left join todo_categories_category tc
+      on c.id = tc.categoryId
+      left join todo t
+      on t.id = tc.todoId) res
+      where res.todoId is null
+      `);
+    return await this.repo.remove(stale);
   }
 }
