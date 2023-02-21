@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Injectable,
   NotFoundException,
   UnauthorizedException,
@@ -18,7 +17,7 @@ export class TodoService {
   constructor(
     @InjectRepository(Todo) private repo: Repository<Todo>,
     private categoryService: CategoryService,
-    private rankingService: RankingService
+    private rankingService: RankingService,
   ) {}
 
   async addTodo(addTodoDto: AddTodoDto, user: User) {
@@ -73,10 +72,10 @@ export class TodoService {
       throw new NotFoundException('Todo not found');
     }
     todo.done = true;
-    if(todo?.categories) {
+    if (todo?.categories) {
       todo.categories.forEach(async (category) => {
         await this.rankingService.updateRank(category, user, todo.duration);
-      })
+      });
     }
     return this.repo.save(todo);
   }
