@@ -127,6 +127,7 @@ jest.mock('googleapis', () => {
                 access_token: 'new123123123123',
               },
             }),
+            revokeToken: jest.fn(),
           };
         }),
       },
@@ -167,6 +168,10 @@ describe('AuthService', () => {
         const result = await this.findUser(email);
         Object.assign(result, attr);
         return Promise.resolve(result);
+      },
+      removeUser(user: User) {
+        mockUsers = mockUsers.filter((el) => el !== user);
+        return Promise.resolve();
       },
     };
 
@@ -229,6 +234,14 @@ describe('AuthService', () => {
       await expect(
         service.verifiedIdToken('exampleTwo@ex.com', 'Invalid'),
       ).rejects.toThrow(BadRequestException);
+    });
+  });
+
+  describe('revokeToken', () => {
+    it('should less than previous userDB', async () => {
+      const prevUser = userStub();
+      service.revokeToken(mockUsers[0]);
+      expect(mockUsers.length).toBeLessThan(prevUser.length);
     });
   });
 });

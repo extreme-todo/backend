@@ -17,7 +17,7 @@ export class Ranking {
   id: number;
 
   @ManyToOne(() => Category, (category) => category.ranking, {
-    cascade: true,
+    onDelete: 'CASCADE',
   })
   @JoinColumn()
   category: Category;
