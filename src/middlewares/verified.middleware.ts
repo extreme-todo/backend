@@ -24,7 +24,6 @@ export class VerifiedMiddleware implements NestMiddleware {
   constructor(private authService: AuthService) {}
 
   async use(req: Request, res: Response, next: NextFunction) {
-    console.log(req.body);
     const {
       userinfo: { email, id_token },
     } = req.body || {};

@@ -61,9 +61,4 @@ export default class TodoController {
   getList(@Query('done') isDone: boolean, @CurrentUser() userdata: User) {
     return this.todoService.getList(isDone, userdata);
   }
-
-  @Get('scheduled')
-  async getScheduled() {
-    return await this.todoService.removeTodo();
-  }
 }
