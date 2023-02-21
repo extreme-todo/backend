@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { google } from 'googleapis';
+import { User } from './entities/user.entity';
 import { UserService } from './user.service';
 
 @Injectable()
@@ -132,6 +133,15 @@ export class AuthService {
       return userinfo;
     } catch (err) {
       throw new BadRequestException('invalid refreshTokens');
+    }
+  }
+
+  async revokeToken(user: User) {
+    try {
+      await this.userService.removeUser(user);
+      const res2 = await this.#oauth2Client.revokeToken(user.access);
+    } catch (err) {
+      throw new BadRequestException(err.message);
     }
   }
 }

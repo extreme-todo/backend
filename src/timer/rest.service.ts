@@ -17,12 +17,14 @@ export class RestService {
   }
 
   async getTime(user: User) {
-    const restTime = this.repo.findOne({ where: { user } });
+    const restTime = this.repo.findOne({ where: { user: { id: user.id } } });
     return restTime;
   }
 
   async addTime(user: User, time: number) {
-    const restTime = await this.repo.findOne({ where: { user } });
+    const restTime = await this.repo.findOne({
+      where: { user: { id: user.id } },
+    });
     restTime.total += time;
     restTime.today += time;
     restTime.thisWeek += time;

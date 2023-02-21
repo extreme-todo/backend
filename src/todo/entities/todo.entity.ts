@@ -27,7 +27,9 @@ export class Todo {
   @Column({ default: false })
   done: boolean;
 
-  @ManyToOne(() => User, (user) => user.todo)
+  @ManyToOne(() => User, (user) => user.todo, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn()
   user: User;
 

@@ -5,6 +5,7 @@ import { TimerService } from 'src/timer/timer.service';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './entities/user.entity';
+import { DBException } from './error/db.exception';
 
 @Injectable()
 export class UserService {
@@ -35,5 +36,9 @@ export class UserService {
     }
     Object.assign(user, attrs);
     return this.repo.save(user);
+  }
+
+  async removeUser(user: User) {
+    await this.repo.remove(user);
   }
 }

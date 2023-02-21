@@ -3,12 +3,15 @@ import {
   Get,
   NotFoundException,
   Param,
+  Post,
   Query,
   Redirect,
 } from '@nestjs/common';
 import { Serialize } from 'src/interceptor/serialize.interceptor';
 import { AuthService } from './auth.service';
+import { CurrentUser } from './decorators/current-user.decorator';
 import { UserDto } from './dto/user.dto';
+import { User } from './entities/user.entity';
 import { UserService } from './user.service';
 
 @Controller('/api/users')
@@ -38,5 +41,10 @@ export class UserController {
       throw new NotFoundException('user not found');
     }
     return user;
+  }
+
+  @Post('/revoke')
+  async revokeUser(@CurrentUser() user: User) {
+    return await this.authService.revokeToken(user);
   }
 }
