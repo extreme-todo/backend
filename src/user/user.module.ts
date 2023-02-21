@@ -6,7 +6,6 @@ import { User } from './entities/user.entity';
 import { AuthService } from './auth.service';
 import { TimerModule } from 'src/timer/timer.module';
 import { SettingModule } from 'src/setting/setting.module';
-import { TodoModule } from 'src/todo/todo.module';
 
 @Module({
   imports: [TypeOrmModule.forFeature([User]), TimerModule, SettingModule],
