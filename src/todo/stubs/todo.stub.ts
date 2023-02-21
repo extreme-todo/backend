@@ -6,20 +6,20 @@ import { UpdateTodoDto } from '../dto/update-todo.dto';
 export const fakeUserHasNoTodo = {
   id: 0,
   email: 'fakeUser@email.com',
-  username: 'fakeUser'
-} as User
+  username: 'fakeUser',
+} as User;
 
 export const fakeUserHasATodo = {
   id: 1,
   email: 'fakeUser1@email.com',
-  username: 'fakeUser1'
-} as User
+  username: 'fakeUser1',
+} as User;
 
 const fakeUser2 = {
   id: 2,
   email: 'fakeUser2@email.com',
-  username: 'fakeUser2'
-} as User
+  username: 'fakeUser2',
+} as User;
 
 export const todoStub = (): Todo[] => {
   return [
@@ -27,6 +27,7 @@ export const todoStub = (): Todo[] => {
       id: 1,
       date: new Date('Dec 27, 2022 18:00:30'),
       todo: 'Go to grocery store',
+      createdAt: new Date('Dec 26, 2022 18:00:30'),
       duration: 60 * 60,
       done: true,
       user: fakeUserHasATodo,
@@ -36,6 +37,7 @@ export const todoStub = (): Todo[] => {
       id: 2,
       date: new Date('Dec 29, 2022 18:00:30'),
       todo: 'Go to Gym',
+      createdAt: new Date('Dec 26, 2022 18:00:30'),
       duration: 60 * 60,
       done: false,
       user: fakeUser2,
@@ -45,6 +47,7 @@ export const todoStub = (): Todo[] => {
       id: 3,
       date: new Date('Dec 30, 2022 18:00:30'),
       todo: 'Go to institute',
+      createdAt: new Date('Dec 28, 2022 18:00:30'),
       duration: 60 * 60 * 2,
       done: true,
       user: fakeUser2,
@@ -59,7 +62,7 @@ export const addTodoStub = (user: User): AddTodoDto => {
     todo: 'Go to school',
     duration: 3000,
     categories: ['study'],
-    userinfo: {email: user.email, id_token: 'faketoken'}
+    userinfo: { email: user.email, id_token: 'faketoken' },
   };
 };
 
@@ -67,7 +70,7 @@ export const updateTodoStub = (user: User): UpdateTodoDto => {
   return {
     duration: 7000,
     todo: 'updated',
-    userinfo: {email: user.email, id_token: 'faketoken'},
+    userinfo: { email: user.email, id_token: 'faketoken' },
     categories: ['study'],
   };
 };
