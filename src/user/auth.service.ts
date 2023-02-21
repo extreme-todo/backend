@@ -110,8 +110,6 @@ export class AuthService {
         const newUserInfo = await this.refreshTokens(email);
         return newUserInfo;
       } else {
-        console.log('⛔️⛔️⛔️ err', err);
-        console.log('⛔️⛔️⛔️ err message', err.message);
         // 그 외의 경우 에러처리(아예 권한이 없는 경우?.. 토큰이 없거나 등등)
         throw new UnauthorizedException('unauthorized user');
       }

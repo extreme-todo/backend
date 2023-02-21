@@ -44,7 +44,8 @@ export default class TodoController {
   @UseGuards(AuthGuard)
   async updateTodo(
     @Param('id') todoId: number,
-    @Body() updateData: UpdateTodoDto, @CurrentUser() userdata: User
+    @Body() updateData: UpdateTodoDto,
+    @CurrentUser() userdata: User,
   ) {
     return this.todoService.updateTodo(todoId, updateData, userdata);
   }

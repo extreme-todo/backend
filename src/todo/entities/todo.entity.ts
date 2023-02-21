@@ -8,12 +8,16 @@ import {
   ManyToMany,
   PrimaryGeneratedColumn,
   JoinTable,
+  CreateDateColumn,
 } from 'typeorm';
 
 @Entity()
 export class Todo {
   @PrimaryGeneratedColumn()
   id: number;
+
+  @CreateDateColumn()
+  createdAt: Date;
 
   @Column({ type: 'timestamp' })
   date: Date;

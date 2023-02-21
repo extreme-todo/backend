@@ -11,6 +11,7 @@ import { AddTodoDto } from './dto/add-todo.dto';
 import { UpdateTodoDto } from './dto/update-todo.dto';
 import { Todo } from './entities/todo.entity';
 import { RankingService } from 'src/ranking/ranking.service';
+import { Cron } from '@nestjs/schedule';
 
 @Injectable()
 export class TodoService {
@@ -85,5 +86,15 @@ export class TodoService {
       relations: { categories: true },
       where: { done: isDone, user: { id: user.id } },
     });
+  }
+
+  @Cron('0 0 5 * * 1')
+  async removeTodos() {
+    const staleTodos = await this.repo
+      .createQueryBuilder('todo')
+      .select('*')
+      .where('todo.date < :date', { date: new Date() })
+      .getRawMany();
+    return await this.repo.remove(staleTodos);
   }
 }
