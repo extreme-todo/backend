@@ -1,5 +1,11 @@
 import { User } from 'src/user/entities/user.entity';
-import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity()
 export class TotalRestTime {
@@ -27,6 +33,7 @@ export class TotalRestTime {
   @Column({ default: 0 })
   lastMonth: number;
 
-  @OneToOne(() => User, (user) => user.totalRestTime)
+  @OneToOne(() => User, (user) => user.totalRestTime, { onDelete: 'CASCADE' })
+  @JoinColumn()
   user: User;
 }

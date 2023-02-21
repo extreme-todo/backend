@@ -1,5 +1,11 @@
 import { User } from '../../user/entities/user.entity';
-import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 export type ColorMode = 'light' | 'dark' | 'auto';
 
@@ -14,6 +20,7 @@ export class Setting {
   @Column({ default: true })
   extremeMode: boolean;
 
-  @OneToOne(() => User, (user) => user.setting)
+  @OneToOne(() => User, (user) => user.setting, { onDelete: 'CASCADE' })
+  @JoinColumn()
   user: User;
 }

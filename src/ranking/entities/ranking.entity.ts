@@ -23,7 +23,7 @@ export class Ranking {
   category: Category;
 
   @ManyToOne(() => User, (user) => user.ranking, {
-    cascade: true,
+    onDelete: 'CASCADE',
   })
   user: User;
 
