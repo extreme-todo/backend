@@ -14,13 +14,13 @@ export class AuthService {
     private config: ConfigService,
   ) {}
 
-  #CLIENT_ID = this.config.get('OAUTH_ID');
-  #CLIENT_PW = this.config.get('OAUTH_PW');
-  #REDIRECT_URL = this.config.get('REDIRECT_URL');
-  #oauth2Client = new google.auth.OAuth2(
-    this.#CLIENT_ID,
-    this.#CLIENT_PW,
-    this.#REDIRECT_URL,
+  private CLIENT_ID = this.config.get('OAUTH_ID');
+  private CLIENT_PW = this.config.get('OAUTH_PW');
+  private REDIRECT_URL = this.config.get('REDIRECT_URL');
+  private oauth2Client = new google.auth.OAuth2(
+    this.CLIENT_ID,
+    this.CLIENT_PW,
+    this.REDIRECT_URL,
   );
 
   // google oauth2 flow start
@@ -30,7 +30,7 @@ export class AuthService {
       'https://www.googleapis.com/auth/userinfo.profile',
     ];
 
-    const url = this.#oauth2Client.generateAuthUrl({
+    const url = this.oauth2Client.generateAuthUrl({
       access_type: 'offline',
       scope: scopes,
       // 점진적 승인 => 어플리케이션이 점진적 승인을 사용하여 컨텍스트에서 추가 범위에 대한 엑세스를 요청할 수 있도록 한다. false로 하면 scope가 요청한 범위만 포함한다.
@@ -41,16 +41,16 @@ export class AuthService {
 
   // authCode를 token으로 바꾸기
   async googleCallback(authCode: string) {
-    const { tokens } = await this.#oauth2Client.getToken(authCode);
+    const { tokens } = await this.oauth2Client.getToken(authCode);
     // QUESTION : 'setCredentials' :: Sets the auth credentials. 이거 뭔지 찾아보기..
-    this.#oauth2Client.setCredentials(tokens);
+    this.oauth2Client.setCredentials(tokens);
 
     // token으로 로그인 처리해주기
     if (!tokens) {
       throw new BadRequestException('tokens not found');
     }
 
-    const idtoken = await this.#oauth2Client.verifyIdToken({
+    const idtoken = await this.oauth2Client.verifyIdToken({
       idToken: tokens.id_token,
     });
     const userinfo = idtoken.getPayload();
@@ -92,7 +92,7 @@ export class AuthService {
   // id_tokens 토큰 검증
   async verifiedIdToken(email: string, token: string) {
     try {
-      await this.#oauth2Client.verifyIdToken({ idToken: token });
+      await this.oauth2Client.verifyIdToken({ idToken: token });
       const user = await this.userService.findUser(email);
       return {
         userdata: user,
@@ -115,9 +115,9 @@ export class AuthService {
   // 토큰 재발급받기
   private async refreshTokens(email: string) {
     const user = await this.userService.findUser(email);
-    this.#oauth2Client.setCredentials({ refresh_token: user.refresh });
+    this.oauth2Client.setCredentials({ refresh_token: user.refresh });
     try {
-      const { credentials } = await this.#oauth2Client.refreshAccessToken();
+      const { credentials } = await this.oauth2Client.refreshAccessToken();
       user.access = credentials.access_token;
       this.userService.createUser(user);
       const userinfo = {
