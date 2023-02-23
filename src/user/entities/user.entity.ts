@@ -1,19 +1,16 @@
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  OneToMany,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { Todo } from '../../todo/entities/todo.entity';
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
-
-export interface ITimeStamp {
-  today: number;
-  yesterday: number;
-  thisWeek: number;
-  lastWeek: number;
-  thisMonth: number;
-  lastMonth: number;
-}
-
-export interface ISetting {
-  darkmode: boolean;
-  extrememode: boolean;
-}
+import { Setting } from '../../setting/entities/setting.entity';
+import { TotalRestTime } from 'src/timer/entities/total-rest-time.entity';
+import { TotalFocusTime } from 'src/timer/entities/total-focus-time.entity';
+import { Ranking } from 'src/ranking/entities/ranking.entity';
 
 @Entity()
 export class User {
@@ -35,21 +32,22 @@ export class User {
   @OneToMany(() => Todo, (todo) => todo.user)
   todo: Todo[];
 
-  // TODO : totalFocusTime을 @OneToOne로 연결해야 함
-  // FIXME : ITimeStamp였는데 mysql 때문에 string으로 일단 바꿈. 후에 Translate 처리 해야함
-  @Column({ default: '{}' })
-  totalFocusTime: string;
-
-  // TODO : totalRestTime을 @OneToOne로 연결해야 함
-  // FIXME : ITimeStamp였는데 mysql 때문에 string으로 일단 바꿈. 후에 Translate 처리 해야함
-  @Column({
-    default:
-      '{today: 0,yesterday: 0,thisWeek: 0,lastWeek: 0,thisMonth: 0,lastMonth: 0,}',
+  @OneToOne(() => TotalFocusTime, (totalFocusTime) => totalFocusTime.user, {
+    cascade: true,
   })
-  totalRestTime: string;
+  totalFocusTime: TotalFocusTime;
 
-  // TODO : setting을 @OneToOne로 연결해야 함
-  // FIXME : ITimeStamp였는데 mysql 때문에 string으로 일단 바꿈. 후에 Translate 처리 해야함
-  @Column({ default: '{darkmode: false,extrememode: true,}' })
-  setting: string;
+  @OneToOne(() => TotalRestTime, (totalRestTime) => totalRestTime.user, {
+    cascade: true,
+  })
+  totalRestTime: TotalRestTime;
+
+  @OneToOne(() => Setting, (setting) => setting.user, {
+    cascade: true,
+  })
+  setting: Setting;
+
+  @OneToMany(() => Ranking, (ranking) => ranking.user)
+  @JoinColumn()
+  ranking: Ranking[];
 }

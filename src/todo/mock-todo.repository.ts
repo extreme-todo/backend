@@ -26,7 +26,6 @@ export const mockTodoRepo = {
   },
   findOne(options: FindOneOptions<Todo>) {
     const todos = todoStub();
-    console.log('hey..', options);
 
     if (options.where['id']) {
       return todos.filter((el) => el.id === options.where['id'])[0];

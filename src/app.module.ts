@@ -1,4 +1,4 @@
-import { Module, ValidationPipe } from '@nestjs/common';
+import { MiddlewareConsumer, Module, ValidationPipe } from '@nestjs/common';
 import { TodoModule } from './todo/todo.module';
 import { UserModule } from './user/user.module';
 import { AppController } from './app.controller';
@@ -7,10 +7,22 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_PIPE } from '@nestjs/core';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Todo } from './todo/entities/todo.entity';
+import { SettingModule } from './setting/setting.module';
 import { User } from './user/entities/user.entity';
+import { Setting } from './setting/entities/setting.entity';
+import { TimerModule } from './timer/timer.module';
+import { ScheduleModule } from '@nestjs/schedule';
+import { TotalFocusTime } from './timer/entities/total-focus-time.entity';
+import { TotalRestTime } from './timer/entities/total-rest-time.entity';
+import { CategoryModule } from './category/category.module';
+import { Category } from './category/entities/category.entity';
+import { RankingModule } from './ranking/ranking.module';
+import { Ranking } from './ranking/entities/ranking.entity';
+import { VerifiedMiddleware } from './middlewares/verified.middleware';
 
 @Module({
   imports: [
+    ScheduleModule.forRoot(),
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: `.env.${process.env.NODE_ENV}`,
@@ -27,7 +39,15 @@ import { User } from './user/entities/user.entity';
           username: config.get('DB_USERNAME'),
           password: config.get('DB_PASSWORD'),
           database: config.get('DB_DATABASE'),
-          entities: [Todo, User],
+          entities: [
+            Todo,
+            User,
+            Setting,
+            Category,
+            TotalFocusTime,
+            TotalRestTime,
+            Ranking,
+          ],
           synchronize: true,
           // url: process.env.DATABASE_URL,
           // migrationsRun: true,
@@ -39,6 +59,10 @@ import { User } from './user/entities/user.entity';
     }),
     TodoModule,
     UserModule,
+    SettingModule,
+    TimerModule,
+    CategoryModule,
+    RankingModule,
   ],
   controllers: [AppController],
   providers: [
@@ -52,4 +76,11 @@ import { User } from './user/entities/user.entity';
     },
   ],
 })
-export class AppModule {}
+export class AppModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(VerifiedMiddleware)
+      .exclude('/api/users/callback/google/(.*)')
+      .forRoutes('*');
+  }
+}

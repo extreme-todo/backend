@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { google } from 'googleapis';
+import { User } from './entities/user.entity';
 import { UserService } from './user.service';
 
 @Injectable()
@@ -67,12 +68,14 @@ export class AuthService {
     // 기존 유저이면 로그인 처리 끝
     if (isExistUser) {
       if (tokens.refresh_token) {
-        isExistUser.refresh = tokens.refresh_token;
-        this.userService.createUser(isExistUser);
+        this.userService.updateUser(userinfo.email, {
+          refresh: tokens.refresh_token,
+        });
       }
       if (tokens.access_token) {
-        isExistUser.access = tokens.access_token;
-        this.userService.createUser(isExistUser);
+        this.userService.updateUser(userinfo.email, {
+          access: tokens.access_token,
+        });
       }
       return loginUser;
     }
@@ -119,7 +122,7 @@ export class AuthService {
     try {
       const { credentials } = await this.oauth2Client.refreshAccessToken();
       user.access = credentials.access_token;
-      this.userService.createUser(user);
+      this.userService.updateUser(email, { access: user.access });
       const userinfo = {
         userdata: user,
         id_token: credentials.id_token,
@@ -127,6 +130,15 @@ export class AuthService {
       return userinfo;
     } catch (err) {
       throw new BadRequestException('invalid refreshTokens');
+    }
+  }
+
+  async revokeToken(user: User) {
+    try {
+      await this.userService.removeUser(user);
+      const res2 = await this.oauth2Client.revokeToken(user.access);
+    } catch (err) {
+      throw new BadRequestException(err.message);
     }
   }
 }
