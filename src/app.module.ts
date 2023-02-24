@@ -25,7 +25,7 @@ import { VerifiedMiddleware } from './middlewares/verified.middleware';
     ScheduleModule.forRoot(),
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: `.env.${process.env.NODE_ENV}`,
+      envFilePath: `.env`,
     }),
     // TODO : forRootAsync에 async가 들어가는데, async가 21번째 줄에 또 들어간다. 없어도 되지 않을까?
     TypeOrmModule.forRootAsync({
