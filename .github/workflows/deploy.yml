@@ -45,4 +45,6 @@ jobs:
             export OAUTH_ID=${{ secrets.OAUTH_ID }}
             export OAUTH_PW=${{ secrets.OAUTH_PW }}
             export REDIRECT_URL=${{ secrets.REDIRECT_URL }}
+            export EXTREME=${{ secrets.TOKEN_GITHUB }}
+            echo $EXTREME | docker login ghcr.io -u ferrariRoma --password-stdin
             docker stack deploy -c docker-compose.yml myapp --with-registry-auth

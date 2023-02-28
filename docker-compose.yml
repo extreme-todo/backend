@@ -5,12 +5,12 @@ services:
     deploy:
       replicas: 3
       update_config:
-        parallemism: 1
+        parallelism: 1
         delay: 10s
       restart_policy:
         condition: on-failure
-      placement:
-        constraints: [node.role == worker]
+    depends_on:
+      - db
     environment:
       - NODE_ENV=production
       - DB_HOST=${DB_HOST}
@@ -26,11 +26,8 @@ services:
     networks:
       - appnet
   db:
-    container_name: ${DB_HOST}
     image: mysql:latest
     deploy:
-      placement:
-        constraints: [node.role == worker]
     environment:
       - MYSQL_DATABASE=${DB_DATABASE}
       - MYSQL_USER=${DB_USERNAME}
@@ -41,5 +38,6 @@ services:
       - appnet
 networks:
   appnet:
+    driver: overlay
 volumes:
   dbdata:
