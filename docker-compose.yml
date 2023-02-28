@@ -1,27 +1,45 @@
-version: '3'
+version: '3.8'
 services:
   app:
-    build: .
+    image: ghcr.io/ferrariroma/nest-app-app:latest
+    deploy:
+      replicas: 3
+      update_config:
+        parallemism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints: [node.role == worker]
+    environment:
+      - NODE_ENV=production
+      - DB_HOST=${DB_HOST}
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_PORT=${DB_PORT}
+      - DB_DATABASE=${DB_DATABASE}
+      - OAUTH_ID=${OAUTH_ID}
+      - OAUTH_PW=${OAUTH_PW}
+      - REDIRECT_URL=${REDIRECT_URL}
     ports:
       - '8080:8080'
-    depends_on:
-      - db
-    environment:
-      DB_HOST: ${DB_HOST}
-      DB_PORT: ${DB_PORT}
-      DB_USERNAME: ${DB_USERNAME}
-      DB_PASSWORD: ${DB_PASSWORD}
-      DB_DATABASE: ${DB_DATABASE}
-      OAUTH_ID: ${OAUTH_ID}
-      OAUTH_PW: ${OAUTH_PW}
-      REDIRECT_URL: ${REDIRECT_URL}
+    networks:
+      - appnet
   db:
     container_name: ${DB_HOST}
     image: mysql:latest
+    deploy:
+      placement:
+        constraints: [node.role == worker]
     environment:
-      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
-      MYSQL_DATABASE: ${DB_DATABASE}
-      MYSQL_USER: ${DB_USERNAME}
-      MYSQL_PASSWORD: ${DB_PASSWORD}
-    ports:
-      - '3306:3306'
+      - MYSQL_DATABASE=${DB_DATABASE}
+      - MYSQL_USER=${DB_USERNAME}
+      - MYSQL_PASSWORD=${DB_PASSWORD}
+    volumes:
+      - dbdata:/var/lib/mysql
+    networks:
+      - appnet
+networks:
+  appnet:
+volumes:
+  dbdata:
