@@ -37,5 +37,17 @@ jobs:
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           script: |
+            echo ${{ secrets.DB_HOST }} | docker secret create DB_HOST -
+            echo ${{ secrets.DB_USERNAME }} | docker secret create DB_USERNAME -
+            echo ${{ secrets.DB_PASSWORD }} | docker secret create DB_PASSWORD -
+            echo ${{ secrets.DB_PORT }} | docker secret create DB_PORT -
+            echo ${{ secrets.DB_DATABASE }} | docker secret create DB_DATABASE -
+            echo ${{ secrets.OAUTH_ID }} | docker secret create OAUTH_ID -
+            echo ${{ secrets.OAUTH_PW }} | docker secret create OAUTH_PW -
+            echo ${{ secrets.REDIRECT_URL }} | docker secret create REDIRECT_URL -
+            echo ${{ secrets.TOKEN_GITHUB }} | docker secret create EXTREME -
+            echo ${{ secrets.DB_DATABASE }} | docker secret create MYSQL_DATABASE -
+            echo ${{ secrets.DB_USERNAME }} | docker secret create MYSQL_USER -
+            echo ${{ secrets.DB_PASSWORD }} | docker secret create MYSQL_PASSWORD -
             echo $EXTREME | docker login ghcr.io -u ferrariRoma --password-stdin
             docker stack deploy -c docker-compose.yml myapp --with-registry-auth

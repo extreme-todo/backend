@@ -13,6 +13,8 @@ services:
         constraints: [node.role == worker]
     depends_on:
       - db
+    tmpfs:
+      - /run
     environment:
       NODE_ENV: production
       DB_HOST_FILE: /run/secrets/DB_HOST
@@ -57,6 +59,8 @@ services:
     deploy:
       placement:
         constraints: [node.role == worker]
+    tmpfs:
+      - /run
     environment:
       MYSQL_DATABASE_FILE: /run/secrets/MYSQL_DATABASE
       # MYSQL_DATABASE: ${DB_DATABASE}
@@ -82,27 +86,27 @@ volumes:
   dbdata:
 secrets:
   DB_HOST:
-    file: DB_HOST
+    external: true
   DB_USERNAME:
-    file: DB_USERNAME
+    external: true
   DB_PASSWORD:
-    file: DB_PASSWORD
+    external: true
   DB_PORT:
-    file: DB_PORT
+    external: true
   DB_DATABASE:
-    file: DB_DATABASE
+    external: true
   OAUTH_ID:
-    file: OAUTH_ID
+    external: true
   OAUTH_PW:
-    file: OAUTH_PW
+    external: true
   REDIRECT_URL:
-    file: REDIRECT_URL
+    external: true
   MYSQL_DATABASE:
-    file: MYSQL_DATABASE
+    external: true
   MYSQL_USERNAME:
-    file: MYSQL_USERNAME
+    external: true
   MYSQL_PASSWORD:
-    file: MYSQL_PASSWORD
+    external: true
 # echo ${{ secrets.DB_HOST }} | docker secret create DB_HOST -
 # echo ${{ secrets.DB_USERNAME }} | docker secret create DB_USERNAME -
 # echo ${{ secrets.DB_PASSWORD }} | docker secret create DB_PASSWORD -
