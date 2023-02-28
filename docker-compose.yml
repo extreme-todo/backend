@@ -14,34 +14,81 @@ services:
     depends_on:
       - db
     environment:
-      - NODE_ENV=production
-      - DB_HOST=${DB_HOST}
-      - DB_USERNAME=${DB_USERNAME}
-      - DB_PASSWORD=${DB_PASSWORD}
-      - DB_PORT=${DB_PORT}
-      - DB_DATABASE=${DB_DATABASE}
-      - OAUTH_ID=${OAUTH_ID}
-      - OAUTH_PW=${OAUTH_PW}
-      - REDIRECT_URL=${REDIRECT_URL}
+      NODE_ENV: production
+      DB_HOST_FILE: /run/secrets/db_host
+      # DB_HOST: ${DB_HOST}
+      DB_USERNAME_FILE: /run/secrets/db_username
+      # DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD_FILE: /run/secrets/db_password
+      # DB_PASSWORD: ${DB_PASSWORD}
+      DB_PORT_FILE: /run/secrets/db_port
+      # DB_PORT: ${DB_PORT}
+      DB_DATABASE_FILE: /run/secrets/db_database
+      # DB_DATABASE: ${DB_DATABASE}
+      OAUTH_ID_FILE: /run/secrets/oauth_id
+      # OAUTH_ID: ${OAUTH_ID}
+      OAUTH_PW_FILE: /run/secrets/oauth_pw
+      # OAUTH_PW: ${OAUTH_PW}
+      REDIRECT_URL_FILE: /run/secrets/redirect_url
+      # REDIRECT_URL: ${REDIRECT_URL}
     ports:
       - '8080:8080'
     networks:
       - appnet
+    secrets:
+      - db_host
+      - db_username
+      - db_password
+      - db_port
+      - db_database
+      - oauth_id
+      - oauth_pw
+      - redirect_url
   db:
     image: mysql:latest
     deploy:
       placement:
         constraints: [node.role == worker]
     environment:
-      - MYSQL_DATABASE=${DB_DATABASE}
-      - MYSQL_USER=${DB_USERNAME}
-      - MYSQL_PASSWORD=${DB_PASSWORD}
+      MYSQL_DATABASE_FILE: /run/secrets/mysql_database
+      # MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_USER_FILE: /run/secrets/mysql_user
+      # MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD_FILE: /run/secrets/mysql_password
+      # MYSQL_PASSWORD: ${DB_PASSWORD}
     volumes:
       - dbdata:/var/lib/mysql
     networks:
       - appnet
+    secrets:
+      - mysql_database
+      - mysql_user
+      - mysql_password
 networks:
   appnet:
     driver: overlay
 volumes:
   dbdata:
+secrets:
+  db_host:
+    file: db_host.txt
+  db_username:
+    file: db_username.txt
+  db_password:
+    file: db_password.txt
+  db_port:
+    file: db_port.txt
+  db_database:
+    file: db_database.txt
+  oauth_id:
+    file: oauth_id.txt
+  oauth_pw:
+    file: oauth_pw.txt
+  redirect_url:
+    file: redirect_url.txt
+  mysql_database:
+    file: mysql_database.txt
+  mysql_user:
+    file: mysql_user.txt
+  mysql_password:
+    file: mysql_password.txt

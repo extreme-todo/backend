@@ -46,5 +46,8 @@ jobs:
             echo ${{ secrets.OAUTH_PW }} | docker secret create OAUTH_PW -
             echo ${{ secrets.REDIRECT_URL }} | docker secret create REDIRECT_URL -
             echo ${{ secrets.TOKEN_GITHUB }} | docker secret create EXTREME -
+            echo ${{ secrets.DB_DATABASE }} | docker secret create MYSQL_DATABASE -
+            echo ${{ secrets.DB_USERNAME }} | docker secret create MYSQL_USER -
+            echo ${{ secrets.DB_PASSWORD}} | docker secret create MYSQL_PASSWORD -
             echo $EXTREME | docker login ghcr.io -u ferrariRoma --password-stdin
             docker stack deploy -c docker-compose.yml myapp --with-registry-auth
