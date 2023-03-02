@@ -68,6 +68,7 @@ services:
       # MYSQL_USER: ${DB_USERNAME}
       MYSQL_PASSWORD_FILE: /run/secrets/MYSQL_PASSWORD
       # MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD_FILE: /run/secrets/MYSQL_ROOT_PASSWORD
     volumes:
       - dbdata:/var/lib/mysql
     networks:
@@ -79,6 +80,7 @@ services:
       - MYSQL_DATABASE
       - MYSQL_USERNAME
       - MYSQL_PASSWORD
+      - MYSQL_ROOT_PASSWORD
 networks:
   appnet:
     driver: overlay
@@ -106,6 +108,8 @@ secrets:
   MYSQL_USERNAME:
     external: true
   MYSQL_PASSWORD:
+    external: true
+  MYSQL_ROOT_PASSWORD:
     external: true
 # echo ${{ secrets.DB_HOST }} | docker secret create DB_HOST -
 # echo ${{ secrets.DB_USERNAME }} | docker secret create DB_USERNAME -
