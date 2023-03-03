@@ -3,8 +3,16 @@ RUN mkdir -p /app
 WORKDIR /app
 ADD . /app/
 COPY env.sh /usr/local/bin
+ENV DB_HOST $DB_HOST
+ENV DB_PORT $DB_PORT
+ENV DB_USERNAME $DB_USERNAME
+ENV DB_PASSWORD $DB_PASSWORD
+ENV DB_DATABASE $DB_DATABASE
+ENV OAUTH_ID $OAUTH_ID
+ENV OAUTH_PW $OAUTH_PW
+ENV REDIRECT_URL $REDIRECT_URL
 RUN chmod +x /usr/local/bin/env.sh
-ENTRYPOINT ["env.sh"]
 RUN npm run build
-RUN npm run start:prod
+ENTRYPOINT ["env.sh"]
 EXPOSE 8080
+RUN npm run start:prod
