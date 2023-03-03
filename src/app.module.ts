@@ -32,7 +32,6 @@ import { VerifiedMiddleware } from './middlewares/verified.middleware';
       inject: [ConfigService],
       // useFactory는 환경변수 정보를 포함하고 있는 configService의 인스턴스를 가진다.
       useFactory: (config: ConfigService) => {
-        console.log(config.get('DB_USERNAME'));
         return {
           type: 'mysql',
           host: config.get('DB_HOST'),

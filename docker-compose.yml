@@ -3,18 +3,13 @@ services:
   app:
     image: ghcr.io/ferrariroma/nest-app-app:latest
     deploy:
-      replicas: 3
       update_config:
         parallelism: 1
         delay: 10s
       restart_policy:
         condition: on-failure
-      placement:
-        constraints: [node.role == worker]
     depends_on:
       - db
-    tmpfs:
-      - /run
     environment:
       NODE_ENV: production
       DB_HOST_FILE: /run/secrets/DB_HOST
@@ -38,14 +33,6 @@ services:
     networks:
       - appnet
     secrets:
-      # - db_host
-      # - db_username
-      # - db_password
-      # - db_port
-      # - db_database
-      # - oauth_id
-      # - oauth_pw
-      # - redirect_url
       - DB_HOST
       - DB_USERNAME
       - DB_PASSWORD
@@ -57,10 +44,6 @@ services:
   db:
     image: mysql:latest
     deploy:
-      placement:
-        constraints: [node.role == worker]
-    tmpfs:
-      - /run
     environment:
       MYSQL_DATABASE_FILE: /run/secrets/MYSQL_DATABASE
       # MYSQL_DATABASE: ${DB_DATABASE}
@@ -74,9 +57,6 @@ services:
     networks:
       - appnet
     secrets:
-      # - mysql_database
-      # - mysql_user
-      # - mysql_password
       - MYSQL_DATABASE
       - MYSQL_USERNAME
       - MYSQL_PASSWORD
