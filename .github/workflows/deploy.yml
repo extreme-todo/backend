@@ -37,5 +37,13 @@ jobs:
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           script: |
-            echo $EXTREME | docker login ghcr.io -u ferrariRoma --password-stdin
+            export DB_HOST=${{ secrets.DB_HOST }}
+            export DB_USERNAME=${{ secrets.DB_USERNAME }}
+            export DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+            export DB_ROOT_PASSWORD=${{ secrets.DB_ROOT_PASSWORD }}
+            export DB_PORT=${{ secrets.DB_PORT }}
+            export DB_DATABASE=${{ secrets.DB_DATABASE }}
+            export OAUTH_ID=${{ secrets.OAUTH_ID }}
+            export OAUTH_PW=${{ secrets.OAUTH_PW }}
+            export REDIRECT_URL=${{ secrets.REDIRECT_URL }}
             docker stack deploy -c docker-compose.yml myapp --with-registry-auth
