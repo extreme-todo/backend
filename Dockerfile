@@ -15,4 +15,4 @@ RUN chmod +x /usr/local/bin/env.sh
 RUN npm run build
 ENTRYPOINT ["env.sh"]
 EXPOSE 8080
-RUN npm run start:prod
+CMD ["npm", "run", "start:prod"]
