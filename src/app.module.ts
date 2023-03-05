@@ -80,7 +80,7 @@ export class AppModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(VerifiedMiddleware)
-      .exclude('/api/users/callback/google/(.*)')
+      .exclude('/api/users/callback/google/(.*)', '/')
       .forRoutes('*');
   }
 }
