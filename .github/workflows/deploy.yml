@@ -46,4 +46,4 @@ jobs:
             export OAUTH_ID=${{ secrets.OAUTH_ID }}
             export OAUTH_PW=${{ secrets.OAUTH_PW }}
             export REDIRECT_URL=${{ secrets.REDIRECT_URL }}
-            docker-compose up
+            docker stack deploy -c docker-compose.yml myapp --with-registry-auth
