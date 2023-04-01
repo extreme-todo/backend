@@ -1,10 +1,10 @@
-import { MiddlewareConsumer, Module, ValidationPipe } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule, OnApplicationBootstrap, ValidationPipe } from '@nestjs/common';
 import { TodoModule } from './todo/todo.module';
 import { UserModule } from './user/user.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { APP_PIPE } from '@nestjs/core';
+import { APP_PIPE, HttpAdapterHost } from '@nestjs/core';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Todo } from './todo/entities/todo.entity';
 import { SettingModule } from './setting/setting.module';
@@ -19,6 +19,7 @@ import { Category } from './category/entities/category.entity';
 import { RankingModule } from './ranking/ranking.module';
 import { Ranking } from './ranking/entities/ranking.entity';
 import { VerifiedMiddleware } from './middlewares/verified.middleware';
+import { Server } from 'node:http';
 
 @Module({
   imports: [
@@ -76,11 +77,18 @@ import { VerifiedMiddleware } from './middlewares/verified.middleware';
     },
   ],
 })
-export class AppModule {
+export class AppModule implements NestModule, OnApplicationBootstrap {
+  constructor(private readonly refHost: HttpAdapterHost<any>) {}
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(VerifiedMiddleware)
       .exclude('/api/users/callback/google/(.*)', '/')
       .forRoutes('*');
+  }
+
+  onApplicationBootstrap() {
+    const server: Server = this.refHost.httpAdapter.getHttpServer();
+    server.keepAliveTimeout = 61 * 1000;
+    server.headersTimeout = 65 * 1000;
   }
 }
