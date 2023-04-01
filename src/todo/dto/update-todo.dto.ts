@@ -12,7 +12,4 @@ export class UpdateTodoDto {
   @IsOptional()
   @IsString({ each: true })
   categories: string[];
-
-  @IsObject()
-  userinfo: Object;
 }

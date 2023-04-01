@@ -62,7 +62,6 @@ export const addTodoStub = (user: User): AddTodoDto => {
     todo: 'Go to school',
     duration: 3000,
     categories: ['study'],
-    userinfo: { email: user.email, id_token: 'faketoken' },
   };
 };
 
@@ -70,7 +69,6 @@ export const updateTodoStub = (user: User): UpdateTodoDto => {
   return {
     duration: 7000,
     todo: 'updated',
-    userinfo: { email: user.email, id_token: 'faketoken' },
     categories: ['study'],
   };
 };
