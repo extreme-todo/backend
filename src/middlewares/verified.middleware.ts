@@ -29,8 +29,6 @@ export class VerifiedMiddleware implements NestMiddleware {
 
   async use(req: Request, res: Response, next: NextFunction) {
 
-    console.log(req.headers)
-
     const verifiedResult = await this.authService.verifiedIdToken(
       req.headers['extreme-email'] as string,
       req.headers['extreme-token'] as string,
