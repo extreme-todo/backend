@@ -11,6 +11,7 @@ ENV OAUTH_ID $OAUTH_ID
 ENV OAUTH_PW $OAUTH_PW
 ENV REDIRECT_URL $REDIRECT_URL
 RUN npm install --global rimraf
+RUN npm install --global @nestjs/cli
 RUN npm run build
 EXPOSE 8080
 ENTRYPOINT npm run start:prod
