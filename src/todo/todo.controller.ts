@@ -10,9 +10,11 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from 'src/guards/auth.guard';
+import { Serialize } from 'src/interceptor/serialize.interceptor';
 import { CurrentUser } from 'src/user/decorators/current-user.decorator';
 import { User } from 'src/user/entities/user.entity';
 import { AddTodoDto } from './dto/add-todo.dto';
+import { TodoDto } from './dto/todo.dto';
 import { UpdateTodoDto } from './dto/update-todo.dto';
 import { TodoService } from './todo.service';
 
@@ -41,6 +43,7 @@ export default class TodoController {
   }
 
   @Patch('/:id')
+  @Serialize(TodoDto)
   @UseGuards(AuthGuard)
   async updateTodo(
     @Param('id') todoId: number,
@@ -51,6 +54,7 @@ export default class TodoController {
   }
 
   @Patch('/:id/done')
+  @Serialize(TodoDto)
   @UseGuards(AuthGuard)
   async doTodo(@Param('id') todoId: number, @CurrentUser() userdata: User) {
     return this.todoService.doTodo(todoId, userdata);
