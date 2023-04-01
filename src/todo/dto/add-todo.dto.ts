@@ -23,7 +23,4 @@ export class AddTodoDto {
   @IsOptional()
   @IsString({ each: true })
   categories?: string[];
-
-  @IsObject()
-  userinfo: Object;
 }
