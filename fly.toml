@@ -1,0 +1,7 @@
+# fly.toml file generated for extreme-backend on 2023-04-07T12:54:51+09:00
+
+app = "extreme-backend"
+primary_region = "hkg"
+
+[env]
+  PORT = "8080"
