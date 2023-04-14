@@ -28,4 +28,6 @@ WORKDIR /app
 ENV NODE_ENV production
 ENV PATH /usr/local/node/bin:$PATH
 
+EXPOSE 8080
+
 CMD [ "npm", "run", "start:prod" ]
