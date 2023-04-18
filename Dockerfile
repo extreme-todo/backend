@@ -1,15 +1,33 @@
-FROM node:16.13.1
-RUN mkdir -p /app
+FROM debian:bullseye as builder
+
+ENV PATH=/usr/local/node/bin:$PATH
+ARG NODE_VERSION=16.13.0
+
+RUN apt-get update; apt install -y curl python-is-python3 pkg-config build-essential && \
+    curl -sL https://github.com/nodenv/node-build/archive/master.tar.gz | tar xz -C /tmp/ && \
+    /tmp/node-build-master/bin/node-build "${NODE_VERSION}" /usr/local/node && \
+rm -rf /tmp/node-build-master
+
+RUN mkdir /app
 WORKDIR /app
-ADD . /app/
-ENV DB_HOST $DB_HOST
-ENV DB_PORT $DB_PORT
-ENV DB_USERNAME $DB_USERNAME
-ENV DB_PASSWORD $DB_PASSWORD
-ENV DB_DATABASE $DB_DATABASE
-ENV OAUTH_ID $OAUTH_ID
-ENV OAUTH_PW $OAUTH_PW
-ENV REDIRECT_URL $REDIRECT_URL
-RUN npm run build
+
+COPY . .
+
+RUN npm install && npm run build
+# RUN node --max-old-space-size=1024 dist/main.js
+
+
+FROM debian:bullseye-slim
+
+LABEL fly_launch_runtime="nodejs"
+
+COPY --from=builder /usr/local/node /usr/local/node
+COPY --from=builder /app /app
+
+WORKDIR /app
+ENV NODE_ENV production
+ENV PATH /usr/local/node/bin:$PATH
+
 EXPOSE 8080
-ENTRYPOINT npm run start:prod
+
+CMD [ "npm", "run", "start:prod" ]
