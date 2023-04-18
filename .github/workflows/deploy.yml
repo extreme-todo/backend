@@ -3,47 +3,18 @@ on:
   push:
     branches:
       - main
-env:
-  DB_HOST: ${{ secrets.DB_HOST }}
-  DB_USERNAME: ${{ secrets.DB_USERNAME }}
-  DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-  DB_PORT: ${{ secrets.DB_PORT }}
-  DB_DATABASE: ${{ secrets.DB_DATABASE }}
-  OAUTH_ID: ${{ secrets.OAUTH_ID }}
-  OAUTH_PW: ${{ secrets.OAUTH_PW }}
-  REDIRECT_URL: ${{ secrets.REDIRECT_URL }}
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v1
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.TOKEN_GITHUB }}
-      - name: Build and push Docker images
-        uses: docker/build-push-action@v2
-        with:
-          context: .
-          push: true
-          tags: ghcr.io/ferrariroma/nest-app-app:${{ github.sha }}
-      - name: Deploy stack to Docker Swarm
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.EC2_PUBLIC }}
-          username: ${{ secrets.EC2_USERNAME }}
-          key: ${{ secrets.EC2_PRIVATE_KEY }}
-          script: |
-            export DB_HOST=${{ secrets.DB_HOST }}
-            export DB_USERNAME=${{ secrets.DB_USERNAME }}
-            export DB_PASSWORD=${{ secrets.DB_PASSWORD }}
-            export DB_ROOT_PASSWORD=${{ secrets.DB_ROOT_PASSWORD }}
-            export DB_PORT=${{ secrets.DB_PORT }}
-            export DB_DATABASE=${{ secrets.DB_DATABASE }}
-            export OAUTH_ID=${{ secrets.OAUTH_ID }}
-            export OAUTH_PW=${{ secrets.OAUTH_PW }}
-            export REDIRECT_URL=${{ secrets.REDIRECT_URL }}
-            docker stack deploy -c docker-compose.yml myapp --with-registry-auth
+      - name: npm install
+        run: npm install
+      - name: unit test
+        run: npm test
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+      - name: Fly deploy
+        run: flyctl deploy --remote-only
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
