@@ -7,7 +7,4 @@ export class UpdateSettingDto {
 
   @IsBoolean()
   extremeMode: boolean;
-
-  @IsObject()
-  userinfo: object;
 }

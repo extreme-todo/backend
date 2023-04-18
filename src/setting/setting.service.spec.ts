@@ -42,8 +42,7 @@ describe('SettingService', () => {
     it('다크 모드, 익스트림모드 on', async () => {
       const currMode = await service.update(fakeUser, {
         colorMode: 'dark',
-        extremeMode: true,
-        userinfo: {}
+        extremeMode: true
       });
       expect(currMode.colorMode).toEqual('dark');
       expect(currMode.extremeMode).toEqual(true);
@@ -51,8 +50,7 @@ describe('SettingService', () => {
     it('라이트모드, 익스트림모드 off', async () => {
       const currMode = await service.update(fakeUser, {
         colorMode: 'light',
-        extremeMode: false,
-        userinfo: {}
+        extremeMode: false
       });
       expect(currMode.colorMode).toEqual('light');
       expect(currMode.extremeMode).toEqual(false);
@@ -60,8 +58,7 @@ describe('SettingService', () => {
     it('자동색상, 익스트림모드 on', async () => {
       const currMode = await service.update(fakeUser, {
         colorMode: 'auto',
-        extremeMode: true,
-        userinfo: {}
+        extremeMode: true
       });
       expect(currMode.colorMode).toEqual('auto');
       expect(currMode.extremeMode).toEqual(true);
