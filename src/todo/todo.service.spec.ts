@@ -112,6 +112,15 @@ describe('TodoService', () => {
         ),
       ).rejects.toThrow(NotFoundException);
     });
+    it('카테고리가 5개 초과일 경우 BadRequest', async () => {
+      await expect(
+        service.updateTodo(
+          existingId,
+        updateTodoStub(fakeUserHasATodo, 6),
+        fakeUserHasATodo,
+        )
+      ).rejects.toThrow(BadRequestException);
+    })
   });
 
   describe('doTodo', () => {

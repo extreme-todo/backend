@@ -61,14 +61,14 @@ export const addTodoStub = (user: User, categorycount?: number): AddTodoDto => {
     date: new Date('Dec 30, 2022 18:00:30'),
     todo: 'Go to school',
     duration: 3000,
-    categories: Array(categorycount).fill('fakecategory'),
+    categories: Array(categorycount ?? 1).fill('fakecategory'),
   };
 };
 
-export const updateTodoStub = (user: User): UpdateTodoDto => {
+export const updateTodoStub = (user: User, categorycount?: number): UpdateTodoDto => {
   return {
     duration: 7000,
     todo: 'updated',
-    categories: ['study'],
+    categories: Array(categorycount ?? 1).fill('fakecategory'),
   };
 };
