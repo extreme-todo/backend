@@ -10,7 +10,7 @@ import {
   todoStub,
   updateTodoStub,
 } from './stubs/todo.stub';
-import { NotFoundException } from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { CategoryService } from '../category/category.service';
 import { User } from '../user/entities/user.entity';
 import { Category } from 'src/category/entities/category.entity';
@@ -58,6 +58,14 @@ describe('TodoService', () => {
       );
       expect(res).toBeDefined();
     });
+    it('카테고리가 5개 초과일 경우 BadRequest', async () => {
+      await expect(
+        service.addTodo(
+          addTodoStub(fakeUserHasNoTodo, 6),
+          fakeUserHasNoTodo,
+        )
+      ).rejects.toThrow(BadRequestException);
+    })
   });
 
   describe('getOneTodo', () => {

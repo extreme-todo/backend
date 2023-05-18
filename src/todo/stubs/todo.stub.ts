@@ -56,12 +56,12 @@ export const todoStub = (): Todo[] => {
   ];
 };
 
-export const addTodoStub = (user: User): AddTodoDto => {
+export const addTodoStub = (user: User, categorycount?: number): AddTodoDto => {
   return {
     date: new Date('Dec 30, 2022 18:00:30'),
     todo: 'Go to school',
     duration: 3000,
-    categories: ['study'],
+    categories: Array(categorycount).fill('fakecategory'),
   };
 };
 
