@@ -75,15 +75,16 @@ export class TodoService {
     return this.repo.save(todo);
   }
 
-  async doTodo(id: number, user: User) {
+  async doTodo(id: number, user: User, focusTime: number) {
     const todo = await this.getOneTodo(id, user);
     if (!todo) {
       throw new NotFoundException('Todo not found');
     }
     todo.done = true;
+    todo.focusTime = focusTime;
     if (todo?.categories) {
       todo.categories.forEach(async (category) => {
-        await this.rankingService.updateRank(category, user, todo.duration);
+        await this.rankingService.updateRank(category, user, focusTime);
       });
     }
     return this.repo.save(todo);
