@@ -124,13 +124,17 @@ describe('TodoService', () => {
   });
 
   describe('doTodo', () => {
+    const fakeFocusTime = 40000
+
     it('존재하는 id에 해당하는 투두 완료', async () => {
-      const res = await service.doTodo(existingId, fakeUserHasATodo);
+      const res = await service.doTodo(existingId, fakeUserHasATodo, fakeFocusTime);
       expect(res.done).toEqual(true);
+      expect(res.focusTime).toEqual(fakeFocusTime)
     });
+
     it('존재하지 않는 id 완료시 NotFound', async () => {
       await expect(
-        service.doTodo(notExistingId, fakeUserHasNoTodo),
+        service.doTodo(notExistingId, fakeUserHasNoTodo, fakeFocusTime),
       ).rejects.toThrow(NotFoundException);
     });
   });
