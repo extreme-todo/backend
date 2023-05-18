@@ -32,6 +32,7 @@ export const todoStub = (): Todo[] => {
       done: true,
       user: fakeUserHasATodo,
       categories: null,
+      focusTime: 0,
     },
     {
       id: 2,
@@ -42,6 +43,7 @@ export const todoStub = (): Todo[] => {
       done: false,
       user: fakeUser2,
       categories: null,
+      focusTime: 0,
     },
     {
       id: 3,
@@ -52,6 +54,7 @@ export const todoStub = (): Todo[] => {
       done: true,
       user: fakeUser2,
       categories: null,
+      focusTime: 0,
     },
   ];
 };
