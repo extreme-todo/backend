@@ -59,7 +59,7 @@ export class RestService {
     console.log('updated monthly rest time');
   }
 
-  async resetFocus(user: User) {
+  async resetRest(user: User) {
     const { id: userId } = user;
     await this.repo
       .createQueryBuilder()
