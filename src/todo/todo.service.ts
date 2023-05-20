@@ -77,8 +77,14 @@ export class TodoService {
 
   async doTodo(id: number, user: User, focusTime: number) {
     const todo = await this.getOneTodo(id, user);
+    if(!focusTime){
+      throw new BadRequestException("집중시간을 찾을 수 없습니다.")
+    }
     if (!todo) {
       throw new NotFoundException('Todo not found');
+    }
+    if(todo.done){
+      throw new BadRequestException("이미 완료한 todo입니다.")
     }
     todo.done = true;
     todo.focusTime = focusTime;
