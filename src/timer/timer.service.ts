@@ -75,6 +75,6 @@ export class TimerService {
 
   resetTimer(user: User) {
     this.focusService.resetFocus(user);
-    this.restService.resetFocus(user);
+    this.restService.resetRest(user);
   }
 }
