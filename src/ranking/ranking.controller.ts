@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
+import { Controller, Delete, Get, Query, UseGuards } from '@nestjs/common';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { User } from 'src/user/entities/user.entity';
 import { RankingService } from './ranking.service';
@@ -12,5 +12,10 @@ export class RankingController {
   @Get('')
   ranking(@Query('category') category: string, @CurrentUser() user: User) {
     return this.rankingService.ranking(category, user);
+  }
+
+  @Delete('/reset')
+  resetRanking(@CurrentUser() user: User) {
+    return this.rankingService.resetRanking(user);
   }
 }
