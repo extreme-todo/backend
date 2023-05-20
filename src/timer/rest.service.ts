@@ -58,4 +58,14 @@ export class RestService {
       .execute();
     console.log('updated monthly rest time');
   }
+
+  async resetFocus(user: User) {
+    const { id: userId } = user;
+    await this.repo
+      .createQueryBuilder()
+      .delete()
+      .from('totalresttime')
+      .where('user = :id', { userId })
+      .execute();
+  }
 }

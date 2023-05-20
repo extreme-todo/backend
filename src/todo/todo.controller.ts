@@ -19,32 +19,29 @@ import { UpdateTodoDto } from './dto/update-todo.dto';
 import { TodoService } from './todo.service';
 
 @Controller('api/todos')
+@UseGuards(AuthGuard)
 export default class TodoController {
   constructor(private todoService: TodoService) {}
 
   @Post('/')
-  @UseGuards(AuthGuard)
   async addTodo(@Body() todoData: AddTodoDto, @CurrentUser() userdata: User) {
     await this.todoService.addTodo(todoData, userdata);
     return 'Successfully created a todo';
   }
 
   @Get('/:id')
-  @UseGuards(AuthGuard)
   async getOneTodo(@Param('id') todoId: number, @CurrentUser() userdata: User) {
     const todo = await this.todoService.getOneTodo(todoId, userdata);
     return todo;
   }
 
   @Delete('/:id')
-  @UseGuards(AuthGuard)
   async deleteTodo(@Param('id') todoId: number, @CurrentUser() userdata: User) {
     return this.todoService.deleteTodo(todoId, userdata);
   }
 
   @Patch('/:id')
   @Serialize(TodoDto)
-  @UseGuards(AuthGuard)
   async updateTodo(
     @Param('id') todoId: number,
     @Body() updateData: UpdateTodoDto,
@@ -55,14 +52,17 @@ export default class TodoController {
 
   @Patch('/:id/done')
   @Serialize(TodoDto)
-  @UseGuards(AuthGuard)
   async doTodo(@Param('id') todoId: number, @CurrentUser() userdata: User) {
     return this.todoService.doTodo(todoId, userdata);
   }
 
   @Get('/')
-  @UseGuards(AuthGuard)
   getList(@Query('done') isDone: boolean, @CurrentUser() userdata: User) {
     return this.todoService.getList(isDone, userdata);
+  }
+
+  @Delete('/reset')
+  resetTodos(@CurrentUser() user: User) {
+    return this.todoService.resetTodos(user);
   }
 }

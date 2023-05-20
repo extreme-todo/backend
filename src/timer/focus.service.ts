@@ -58,4 +58,14 @@ export class FocusService {
       .execute();
     console.log('updated monthly focus time');
   }
+
+  async resetFocus(user: User) {
+    const { id: userId } = user;
+    await this.repo
+      .createQueryBuilder()
+      .delete()
+      .from('totalfocustime')
+      .where('user = :id', { userId })
+      .execute();
+  }
 }
