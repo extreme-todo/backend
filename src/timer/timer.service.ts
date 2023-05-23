@@ -72,4 +72,9 @@ export class TimerService {
     await this.focusService.updateMonth();
     await this.restService.updateMonth();
   }
+
+  resetTimer(user: User) {
+    this.focusService.resetFocus(user);
+    this.restService.resetRest(user);
+  }
 }

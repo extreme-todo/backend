@@ -14,7 +14,7 @@ import { Todo } from './entities/todo.entity';
 import { RankingService } from 'src/ranking/ranking.service';
 import { Cron } from '@nestjs/schedule';
 
-const MAX_CATEGORY_LENGTH = 5
+const MAX_CATEGORY_LENGTH = 5;
 @Injectable()
 export class TodoService {
   constructor(
@@ -24,8 +24,10 @@ export class TodoService {
   ) {}
 
   async addTodo(addTodoDto: AddTodoDto, user: User) {
-    if(addTodoDto.categories.length > MAX_CATEGORY_LENGTH){
-      throw new BadRequestException(`등록 가능한 카테고리 개수 ${MAX_CATEGORY_LENGTH}개를 초과했습니다.`)
+    if (addTodoDto.categories.length > MAX_CATEGORY_LENGTH) {
+      throw new BadRequestException(
+        `등록 가능한 카테고리 개수 ${MAX_CATEGORY_LENGTH}개를 초과했습니다.`,
+      );
     }
     const categories = await this.categoryService.findOrCreateCategories(
       addTodoDto.categories,
@@ -61,8 +63,10 @@ export class TodoService {
     if (!todo) {
       throw new NotFoundException('Todo not found');
     }
-    if(updateTodo.categories.length > MAX_CATEGORY_LENGTH){
-      throw new BadRequestException(`등록 가능한 카테고리 개수 ${MAX_CATEGORY_LENGTH}개를 초과했습니다.`)
+    if (updateTodo.categories.length > MAX_CATEGORY_LENGTH) {
+      throw new BadRequestException(
+        `등록 가능한 카테고리 개수 ${MAX_CATEGORY_LENGTH}개를 초과했습니다.`,
+      );
     }
     if (updateTodo?.categories) {
       const newCategories = await this.categoryService.findOrCreateCategories(
@@ -111,5 +115,15 @@ export class TodoService {
       .where('todo.date < :date', { date: new Date() })
       .getRawMany();
     return await this.repo.remove(staleTodos);
+  }
+
+  async resetTodos(user: User) {
+    const { id: userId } = user;
+    return await this.repo
+      .createQueryBuilder()
+      .delete()
+      .from('todo')
+      .where('user = :id', { userId })
+      .execute();
   }
 }

@@ -39,14 +39,14 @@ export class RankingService {
       },
     });
 
-    const {max: maxCategory} = await this.repo
+    const { max: maxCategory } = await this.repo
       .createQueryBuilder('ranking')
       .select('MAX(ranking.time)', 'max')
       .leftJoin('ranking.category', 'category')
       .where('category.name = :category', { category })
-      .getRawOne()
+      .getRawOne();
 
-    const {min: minCategory} = await this.repo
+    const { min: minCategory } = await this.repo
       .createQueryBuilder('ranking')
       .select('MIN(ranking.time)', 'min')
       .leftJoin('ranking.category', 'category')
@@ -109,5 +109,15 @@ export class RankingService {
   @Cron('0 0 5 * * 1')
   private async deleteRank() {
     return await this.repo.clear();
+  }
+
+  async resetRanking(user: User) {
+    const { id: userId } = user;
+    return await this.repo
+      .createQueryBuilder()
+      .delete()
+      .from('ranking')
+      .where('user = :id', { userId })
+      .execute();
   }
 }
