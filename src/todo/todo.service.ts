@@ -112,11 +112,15 @@ export class TodoService {
 
   async resetTodos(user: User) {
     const { id: userId } = user;
-    return await this.repo
+    const { affected } = await this.repo
       .createQueryBuilder()
       .delete()
       .from('todo')
-      .where('user = :id', { userId })
+      .where('user = :userId', { userId })
       .execute();
+
+    if (affected === 0) {
+      throw new NotFoundException('db delete failed');
+    }
   }
 }

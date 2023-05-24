@@ -68,7 +68,10 @@ export const addTodoStub = (user: User, categorycount?: number): AddTodoDto => {
   };
 };
 
-export const updateTodoStub = (user: User, categorycount?: number): UpdateTodoDto => {
+export const updateTodoStub = (
+  user: User,
+  categorycount?: number,
+): UpdateTodoDto => {
   return {
     duration: 7000,
     todo: 'updated',

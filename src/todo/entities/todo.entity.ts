@@ -9,6 +9,7 @@ import {
   PrimaryGeneratedColumn,
   JoinTable,
   CreateDateColumn,
+  Index,
 } from 'typeorm';
 
 @Entity()
@@ -30,6 +31,9 @@ export class Todo {
 
   @Column({ default: false })
   done: boolean;
+
+  @Column({ default: 0 })
+  focusTime: number;
 
   @ManyToOne(() => User, (user) => user.todo, {
     onDelete: 'CASCADE',
