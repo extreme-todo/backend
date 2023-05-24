@@ -20,6 +20,9 @@ export class TodoDto {
   @Expose()
   done: boolean;
 
+  @Expose()
+  focusTime: number;
+
   @Transform(({ obj }) => obj.categories.map(cat => {
     return {id: cat.id, name: cat.name}
   }))

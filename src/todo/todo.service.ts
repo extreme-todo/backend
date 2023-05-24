@@ -79,15 +79,22 @@ export class TodoService {
     return this.repo.save(todo);
   }
 
-  async doTodo(id: number, user: User) {
+  async doTodo(id: number, user: User, focusTime: number) {
     const todo = await this.getOneTodo(id, user);
+    if(!focusTime){
+      throw new BadRequestException("집중시간을 찾을 수 없습니다.")
+    }
     if (!todo) {
       throw new NotFoundException('Todo not found');
     }
+    if(todo.done){
+      throw new BadRequestException("이미 완료한 todo입니다.")
+    }
     todo.done = true;
+    todo.focusTime = focusTime;
     if (todo?.categories) {
       todo.categories.forEach(async (category) => {
-        await this.rankingService.updateRank(category, user, todo.duration);
+        await this.rankingService.updateRank(category, user, focusTime);
       });
     }
     return this.repo.save(todo);

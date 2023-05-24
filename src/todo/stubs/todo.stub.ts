@@ -15,7 +15,7 @@ export const fakeUserHasATodo = {
   username: 'fakeUser1',
 } as User;
 
-const fakeUser2 = {
+export const fakeUserHas2Todos = {
   id: 2,
   email: 'fakeUser2@email.com',
   username: 'fakeUser2',
@@ -29,7 +29,7 @@ export const todoStub = (): Todo[] => {
       todo: 'Go to grocery store',
       createdAt: new Date('Dec 26, 2022 18:00:30'),
       duration: 60 * 60,
-      done: true,
+      done: false,
       user: fakeUserHasATodo,
       categories: null,
       focusTime: 0,
@@ -41,7 +41,7 @@ export const todoStub = (): Todo[] => {
       createdAt: new Date('Dec 26, 2022 18:00:30'),
       duration: 60 * 60,
       done: false,
-      user: fakeUser2,
+      user: fakeUserHas2Todos,
       categories: null,
       focusTime: 0,
     },
@@ -52,7 +52,7 @@ export const todoStub = (): Todo[] => {
       createdAt: new Date('Dec 28, 2022 18:00:30'),
       duration: 60 * 60 * 2,
       done: true,
-      user: fakeUser2,
+      user: fakeUserHas2Todos,
       categories: null,
       focusTime: 0,
     },

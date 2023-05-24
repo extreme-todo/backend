@@ -5,6 +5,7 @@ import { mockTodoRepo } from './mock-todo.repository';
 import { TodoService } from './todo.service';
 import {
   addTodoStub,
+  fakeUserHas2Todos,
   fakeUserHasATodo,
   fakeUserHasNoTodo,
   todoStub,
@@ -24,6 +25,7 @@ describe('TodoService', () => {
     },
   };
   const existingId = todoStub()[0].id;
+  const doneId = todoStub()[2].id;
   const notExistingId = 123;
   let mockRepo;
 
@@ -137,13 +139,25 @@ describe('TodoService', () => {
         service.doTodo(notExistingId, fakeUserHasNoTodo, fakeFocusTime),
       ).rejects.toThrow(NotFoundException);
     });
+
+    it('완료된 todo일 경우 BadRequest', async () => {
+      await expect(
+        service.doTodo(doneId, fakeUserHas2Todos, fakeFocusTime),
+      ).rejects.toThrow(BadRequestException);
+    })
+
+    it('focusTime이 없을 경우 BadRequest', async () => {
+      await expect(
+        service.doTodo(existingId, fakeUserHasATodo, parseInt(undefined)),
+      ).rejects.toThrow(BadRequestException);
+    })
   });
 
   describe('getList', () => {
     const isDone = true;
     it('should be fine', async () => {
-      const getTodoList = await service.getList(isDone, fakeUserHasATodo);
-      expect(getTodoList).toHaveLength(2);
+      const getTodoList = await service.getList(isDone, fakeUserHas2Todos);
+      expect(getTodoList).toHaveLength(1);
     });
   });
 });
