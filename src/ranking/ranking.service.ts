@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { User } from 'src/user/entities/user.entity';
 import { Category } from 'src/category/entities/category.entity';
 import { Ranking } from './entities/ranking.entity';
@@ -113,11 +113,15 @@ export class RankingService {
 
   async resetRanking(user: User) {
     const { id: userId } = user;
-    return await this.repo
+
+    const { affected } = await this.repo
       .createQueryBuilder()
       .delete()
       .from('ranking')
-      .where('user = :id', { userId })
+      .where('user = :userId', { userId })
       .execute();
+    if (affected === 0) {
+      throw new NotFoundException('db delete failed');
+    }
   }
 }

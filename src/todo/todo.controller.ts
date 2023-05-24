@@ -29,6 +29,11 @@ export default class TodoController {
     return 'Successfully created a todo';
   }
 
+  @Delete('/reset')
+  resetTodos(@CurrentUser() user: User) {
+    return this.todoService.resetTodos(user);
+  }
+
   @Get('/:id')
   async getOneTodo(@Param('id') todoId: number, @CurrentUser() userdata: User) {
     const todo = await this.todoService.getOneTodo(todoId, userdata);
@@ -61,10 +66,5 @@ export default class TodoController {
   @Get('/')
   getList(@Query('done') isDone: boolean, @CurrentUser() userdata: User) {
     return this.todoService.getList(isDone, userdata);
-  }
-
-  @Delete('/reset')
-  resetTodos(@CurrentUser() user: User) {
-    return this.todoService.resetTodos(user);
   }
 }

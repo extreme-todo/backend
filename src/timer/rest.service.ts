@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TotalRestTime } from './entities/total-rest-time.entity';
 import { Repository } from 'typeorm';
@@ -61,11 +61,15 @@ export class RestService {
 
   async resetRest(user: User) {
     const { id: userId } = user;
-    await this.repo
+    const { affected } = await this.repo
       .createQueryBuilder()
-      .delete()
-      .from('totalresttime')
-      .where('user = :id', { userId })
+      .update()
+      .set({ today: 0, yesterday: 0, thisWeek: 0, lastWeek: 0, thisMonth: 0 })
+      .where('user = :userId', { userId })
       .execute();
+
+    if (affected === 0) {
+      throw new NotFoundException('db update failed');
+    }
   }
 }

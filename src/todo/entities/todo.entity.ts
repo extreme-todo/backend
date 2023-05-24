@@ -9,6 +9,7 @@ import {
   PrimaryGeneratedColumn,
   JoinTable,
   CreateDateColumn,
+  Index,
 } from 'typeorm';
 
 @Entity()
