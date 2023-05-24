@@ -57,8 +57,10 @@ export default class TodoController {
 
   @Patch('/:id/done')
   @Serialize(TodoDto)
-  async doTodo(@Param('id') todoId: number, @CurrentUser() userdata: User) {
-    return this.todoService.doTodo(todoId, userdata);
+  @UseGuards(AuthGuard)
+  async doTodo(@Param('id') todoId: number, @CurrentUser() userdata: User, @Query('focusTime') focusTime: string) {
+    return this.todoService.doTodo(todoId, userdata, parseInt(focusTime));
+
   }
 
   @Get('/')

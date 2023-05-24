@@ -28,6 +28,7 @@ export class TodoDto {
       return { id: cat.id, name: cat.name };
     }),
   )
+
   @Expose()
   categories: Category[];
 }
