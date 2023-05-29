@@ -54,11 +54,20 @@ describe('TodoService', () => {
 
   describe('addTodo', () => {
     it('새로운 투두 생성', async () => {
-      const res = service.addTodo(
+      const res = await service.addTodo(
         addTodoStub(fakeUserHasNoTodo),
         fakeUserHasNoTodo,
       );
       expect(res).toBeDefined();
+      expect(res.order).toEqual(0)
+    });
+    it('미완료 투두를 1개 가진 유저가 새로운 투두 생성', async () => {
+      const res = await service.addTodo(
+        addTodoStub(fakeUserHas2Todos),
+        fakeUserHas2Todos,
+      );
+      expect(res).toBeDefined();
+      expect(res.order).toEqual(1);
     });
     it('카테고리가 5개 초과일 경우 BadRequest', async () => {
       await expect(

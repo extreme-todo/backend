@@ -116,7 +116,7 @@ export const addTodoStub = (user: User, categorycount?: number): AddTodoDto => {
     todo: 'Go to school',
     duration: 3000,
     categories: Array(categorycount ?? 1).fill('fakecategory'),
-    order: 1,
+    order: null,
   };
 };
 
@@ -128,6 +128,6 @@ export const updateTodoStub = (
     duration: 7000,
     todo: 'updated',
     categories: Array(categorycount ?? 1).fill('fakecategory'),
-    order: 1,
+    order: null,
   };
 };
