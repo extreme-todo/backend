@@ -108,6 +108,7 @@ export class TodoService {
     return await this.repo.find({
       relations: { categories: true },
       where: { done: isDone, user: { id: user.id } },
+      order: {'order': 'ASC'}
     });
   }
 
