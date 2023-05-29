@@ -21,6 +21,12 @@ export const fakeUserHas2Todos = {
   username: 'fakeUser2',
 } as User;
 
+export const fakeUserHas5Todos = {
+  id: 3,
+  email: 'fakeUser3@email.com',
+  username: 'fakeUser3',
+} as User;
+
 export const todoStub = (): Todo[] => {
   return [
     {
@@ -45,7 +51,7 @@ export const todoStub = (): Todo[] => {
       user: fakeUserHas2Todos,
       categories: null,
       focusTime: 0,
-      order: 1,
+      order: 0,
     },
     {
       id: 3,
@@ -57,7 +63,7 @@ export const todoStub = (): Todo[] => {
       user: fakeUserHas2Todos,
       categories: null,
       focusTime: 0,
-      order: 2,
+      order: null,
     },
     {
       id: 4,
@@ -66,7 +72,7 @@ export const todoStub = (): Todo[] => {
       createdAt: new Date('Dec 26, 2022 18:00:30'),
       duration: 60 * 60,
       done: false,
-      user: fakeUserHasATodo,
+      user: fakeUserHas5Todos,
       categories: null,
       focusTime: 0,
       order: null,
@@ -78,7 +84,7 @@ export const todoStub = (): Todo[] => {
       createdAt: new Date('Dec 26, 2022 18:00:30'),
       duration: 60 * 60,
       done: false,
-      user: fakeUserHasATodo,
+      user: fakeUserHas5Todos,
       categories: null,
       focusTime: 0,
       order: 2,
@@ -90,7 +96,7 @@ export const todoStub = (): Todo[] => {
       createdAt: new Date('Dec 26, 2022 18:00:30'),
       duration: 60 * 60,
       done: false,
-      user: fakeUserHasATodo,
+      user: fakeUserHas5Todos,
       categories: null,
       focusTime: 0,
       order: 3,
@@ -102,10 +108,22 @@ export const todoStub = (): Todo[] => {
       createdAt: new Date('Dec 26, 2022 18:00:30'),
       duration: 60 * 60,
       done: false,
-      user: fakeUserHasATodo,
+      user: fakeUserHas5Todos,
       categories: null,
       focusTime: 0,
       order: 4,
+    },
+    {
+      id: 8,
+      date: new Date('Dec 27, 2022 18:00:30'),
+      todo: 'Go to grocery store',
+      createdAt: new Date('Dec 26, 2022 18:00:30'),
+      duration: 60 * 60,
+      done: false,
+      user: fakeUserHas5Todos,
+      categories: null,
+      focusTime: 0,
+      order: 5,
     },
   ];
 };
