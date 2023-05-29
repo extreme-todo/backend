@@ -1,4 +1,5 @@
 import { Expose, Transform } from 'class-transformer';
+import { IsOptional } from 'class-validator';
 import { Category } from 'src/category/entities/category.entity';
 
 export class TodoDto {
@@ -28,7 +29,10 @@ export class TodoDto {
       return { id: cat.id, name: cat.name };
     }),
   )
-
   @Expose()
   categories: Category[];
+
+  @IsOptional()
+  @Expose()
+  order: number;
 }
