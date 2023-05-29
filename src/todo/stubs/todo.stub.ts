@@ -33,7 +33,7 @@ export const todoStub = (): Todo[] => {
       user: fakeUserHasATodo,
       categories: null,
       focusTime: 0,
-      order: 0,
+      order: 1,
     },
     {
       id: 2,
@@ -45,7 +45,7 @@ export const todoStub = (): Todo[] => {
       user: fakeUserHas2Todos,
       categories: null,
       focusTime: 0,
-      order: 0,
+      order: 1,
     },
     {
       id: 3,
@@ -57,7 +57,55 @@ export const todoStub = (): Todo[] => {
       user: fakeUserHas2Todos,
       categories: null,
       focusTime: 0,
-      order: 1,
+      order: 2,
+    },
+    {
+      id: 4,
+      date: new Date('Dec 27, 2022 18:00:30'),
+      todo: 'Go to grocery store',
+      createdAt: new Date('Dec 26, 2022 18:00:30'),
+      duration: 60 * 60,
+      done: false,
+      user: fakeUserHasATodo,
+      categories: null,
+      focusTime: 0,
+      order: null,
+    },
+    {
+      id: 5,
+      date: new Date('Dec 27, 2022 18:00:30'),
+      todo: 'write test code',
+      createdAt: new Date('Dec 26, 2022 18:00:30'),
+      duration: 60 * 60,
+      done: false,
+      user: fakeUserHasATodo,
+      categories: null,
+      focusTime: 0,
+      order: 2,
+    },
+    {
+      id: 6,
+      date: new Date('Dec 27, 2022 18:00:30'),
+      todo: 'work ET',
+      createdAt: new Date('Dec 26, 2022 18:00:30'),
+      duration: 60 * 60,
+      done: false,
+      user: fakeUserHasATodo,
+      categories: null,
+      focusTime: 0,
+      order: 3,
+    },
+    {
+      id: 7,
+      date: new Date('Dec 27, 2022 18:00:30'),
+      todo: 'go to gym',
+      createdAt: new Date('Dec 26, 2022 18:00:30'),
+      duration: 60 * 60,
+      done: false,
+      user: fakeUserHasATodo,
+      categories: null,
+      focusTime: 0,
+      order: 4,
     },
   ];
 };
@@ -68,7 +116,7 @@ export const addTodoStub = (user: User, categorycount?: number): AddTodoDto => {
     todo: 'Go to school',
     duration: 3000,
     categories: Array(categorycount ?? 1).fill('fakecategory'),
-    order: null
+    order: null,
   };
 };
 
@@ -80,6 +128,6 @@ export const updateTodoStub = (
     duration: 7000,
     todo: 'updated',
     categories: Array(categorycount ?? 1).fill('fakecategory'),
-    order: null
+    order: null,
   };
 };
