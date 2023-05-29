@@ -34,6 +34,9 @@ export class TodoService {
       addTodoDto.categories,
     );
     const newTodo = this.repo.create({ ...addTodoDto, categories, user });
+
+    // 새 todo의 order = 미완료 todo가 없을 경우 0, 있을 경우 제일 마지막 todo의 order값에 1을 더한다
+    newTodo.order = ((await this.getList(false, user))?.pop()?.order ?? -1) + 1;
     return await this.repo.save(newTodo);
   }
 
