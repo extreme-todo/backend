@@ -64,6 +64,7 @@ export class TodoService {
       .getRawMany();
 
     const updated = this.minusOrder(todos);
+
     return this.repo.save(updated);
   }
 
@@ -117,6 +118,8 @@ export class TodoService {
       throw new BadRequestException('이미 완료한 todo입니다.');
     }
 
+    const prevOrder = todo.order;
+
     todo.done = true;
     todo.order = null;
     todo.focusTime = focusTime;
@@ -127,7 +130,8 @@ export class TodoService {
       });
     }
 
-    return this.repo.save(todo);
+    const doneTodo = await this.repo.save(todo);
+    return { prevOrder, doneTodo };
   }
 
   async getList(isDone: boolean, user: User): Promise<Todo[]> {
@@ -154,8 +158,9 @@ export class TodoService {
       .createQueryBuilder('todo')
       .select()
       .where('userId = :userId', { userId })
-      .andWhere('order >= :smallOrder', { smallOrder })
-      .andWhere('order <= :bigOrder', { bigOrder })
+      .andWhere('todo.order >= :smallOrder', { smallOrder })
+      .andWhere('todo.order <= :bigOrder', { bigOrder })
+      .orderBy({ 'todo.order': 'ASC' })
       .getMany();
 
     const updated = this.updateOrder(todosToUpdate, previousOrder, newOrder);
@@ -165,8 +170,8 @@ export class TodoService {
 
   updateOrder(todos: Todo[], previousOrder: number, newOrder: number): Todo[] {
     return todos.map((todo) => {
-      if (todo.order === previousOrder) {
-        todo.order = newOrder;
+      if (todo.order === Number(previousOrder)) {
+        todo.order = Number(newOrder);
       } else {
         const isShiftUp = previousOrder > newOrder;
         const shiftAmount = isShiftUp ? 1 : -1;

@@ -134,7 +134,6 @@ export const addTodoStub = (user: User, categorycount?: number): AddTodoDto => {
     todo: 'Go to school',
     duration: 3000,
     categories: Array(categorycount ?? 1).fill('fakecategory'),
-    order: null,
   };
 };
 

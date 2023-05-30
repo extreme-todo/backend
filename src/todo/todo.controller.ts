@@ -29,6 +29,16 @@ export default class TodoController {
     return 'Successfully created a todo';
   }
 
+  @Patch('/reorder')
+  @UseGuards(AuthGuard)
+  orderTodos(
+    @CurrentUser() userdata: User,
+    @Query('prevOrder') prevOrder: number,
+    @Query('newOrder') newOrder: number,
+  ) {
+    return this.todoService.reorderTodos(prevOrder, newOrder, userdata.id);
+  }
+
   @Delete('/reset')
   resetTodos(@CurrentUser() user: User) {
     return this.todoService.resetTodos(user);
@@ -57,19 +67,21 @@ export default class TodoController {
   }
 
   @Patch('/:id/done')
-  @Serialize(TodoDto)
   @UseGuards(AuthGuard)
   async doTodo(
     @Param('id') todoId: number,
     @CurrentUser() userdata: User,
     @Query('focusTime') focusTime: string,
   ) {
-    const done = await this.todoService.doTodo(
+    const { prevOrder } = await this.todoService.doTodo(
       todoId,
       userdata,
       parseInt(focusTime),
     );
-    return this.todoService.removeTodoOrder(done.order, userdata.id);
+
+    await this.todoService.removeTodoOrder(prevOrder, userdata.id);
+
+    return 'Successfully done a todo';
   }
 
   @Get('/')
