@@ -29,13 +29,6 @@ export default class TodoController {
     return 'Successfully created a todo';
   }
 
-  // TODO: 테스트용 코드로, PR 전에 삭제 필요
-  @Get('/testorder')
-  @UseGuards(AuthGuard)
-  orderTodos(@CurrentUser() userdata: User) {
-    return this.todoService.orderTodos(userdata);
-  }
-
   @Delete('/reset')
   resetTodos(@CurrentUser() user: User) {
     return this.todoService.resetTodos(user);
@@ -49,7 +42,8 @@ export default class TodoController {
 
   @Delete('/:id')
   async deleteTodo(@Param('id') todoId: number, @CurrentUser() userdata: User) {
-    return this.todoService.deleteTodo(todoId, userdata);
+    const deleted = await this.todoService.deleteTodo(todoId, userdata);
+    return this.todoService.removeTodoOrder(deleted.order, userdata.id);
   }
 
   @Patch('/:id')
@@ -70,7 +64,12 @@ export default class TodoController {
     @CurrentUser() userdata: User,
     @Query('focusTime') focusTime: string,
   ) {
-    return this.todoService.doTodo(todoId, userdata, parseInt(focusTime));
+    const done = await this.todoService.doTodo(
+      todoId,
+      userdata,
+      parseInt(focusTime),
+    );
+    return this.todoService.removeTodoOrder(done.order, userdata.id);
   }
 
   @Get('/')

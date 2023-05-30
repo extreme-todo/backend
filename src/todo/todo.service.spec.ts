@@ -143,6 +143,7 @@ describe('TodoService', () => {
       );
       expect(res.done).toEqual(true);
       expect(res.focusTime).toEqual(fakeFocusTime);
+      expect(res.order).toBeNull();
     });
 
     it('존재하지 않는 id 완료시 NotFound', async () => {
@@ -189,6 +190,22 @@ describe('TodoService', () => {
       expect(updated[0].order).toEqual(2);
       expect(updated[1].order).toEqual(3);
       expect(updated[2].order).toEqual(1);
+    });
+  });
+
+  describe('minusOrder', () => {
+    let stubs: Todo[];
+    let todos: Todo[];
+    beforeEach(() => {
+      stubs = todoStub();
+      todos = stubs.filter(
+        (todo) => todo.user.id === fakeUserHas5Todos.id && todo.order > 2,
+      );
+    });
+    it('should take out order', () => {
+      const minus = service.minusOrder(todos);
+      expect(minus[0].order).toEqual(2);
+      expect(minus[1].order).toEqual(3);
     });
   });
 });
