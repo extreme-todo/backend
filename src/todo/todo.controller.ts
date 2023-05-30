@@ -19,32 +19,45 @@ import { UpdateTodoDto } from './dto/update-todo.dto';
 import { TodoService } from './todo.service';
 
 @Controller('api/todos')
+@UseGuards(AuthGuard)
 export default class TodoController {
   constructor(private todoService: TodoService) {}
 
   @Post('/')
-  @UseGuards(AuthGuard)
   async addTodo(@Body() todoData: AddTodoDto, @CurrentUser() userdata: User) {
     await this.todoService.addTodo(todoData, userdata);
     return 'Successfully created a todo';
   }
 
-  @Get('/:id')
+  @Patch('/reorder')
   @UseGuards(AuthGuard)
+  orderTodos(
+    @CurrentUser() userdata: User,
+    @Query('prevOrder') prevOrder: number,
+    @Query('newOrder') newOrder: number,
+  ) {
+    return this.todoService.reorderTodos(prevOrder, newOrder, userdata.id);
+  }
+
+  @Delete('/reset')
+  resetTodos(@CurrentUser() user: User) {
+    return this.todoService.resetTodos(user);
+  }
+
+  @Get('/:id')
   async getOneTodo(@Param('id') todoId: number, @CurrentUser() userdata: User) {
     const todo = await this.todoService.getOneTodo(todoId, userdata);
     return todo;
   }
 
   @Delete('/:id')
-  @UseGuards(AuthGuard)
   async deleteTodo(@Param('id') todoId: number, @CurrentUser() userdata: User) {
-    return this.todoService.deleteTodo(todoId, userdata);
+    const deleted = await this.todoService.deleteTodo(todoId, userdata);
+    return this.todoService.removeTodoOrder(deleted.order, userdata.id);
   }
 
   @Patch('/:id')
   @Serialize(TodoDto)
-  @UseGuards(AuthGuard)
   async updateTodo(
     @Param('id') todoId: number,
     @Body() updateData: UpdateTodoDto,
@@ -54,14 +67,24 @@ export default class TodoController {
   }
 
   @Patch('/:id/done')
-  @Serialize(TodoDto)
   @UseGuards(AuthGuard)
-  async doTodo(@Param('id') todoId: number, @CurrentUser() userdata: User) {
-    return this.todoService.doTodo(todoId, userdata);
+  async doTodo(
+    @Param('id') todoId: number,
+    @CurrentUser() userdata: User,
+    @Query('focusTime') focusTime: string,
+  ) {
+    const { prevOrder } = await this.todoService.doTodo(
+      todoId,
+      userdata,
+      parseInt(focusTime),
+    );
+
+    await this.todoService.removeTodoOrder(prevOrder, userdata.id);
+
+    return 'Successfully done a todo';
   }
 
   @Get('/')
-  @UseGuards(AuthGuard)
   getList(@Query('done') isDone: boolean, @CurrentUser() userdata: User) {
     return this.todoService.getList(isDone, userdata);
   }

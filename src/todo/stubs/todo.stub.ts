@@ -15,10 +15,16 @@ export const fakeUserHasATodo = {
   username: 'fakeUser1',
 } as User;
 
-const fakeUser2 = {
+export const fakeUserHas2Todos = {
   id: 2,
   email: 'fakeUser2@email.com',
   username: 'fakeUser2',
+} as User;
+
+export const fakeUserHas5Todos = {
+  id: 3,
+  email: 'fakeUser3@email.com',
+  username: 'fakeUser3',
 } as User;
 
 export const todoStub = (): Todo[] => {
@@ -29,9 +35,11 @@ export const todoStub = (): Todo[] => {
       todo: 'Go to grocery store',
       createdAt: new Date('Dec 26, 2022 18:00:30'),
       duration: 60 * 60,
-      done: true,
+      done: false,
       user: fakeUserHasATodo,
       categories: null,
+      focusTime: 0,
+      order: 1,
     },
     {
       id: 2,
@@ -40,8 +48,10 @@ export const todoStub = (): Todo[] => {
       createdAt: new Date('Dec 26, 2022 18:00:30'),
       duration: 60 * 60,
       done: false,
-      user: fakeUser2,
+      user: fakeUserHas2Todos,
       categories: null,
+      focusTime: 0,
+      order: 0,
     },
     {
       id: 3,
@@ -50,25 +60,91 @@ export const todoStub = (): Todo[] => {
       createdAt: new Date('Dec 28, 2022 18:00:30'),
       duration: 60 * 60 * 2,
       done: true,
-      user: fakeUser2,
+      user: fakeUserHas2Todos,
       categories: null,
+      focusTime: 0,
+      order: null,
+    },
+    {
+      id: 4,
+      date: new Date('Dec 27, 2022 18:00:30'),
+      todo: 'Go to grocery store',
+      createdAt: new Date('Dec 26, 2022 18:00:30'),
+      duration: 60 * 60,
+      done: false,
+      user: fakeUserHas5Todos,
+      categories: null,
+      focusTime: 0,
+      order: 0,
+    },
+    {
+      id: 5,
+      date: new Date('Dec 27, 2022 18:00:30'),
+      todo: 'write test code',
+      createdAt: new Date('Dec 26, 2022 18:00:30'),
+      duration: 60 * 60,
+      done: false,
+      user: fakeUserHas5Todos,
+      categories: null,
+      focusTime: 0,
+      order: 1,
+    },
+    {
+      id: 6,
+      date: new Date('Dec 27, 2022 18:00:30'),
+      todo: 'work ET',
+      createdAt: new Date('Dec 26, 2022 18:00:30'),
+      duration: 60 * 60,
+      done: false,
+      user: fakeUserHas5Todos,
+      categories: null,
+      focusTime: 0,
+      order: 2,
+    },
+    {
+      id: 7,
+      date: new Date('Dec 27, 2022 18:00:30'),
+      todo: 'go to gym',
+      createdAt: new Date('Dec 26, 2022 18:00:30'),
+      duration: 60 * 60,
+      done: false,
+      user: fakeUserHas5Todos,
+      categories: null,
+      focusTime: 0,
+      order: 3,
+    },
+    {
+      id: 8,
+      date: new Date('Dec 27, 2022 18:00:30'),
+      todo: 'Go to grocery store',
+      createdAt: new Date('Dec 26, 2022 18:00:30'),
+      duration: 60 * 60,
+      done: false,
+      user: fakeUserHas5Todos,
+      categories: null,
+      focusTime: 0,
+      order: 4,
     },
   ];
 };
 
-export const addTodoStub = (user: User): AddTodoDto => {
+export const addTodoStub = (user: User, categorycount?: number): AddTodoDto => {
   return {
     date: new Date('Dec 30, 2022 18:00:30'),
     todo: 'Go to school',
     duration: 3000,
-    categories: ['study'],
+    categories: Array(categorycount ?? 1).fill('fakecategory'),
   };
 };
 
-export const updateTodoStub = (user: User): UpdateTodoDto => {
+export const updateTodoStub = (
+  user: User,
+  categorycount?: number,
+): UpdateTodoDto => {
   return {
     duration: 7000,
     todo: 'updated',
-    categories: ['study'],
+    categories: Array(categorycount ?? 1).fill('fakecategory'),
+    order: null,
   };
 };

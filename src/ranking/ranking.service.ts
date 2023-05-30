@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { User } from 'src/user/entities/user.entity';
 import { Category } from 'src/category/entities/category.entity';
 import { Ranking } from './entities/ranking.entity';
@@ -39,14 +39,14 @@ export class RankingService {
       },
     });
 
-    const {max: maxCategory} = await this.repo
+    const { max: maxCategory } = await this.repo
       .createQueryBuilder('ranking')
       .select('MAX(ranking.time)', 'max')
       .leftJoin('ranking.category', 'category')
       .where('category.name = :category', { category })
-      .getRawOne()
+      .getRawOne();
 
-    const {min: minCategory} = await this.repo
+    const { min: minCategory } = await this.repo
       .createQueryBuilder('ranking')
       .select('MIN(ranking.time)', 'min')
       .leftJoin('ranking.category', 'category')
@@ -109,5 +109,19 @@ export class RankingService {
   @Cron('0 0 5 * * 1')
   private async deleteRank() {
     return await this.repo.clear();
+  }
+
+  async resetRanking(user: User) {
+    const { id: userId } = user;
+
+    const { affected } = await this.repo
+      .createQueryBuilder()
+      .delete()
+      .from('ranking')
+      .where('user = :userId', { userId })
+      .execute();
+    if (affected === 0) {
+      throw new NotFoundException('db delete failed');
+    }
   }
 }

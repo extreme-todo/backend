@@ -1,4 +1,5 @@
 import { Expose, Transform } from 'class-transformer';
+import { IsOptional } from 'class-validator';
 import { Category } from 'src/category/entities/category.entity';
 
 export class TodoDto {
@@ -20,9 +21,18 @@ export class TodoDto {
   @Expose()
   done: boolean;
 
-  @Transform(({ obj }) => obj.categories.map(cat => {
-    return {id: cat.id, name: cat.name}
-  }))
+  @Expose()
+  focusTime: number;
+
+  @Transform(({ obj }) =>
+    obj.categories.map((cat) => {
+      return { id: cat.id, name: cat.name };
+    }),
+  )
   @Expose()
   categories: Category[];
+
+  @IsOptional()
+  @Expose()
+  order: number;
 }
