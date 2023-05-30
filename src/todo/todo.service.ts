@@ -112,6 +112,42 @@ export class TodoService {
     });
   }
 
+  async reorderTodos(
+    previousOrder: number,
+    newOrder: number,
+    userId: number,
+  ): Promise<void> {
+    // 여기 바꿨어요! 일단 큰 값과 작은 값으로만 나누어 보았어요.
+    let smallOrder = previousOrder,
+      bigOrder = newOrder;
+    if (previousOrder > newOrder) {
+      smallOrder = newOrder;
+      bigOrder = previousOrder;
+    }
+
+    const todosToUpdate = await this.repo
+      .createQueryBuilder('todo')
+      .select()
+      .where('userId = :userId', { userId })
+      .andWhere('order >= :smallOrder', { smallOrder })
+      .andWhere('order <= :bigOrder', { bigOrder }) // 여기 바꼈어요! <를 <=로 바꿔 보았습니다.
+      .getMany();
+
+    const updatePromises = todosToUpdate.map((todo) => {
+      if (todo.order === previousOrder) {
+        todo.order = newOrder;
+      } else {
+        // 순서 변경에 따라 order 값을 갱신
+        const isShiftUp = previousOrder > newOrder;
+        const shiftAmount = isShiftUp ? 1 : -1;
+        todo.order += shiftAmount;
+      }
+      return this.repo.save(todo);
+    });
+
+    await Promise.all(updatePromises);
+  }
+
   @Cron('0 0 5 * * 1')
   async removeTodos() {
     const staleTodos = await this.repo
@@ -146,23 +182,39 @@ export class TodoService {
       .createQueryBuilder()
       .select('*')
       .where('userId = :userId', { userId })
-      .andWhere('done = :done', { done : false })
-      .orderBy({ 'todo.order': 'ASC', 'todo.date': "ASC" })
+      .andWhere('done = :done', { done: false })
+      .orderBy({ 'todo.order': 'ASC', 'todo.date': 'ASC' })
       .getRawMany();
 
-    console.group("\n", "\x1b[40m", "\x1b[37m", '완료되지 않은 투두 (수정 작업 전)' ,'\x1b[0m');
-    console.info("* 완료되지 않은 투두를 order과 date 순으로 불러옵니다.")
-    console.info("* order이 비어있거나, order이 연속적이지 않은 투두들까지 포함하여 출력됩니다.")
+    console.group(
+      '\n',
+      '\x1b[40m',
+      '\x1b[37m',
+      '완료되지 않은 투두 (수정 작업 전)',
+      '\x1b[0m',
+    );
+    console.info('* 완료되지 않은 투두를 order과 date 순으로 불러옵니다.');
+    console.info(
+      '* order이 비어있거나, order이 연속적이지 않은 투두들까지 포함하여 출력됩니다.',
+    );
     console.table(undoneTodos);
-    console.groupEnd()
+    console.groupEnd();
 
     let orderedTodos: Todo[];
     orderedTodos = undoneTodos.map((todo: Todo, idx: number) => {
       return { ...todo, order: idx };
     });
 
-    console.group("\n", "\x1b[40m", "\x1b[37m", '정렬 완료한 투두 (수정 작업 전)' ,'\x1b[0m');
-    console.log("* 이전에 불러온 투두들이 보였던 순서대로 모든 투두에 index를 재부여합니다.")
+    console.group(
+      '\n',
+      '\x1b[40m',
+      '\x1b[37m',
+      '정렬 완료한 투두 (수정 작업 전)',
+      '\x1b[0m',
+    );
+    console.log(
+      '* 이전에 불러온 투두들이 보였던 순서대로 모든 투두에 index를 재부여합니다.',
+    );
     console.table(orderedTodos);
     console.groupEnd();
 
