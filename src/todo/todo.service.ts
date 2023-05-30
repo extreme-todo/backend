@@ -108,7 +108,7 @@ export class TodoService {
     return await this.repo.find({
       relations: { categories: true },
       where: { done: isDone, user: { id: user.id } },
-      order: {'order': 'ASC'}
+      order: { order: 'ASC' },
     });
   }
 
@@ -116,8 +116,7 @@ export class TodoService {
     previousOrder: number,
     newOrder: number,
     userId: number,
-  ): Promise<void> {
-    // 여기 바꿨어요! 일단 큰 값과 작은 값으로만 나누어 보았어요.
+  ): Promise<Todo[]> {
     let smallOrder = previousOrder,
       bigOrder = newOrder;
     if (previousOrder > newOrder) {
@@ -130,22 +129,25 @@ export class TodoService {
       .select()
       .where('userId = :userId', { userId })
       .andWhere('order >= :smallOrder', { smallOrder })
-      .andWhere('order <= :bigOrder', { bigOrder }) // 여기 바꼈어요! <를 <=로 바꿔 보았습니다.
+      .andWhere('order <= :bigOrder', { bigOrder })
       .getMany();
 
-    const updatePromises = todosToUpdate.map((todo) => {
+    const updated = this.updateOrder(todosToUpdate, previousOrder, newOrder);
+
+    return this.repo.save(updated);
+  }
+
+  updateOrder(todos: Todo[], previousOrder: number, newOrder: number): Todo[] {
+    return todos.map((todo) => {
       if (todo.order === previousOrder) {
         todo.order = newOrder;
       } else {
-        // 순서 변경에 따라 order 값을 갱신
         const isShiftUp = previousOrder > newOrder;
         const shiftAmount = isShiftUp ? 1 : -1;
         todo.order += shiftAmount;
       }
-      return this.repo.save(todo);
+      return todo;
     });
-
-    await Promise.all(updatePromises);
   }
 
   @Cron('0 0 5 * * 1')

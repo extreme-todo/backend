@@ -75,7 +75,7 @@ export const todoStub = (): Todo[] => {
       user: fakeUserHas5Todos,
       categories: null,
       focusTime: 0,
-      order: null,
+      order: 0,
     },
     {
       id: 5,
@@ -87,7 +87,7 @@ export const todoStub = (): Todo[] => {
       user: fakeUserHas5Todos,
       categories: null,
       focusTime: 0,
-      order: 2,
+      order: 1,
     },
     {
       id: 6,
@@ -99,7 +99,7 @@ export const todoStub = (): Todo[] => {
       user: fakeUserHas5Todos,
       categories: null,
       focusTime: 0,
-      order: 3,
+      order: 2,
     },
     {
       id: 7,
@@ -111,7 +111,7 @@ export const todoStub = (): Todo[] => {
       user: fakeUserHas5Todos,
       categories: null,
       focusTime: 0,
-      order: 4,
+      order: 3,
     },
     {
       id: 8,
@@ -123,7 +123,7 @@ export const todoStub = (): Todo[] => {
       user: fakeUserHas5Todos,
       categories: null,
       focusTime: 0,
-      order: 5,
+      order: 4,
     },
   ];
 };
