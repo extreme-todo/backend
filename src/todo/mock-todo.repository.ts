@@ -11,11 +11,16 @@ import { todoStub } from './stubs/todo.stub';
 export const mockTodoRepo = {
   find(where: FindManyOptions<Todo>) {
     const todos = todoStub();
-    if (where.where['id']) {
-      return todos.filter((el) => el.id === where.where['id']);
-    }
-    if (where.where['done']) {
-      return todos.filter((el) => el.done === where.where['done']);
+    if (where.where) {
+      const keys = Object.keys(where.where);
+      let res: Todo[] = [...todos];
+      keys.forEach((key) => {
+        if(key!=='user')
+          res = res.filter((el) => el[key] === where.where[key]);
+        else
+          res = res.filter((el) => el[key].id === where.where[key].id)
+      });
+      return res;
     }
   },
   create(entityLike: DeepPartial<Todo>) {

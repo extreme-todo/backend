@@ -47,4 +47,8 @@ export class Todo {
   })
   @JoinTable()
   categories: Category[];
+
+  @Index()
+  @Column({default: null, nullable: true})
+  order: number;
 }
