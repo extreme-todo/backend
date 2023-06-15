@@ -32,8 +32,10 @@ export class UserController {
   }
 
   @Get('/callback/google/finish')
-  googleCallback(@Query() authCode: string) {
-    return this.authService.googleCallback(authCode);
+  @Redirect('', 302)
+  async googleCallback(@Query() authCode: string) {
+    const url = await this.authService.googleCallback(authCode);
+    return { url };
   }
 
   @Serialize(UserDto)
