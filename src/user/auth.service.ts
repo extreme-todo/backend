@@ -7,6 +7,7 @@ import { ConfigService } from '@nestjs/config';
 import { google } from 'googleapis';
 import { User } from './entities/user.entity';
 import { UserService } from './user.service';
+import { URLSearchParams } from 'node:url';
 
 @Injectable()
 export class AuthService {
@@ -18,6 +19,7 @@ export class AuthService {
   private CLIENT_ID = this.config.get('OAUTH_ID');
   private CLIENT_PW = this.config.get('OAUTH_PW');
   private REDIRECT_URL = this.config.get('REDIRECT_URL');
+  private CLIENT_URL = this.config.get('CLIENT_URL');
   private oauth2Client = new google.auth.OAuth2(
     this.CLIENT_ID,
     this.CLIENT_PW,
@@ -65,6 +67,9 @@ export class AuthService {
       token: tokens.id_token,
     };
 
+    const params = new URLSearchParams(loginUser);
+    const client = `${this.CLIENT_URL}?${params}`;
+
     // 기존 유저이면 로그인 처리 끝
     if (isExistUser) {
       if (tokens.refresh_token) {
@@ -77,7 +82,7 @@ export class AuthService {
           access: tokens.access_token,
         });
       }
-      return loginUser;
+      return client;
     }
 
     // 기존 유저가 아니라면 DB 새로 등록하기
@@ -89,7 +94,8 @@ export class AuthService {
     };
 
     this.userService.createUser(newUserInfo);
-    return loginUser;
+
+    return client;
   }
 
   // id_tokens 토큰 검증
