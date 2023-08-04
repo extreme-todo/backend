@@ -85,7 +85,8 @@ export default class TodoController {
   }
 
   @Get('/')
-  getList(@Query('done') isDone: boolean, @CurrentUser() userdata: User) {
-    return this.todoService.getList(isDone, userdata);
+  async getList(@Query('done') isDone: boolean, @CurrentUser() userdata: User) {
+    const getTodos = await this.todoService.getList(isDone, userdata);
+    return this.todoService.groupByDate(getTodos);
   }
 }

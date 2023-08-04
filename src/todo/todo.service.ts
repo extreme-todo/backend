@@ -138,8 +138,19 @@ export class TodoService {
     return await this.repo.find({
       relations: { categories: true },
       where: { done: isDone, user: { id: user.id } },
-      order: { order: 'ASC' },
+      order: { date: 'ASC', order: 'ASC' },
     });
+  }
+
+  groupByDate(todos: Todo[]) {
+    const todosMap = new Map<string, Todo[]>();
+    for (const todo of todos) {
+      const dateKey = todo.date.toISOString().split('T')[0];
+      const group = todosMap.get(dateKey) || [];
+      group.push(todo);
+      todosMap.set(dateKey, group);
+    }
+    return todosMap;
   }
 
   async reorderTodos(
