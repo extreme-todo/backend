@@ -30,6 +30,7 @@ export class TodoService {
         `등록 가능한 카테고리 개수 ${MAX_CATEGORY_LENGTH}개를 초과했습니다.`,
       );
     }
+
     const categories = await this.categoryService.findOrCreateCategories(
       addTodoDto.categories,
     );
@@ -143,12 +144,11 @@ export class TodoService {
   }
 
   groupByDate(todos: Todo[]) {
-    const todosMap = new Map<string, Todo[]>();
+    const todosMap = new Map<Date, Todo[]>();
     for (const todo of todos) {
-      const dateKey = todo.date.toISOString().split('T')[0];
-      const group = todosMap.get(dateKey) || [];
+      const group = todosMap.get(todo.date) || [];
       group.push(todo);
-      todosMap.set(dateKey, group);
+      todosMap.set(todo.date, group);
     }
     return todosMap;
   }

@@ -20,7 +20,7 @@ export class Todo {
   @CreateDateColumn()
   createdAt: Date;
 
-  @Column({ type: 'timestamp' })
+  @Column({ type: 'date' })
   date: Date;
 
   @Column()
@@ -49,6 +49,6 @@ export class Todo {
   categories: Category[];
 
   @Index()
-  @Column({default: null, nullable: true})
+  @Column({ default: null, nullable: true })
   order: number;
 }
