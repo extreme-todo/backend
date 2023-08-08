@@ -47,7 +47,6 @@ export class AuthService {
     const { tokens } = await this.oauth2Client.getToken(authCode);
     // QUESTION : 'setCredentials' :: Sets the auth credentials. 이거 뭔지 찾아보기..
     this.oauth2Client.setCredentials(tokens);
-
     // token으로 로그인 처리해주기
     if (!tokens) {
       throw new BadRequestException('tokens not found');

@@ -31,6 +31,7 @@ export const todoStub = (): Todo[] => {
   return [
     {
       id: 1,
+      // date: new Date('Dec 27, 2022 18:00:30').toISOString().split('T')[0], // 이렇게 할려고 하니 string 타입이 되어 에러가 발생하는데, 타입을 어떻게 해야할까?
       date: new Date('Dec 27, 2022 18:00:30'),
       todo: 'Go to grocery store',
       createdAt: new Date('Dec 26, 2022 18:00:30'),

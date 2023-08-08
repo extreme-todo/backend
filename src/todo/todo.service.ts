@@ -30,6 +30,7 @@ export class TodoService {
         `등록 가능한 카테고리 개수 ${MAX_CATEGORY_LENGTH}개를 초과했습니다.`,
       );
     }
+
     const categories = await this.categoryService.findOrCreateCategories(
       addTodoDto.categories,
     );
@@ -138,8 +139,18 @@ export class TodoService {
     return await this.repo.find({
       relations: { categories: true },
       where: { done: isDone, user: { id: user.id } },
-      order: { order: 'ASC' },
+      order: { date: 'ASC', order: 'ASC' },
     });
+  }
+
+  groupByDate(todos: Todo[]) {
+    const todosMap = new Map<Date, Todo[]>();
+    for (const todo of todos) {
+      const group = todosMap.get(todo.date) || [];
+      group.push(todo);
+      todosMap.set(todo.date, group);
+    }
+    return todosMap;
   }
 
   async reorderTodos(
