@@ -5,9 +5,9 @@ import { User } from 'src/user/entities/user.entity';
 import { UpdateSettingDto } from './dto/update-setting.dto';
 import { SettingService } from './setting.service';
 
-@Controller('api/setting')
+@Controller('api/settings')
 export class SettingController {
-  constructor(private settingService: SettingService){}
+  constructor(private settingService: SettingService) {}
 
   @Get('/')
   @UseGuards(AuthGuard)
