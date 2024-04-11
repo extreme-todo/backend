@@ -34,10 +34,43 @@ export class TodoService {
     const categories = await this.categoryService.findOrCreateCategories(
       addTodoDto.categories,
     );
-    const newTodo = this.repo.create({ ...addTodoDto, categories, user });
 
-    // 새 todo의 order = 미완료 todo가 없을 경우 0, 있을 경우 제일 마지막 todo의 order값에 1을 더한다
-    newTodo.order = ((await this.getList(false, user))?.pop()?.order ?? -1) + 1;
+    let newTodoOrder: number;
+
+    const todos = await this.repo.find({
+      where: { done: false, user: { id: user.id } },
+      order: { order: 'DESC' },
+    });
+
+    if (todos.length === 0) {
+      newTodoOrder = 1;
+    } else {
+      const searchData = todos.find(
+        (todo) => new Date(todo.date) <= new Date(addTodoDto.date),
+      );
+
+      if (searchData === undefined) {
+        newTodoOrder = 1;
+
+        const plusedTodos = this.plusOrder(todos);
+
+        await this.repo.save(plusedTodos);
+      } else {
+        newTodoOrder = searchData.order + 1;
+        const plusedTodos = this.plusOrder(todos.slice(searchData.order));
+        await this.repo.save(plusedTodos);
+      }
+    }
+
+    const newTodoData = {
+      ...addTodoDto,
+      categories,
+      user,
+      order: newTodoOrder,
+    };
+
+    const newTodo = this.repo.create(newTodoData);
+
     return await this.repo.save(newTodo);
   }
 
@@ -81,6 +114,13 @@ export class TodoService {
   minusOrder(todos: Todo[]): Todo[] {
     return todos.map((todo) => {
       todo.order -= 1;
+      return todo;
+    });
+  }
+
+  plusOrder(todos: Todo[]): Todo[] {
+    return todos.map((todo) => {
+      todo.order += 1;
       return todo;
     });
   }

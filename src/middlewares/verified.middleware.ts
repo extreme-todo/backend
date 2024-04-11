@@ -14,8 +14,8 @@ declare global {
     interface Request {
       userinfo?: INewUserinfo;
       headers?: IncomingHttpHeaders & {
-        extremetoken?: string;
-        extremeemail?: string;
+        'extreme-token'?: string;
+        'extreme-email'?: string;
       };
     }
     interface Response {}
@@ -28,8 +28,8 @@ export class VerifiedMiddleware implements NestMiddleware {
 
   async use(req: Request, res: Response, next: NextFunction) {
     const verifiedResult = await this.authService.verifiedIdToken(
-      req.headers['extremeemail'] as string,
-      req.headers['extremetoken'] as string,
+      req.headers['extreme-email'] as string,
+      req.headers['extreme-token'] as string,
     );
 
     req.userinfo = verifiedResult;
