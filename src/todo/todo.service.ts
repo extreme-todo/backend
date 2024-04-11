@@ -38,7 +38,6 @@ export class TodoService {
     let newTodoOrder: number;
 
     const todos = await this.repo.find({
-      // relations: { categories: true }, // QUESTION : 이 작업에는 category가 필요없으니 이렇게 해도 되겠지??
       where: { done: false, user: { id: user.id } },
       order: { order: 'DESC' },
     });
