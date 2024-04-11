@@ -60,7 +60,7 @@ describe('TodoService', () => {
         fakeUserHasNoTodo,
       );
       expect(res).toBeDefined();
-      expect(res.order).toEqual(0);
+      expect(res.order).toEqual(1);
     });
     it('미완료 투두를 1개 가진 유저가 새로운 투두 생성', async () => {
       const res = await service.addTodo(
@@ -176,7 +176,7 @@ describe('TodoService', () => {
   describe('groupByDate', () => {
     it('should make group based on the Date', () => {
       const grouped = service.groupByDate(todoStub());
-      expect(grouped.size).toBe(3);
+      expect(grouped.size).toBe(8);
     });
   });
 
@@ -213,6 +213,22 @@ describe('TodoService', () => {
       const minus = service.minusOrder(todos);
       expect(minus[0].order).toEqual(2);
       expect(minus[1].order).toEqual(3);
+    });
+  });
+
+  describe('plusOrder', () => {
+    let stubs: Todo[];
+    let todos: Todo[];
+    beforeEach(() => {
+      stubs = todoStub();
+      todos = stubs.filter(
+        (todo) => todo.user.id === fakeUserHas5Todos.id && todo.order > 2,
+      );
+    });
+    it('should plus one to order', () => {
+      const minus = service.plusOrder(todos);
+      expect(minus[0].order).toEqual(4);
+      expect(minus[1].order).toEqual(5);
     });
   });
 });
