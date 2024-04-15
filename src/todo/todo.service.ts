@@ -220,16 +220,24 @@ export class TodoService {
   }
 
   updateOrder(todos: Todo[], previousOrder: number, newOrder: number): Todo[] {
-    return todos.map((todo) => {
-      if (todo.order === Number(previousOrder)) {
-        todo.order = Number(newOrder);
-      } else {
-        const isShiftUp = previousOrder > newOrder;
-        const shiftAmount = isShiftUp ? 1 : -1;
-        todo.order += shiftAmount;
-      }
-      return todo;
-    });
+    const isPlus = previousOrder > newOrder;
+    let calcTodos: Todo[];
+    let idx: number;
+
+    if (isPlus) {
+      calcTodos = this.plusOrder(todos);
+      idx = calcTodos.findIndex(
+        (todo) => Number(todo.order) === Number(previousOrder) + 1,
+      );
+    } else {
+      calcTodos = this.minusOrder(todos);
+      idx = calcTodos.findIndex(
+        (todo) => Number(todo.order) === Number(previousOrder) - 1,
+      );
+    }
+
+    calcTodos[idx].order = newOrder;
+    return calcTodos;
   }
 
   @Cron('0 0 5 * * 1')
