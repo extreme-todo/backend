@@ -31,7 +31,7 @@ export default class TodoController {
 
   @Patch('/reorder')
   @UseGuards(AuthGuard)
-  orderTodos(
+  reorderTodos(
     @CurrentUser() userdata: User,
     @Query('prevOrder') prevOrder: number,
     @Query('newOrder') newOrder: number,
