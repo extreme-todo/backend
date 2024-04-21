@@ -178,7 +178,6 @@ export class TodoService {
 
   async getList(isDone: boolean, user: User): Promise<Todo[]> {
     return await this.repo.find({
-      select: {},
       where: { done: isDone, user: { id: user.id } },
       order: { date: 'ASC', order: 'ASC' },
     });
