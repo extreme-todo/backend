@@ -147,5 +147,6 @@ export const updateTodoStub = (
     todo: 'updated',
     categories: Array(categorycount ?? 1).fill('fakecategory'),
     order: null,
+    date: '2024-05-15',
   };
 };

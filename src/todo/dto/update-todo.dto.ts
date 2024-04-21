@@ -22,4 +22,8 @@ export class UpdateTodoDto {
   @IsOptional()
   @IsNumber()
   order: number;
+
+  @IsOptional()
+  @IsString()
+  date: string;
 }

@@ -13,6 +13,7 @@ import { UpdateTodoDto } from './dto/update-todo.dto';
 import { Todo } from './entities/todo.entity';
 import { RankingService } from 'src/ranking/ranking.service';
 import { Cron } from '@nestjs/schedule';
+import { find } from 'rxjs';
 
 const MAX_CATEGORY_LENGTH = 5;
 
@@ -130,12 +131,12 @@ export class TodoService {
     if (!todo) {
       throw new NotFoundException('Todo not found');
     }
-    if (updateTodo.categories.length > MAX_CATEGORY_LENGTH) {
-      throw new BadRequestException(
-        `등록 가능한 카테고리 개수 ${MAX_CATEGORY_LENGTH}개를 초과했습니다.`,
-      );
-    }
-    if (updateTodo?.categories) {
+    if (updateTodo.categories) {
+      if (updateTodo.categories.length > MAX_CATEGORY_LENGTH) {
+        throw new BadRequestException(
+          `등록 가능한 카테고리 개수 ${MAX_CATEGORY_LENGTH}개를 초과했습니다.`,
+        );
+      }
       const newCategories = await this.categoryService.findOrCreateCategories(
         updateTodo.categories,
       );
@@ -177,7 +178,6 @@ export class TodoService {
 
   async getList(isDone: boolean, user: User): Promise<Todo[]> {
     return await this.repo.find({
-      relations: { categories: true },
       where: { done: isDone, user: { id: user.id } },
       order: { date: 'ASC', order: 'ASC' },
     });
