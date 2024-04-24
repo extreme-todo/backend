@@ -14,6 +14,7 @@ import { Todo } from './entities/todo.entity';
 import { RankingService } from 'src/ranking/ranking.service';
 import { Cron } from '@nestjs/schedule';
 import { find } from 'rxjs';
+import { Category } from 'src/category/entities/category.entity';
 
 const MAX_CATEGORY_LENGTH = 5;
 
@@ -26,15 +27,18 @@ export class TodoService {
   ) {}
 
   async addTodo(addTodoDto: AddTodoDto, user: User) {
-    if (addTodoDto.categories.length > MAX_CATEGORY_LENGTH) {
-      throw new BadRequestException(
-        `등록 가능한 카테고리 개수 ${MAX_CATEGORY_LENGTH}개를 초과했습니다.`,
+    let categories: Category[] = null;
+    if (addTodoDto.categories) {
+      if (addTodoDto.categories.length > MAX_CATEGORY_LENGTH) {
+        throw new BadRequestException(
+          `등록 가능한 카테고리 개수 ${MAX_CATEGORY_LENGTH}개를 초과했습니다.`,
+        );
+      }
+
+      categories = await this.categoryService.findOrCreateCategories(
+        addTodoDto.categories,
       );
     }
-
-    const categories = await this.categoryService.findOrCreateCategories(
-      addTodoDto.categories,
-    );
 
     let newTodoOrder: number;
 
