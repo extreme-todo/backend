@@ -50,9 +50,11 @@ export class TodoService {
     if (todos.length === 0) {
       newTodoOrder = 1;
     } else {
-      const searchData = todos.find(
-        (todo) => new Date(todo.date) <= new Date(addTodoDto.date),
-      );
+      const offset = addTodoDto.date.getTimezoneOffset() * 60 * 1000;
+      const milSec = addTodoDto.date.getTime();
+      const localTime = new Date(milSec - offset);
+
+      const searchData = todos.find((todo) => new Date(todo.date) <= localTime);
 
       if (searchData === undefined) {
         newTodoOrder = 1;
@@ -62,7 +64,9 @@ export class TodoService {
         await this.repo.save(plusedTodos);
       } else {
         newTodoOrder = searchData.order + 1;
-        const plusedTodos = this.plusOrder(todos.slice(searchData.order));
+        const plusedTodos = this.plusOrder(
+          todos.slice(0, todos.length - searchData.order),
+        );
         await this.repo.save(plusedTodos);
       }
     }
