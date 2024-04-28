@@ -17,6 +17,7 @@ import { AddTodoDto } from './dto/add-todo.dto';
 import { TodoDto } from './dto/todo.dto';
 import { UpdateTodoDto } from './dto/update-todo.dto';
 import { TodoService } from './todo.service';
+import { ReorderDto } from './dto/reorder.dto';
 
 @Controller('api/todos')
 @UseGuards(AuthGuard)
@@ -33,8 +34,7 @@ export default class TodoController {
   @UseGuards(AuthGuard)
   reorderTodos(
     @CurrentUser() userdata: User,
-    @Query('prevOrder') prevOrder: number,
-    @Query('newOrder') newOrder: number,
+    @Query() { prevOrder, newOrder }: ReorderDto,
   ) {
     return this.todoService.reorderTodos(prevOrder, newOrder, userdata.id);
   }
