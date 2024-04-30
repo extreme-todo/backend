@@ -14,6 +14,7 @@ import { Todo } from './entities/todo.entity';
 import { RankingService } from 'src/ranking/ranking.service';
 import { Cron } from '@nestjs/schedule';
 import { find } from 'rxjs';
+import { Category } from 'src/category/entities/category.entity';
 
 const MAX_CATEGORY_LENGTH = 5;
 
@@ -26,15 +27,18 @@ export class TodoService {
   ) {}
 
   async addTodo(addTodoDto: AddTodoDto, user: User) {
-    if (addTodoDto.categories.length > MAX_CATEGORY_LENGTH) {
-      throw new BadRequestException(
-        `등록 가능한 카테고리 개수 ${MAX_CATEGORY_LENGTH}개를 초과했습니다.`,
+    let categories: Category[] = null;
+    if (addTodoDto.categories) {
+      if (addTodoDto.categories.length > MAX_CATEGORY_LENGTH) {
+        throw new BadRequestException(
+          `등록 가능한 카테고리 개수 ${MAX_CATEGORY_LENGTH}개를 초과했습니다.`,
+        );
+      }
+
+      categories = await this.categoryService.findOrCreateCategories(
+        addTodoDto.categories,
       );
     }
-
-    const categories = await this.categoryService.findOrCreateCategories(
-      addTodoDto.categories,
-    );
 
     let newTodoOrder: number;
 
@@ -47,7 +51,7 @@ export class TodoService {
       newTodoOrder = 1;
     } else {
       const searchData = todos.find(
-        (todo) => new Date(todo.date) <= new Date(addTodoDto.date),
+        (todo) => new Date(todo.date) <= addTodoDto.date,
       );
 
       if (searchData === undefined) {
@@ -58,7 +62,9 @@ export class TodoService {
         await this.repo.save(plusedTodos);
       } else {
         newTodoOrder = searchData.order + 1;
-        const plusedTodos = this.plusOrder(todos.slice(searchData.order));
+        const plusedTodos = this.plusOrder(
+          todos.slice(0, todos.length - searchData.order),
+        );
         await this.repo.save(plusedTodos);
       }
     }
@@ -226,17 +232,14 @@ export class TodoService {
 
     if (isPlus) {
       calcTodos = this.plusOrder(todos);
-      idx = calcTodos.findIndex(
-        (todo) => Number(todo.order) === Number(previousOrder) + 1,
-      );
+      idx = calcTodos.findIndex((todo) => todo.order === previousOrder + 1);
     } else {
       calcTodos = this.minusOrder(todos);
-      idx = calcTodos.findIndex(
-        (todo) => Number(todo.order) === Number(previousOrder) - 1,
-      );
+      idx = calcTodos.findIndex((todo) => todo.order === previousOrder - 1);
     }
 
     calcTodos[idx].order = newOrder;
+
     return calcTodos;
   }
 

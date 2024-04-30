@@ -20,7 +20,7 @@ export class Todo {
   @CreateDateColumn()
   createdAt: Date;
 
-  @Column({ type: 'date' })
+  @Column({ type: 'datetime' })
   date: Date;
 
   @Column()
