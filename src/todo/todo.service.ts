@@ -134,8 +134,8 @@ export class TodoService {
   }
 
   async updateTodo(id: number, updateTodo: UpdateTodoDto, user: User) {
-    const todo = await this.getOneTodo(id, user);
-    if (!todo) {
+    const getTodo = await this.getOneTodo(id, user);
+    if (!getTodo) {
       throw new NotFoundException('Todo not found');
     }
     if (updateTodo.categories) {
@@ -147,11 +147,36 @@ export class TodoService {
       const newCategories = await this.categoryService.findOrCreateCategories(
         updateTodo.categories,
       );
-      Object.assign(todo, { ...updateTodo, categories: newCategories });
-    } else {
-      Object.assign(todo, updateTodo);
+      Object.assign(getTodo, { categories: newCategories });
     }
-    return this.repo.save(todo);
+
+    if (getTodo.date !== updateTodo.date) {
+      const getAllTodo = await this.repo.find({
+        where: { done: false, user: { id: user.id } },
+        order: { order: 'DESC' },
+      });
+      let orderResult = this.searchOrder(getAllTodo, updateTodo.date);
+      orderResult = orderResult === 0 ? 1 : orderResult;
+
+      if (orderResult !== getTodo.order) {
+        const bigOrder =
+          getTodo.order > orderResult ? getTodo.order : orderResult;
+        const smallOrder =
+          getTodo.order < orderResult ? getTodo.order : orderResult;
+        const reorderTodos = this.updateOrder(
+          getAllTodo.filter(
+            (todo) => todo.order <= bigOrder && todo.order >= smallOrder,
+          ),
+          getTodo.order,
+          orderResult,
+        );
+        Object.assign(getTodo, { order: orderResult });
+        await this.repo.save(reorderTodos);
+      }
+    }
+
+    Object.assign(getTodo, updateTodo);
+    return this.repo.save(getTodo);
   }
 
   async doTodo(id: number, user: User, focusTime: number) {
@@ -254,7 +279,6 @@ export class TodoService {
       calcTodos = this.minusOrder(todos);
       idx = calcTodos.findIndex((todo) => todo.order === previousOrder - 1);
     }
-
     calcTodos[idx].order = newOrder;
 
     return calcTodos;
