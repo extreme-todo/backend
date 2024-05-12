@@ -40,33 +40,32 @@ export class TodoService {
       );
     }
 
-    let newTodoOrder: number;
+    // todos.length가 0일 때 newTodoOrder은 1
+    let newTodoOrder = 1;
 
     const todos = await this.repo.find({
       where: { done: false, user: { id: user.id } },
       order: { order: 'DESC' },
     });
 
-    if (todos.length === 0) {
-      newTodoOrder = 1;
-    } else {
-      const searchData = todos.find(
-        (todo) => new Date(todo.date) <= addTodoDto.date,
-      );
-
-      if (searchData === undefined) {
-        newTodoOrder = 1;
-
-        const plusedTodos = this.plusOrder(todos);
-
-        await this.repo.save(plusedTodos);
+    if (todos.length !== 0) {
+      const orderResult = this.searchOrder(todos, addTodoDto.date);
+      let plusedTodos: Todo[] = undefined;
+      if (newTodoOrder === 0) {
+        // orderResult가 0이면 newTodoOrder은 1
+        plusedTodos = this.plusOrder(todos);
       } else {
-        newTodoOrder = searchData.order + 1;
-        const plusedTodos = this.plusOrder(
-          todos.slice(0, todos.length - searchData.order),
-        );
-        await this.repo.save(plusedTodos);
+        // 아니면 newTodoOrder은 orderResult+1
+        newTodoOrder = orderResult + 1;
+        if (orderResult !== todos.length) {
+          // 마지막에 추가 되어야 하면 plusOrder 수행할 필요가 없기 때문에 분기처리
+          plusedTodos = this.plusOrder(
+            todos.slice(0, todos.length - orderResult),
+          );
+        }
       }
+      // 기존 todo에 update가 없다면 write를 하지 않아도 된다.
+      plusedTodos !== undefined && (await this.repo.save(plusedTodos));
     }
 
     const newTodoData = {
@@ -119,6 +118,7 @@ export class TodoService {
   }
 
   minusOrder(todos: Todo[]): Todo[] {
+    if (todos.length === 0) return;
     return todos.map((todo) => {
       todo.order -= 1;
       return todo;
@@ -126,6 +126,7 @@ export class TodoService {
   }
 
   plusOrder(todos: Todo[]): Todo[] {
+    if (todos.length === 0) return;
     return todos.map((todo) => {
       todo.order += 1;
       return todo;

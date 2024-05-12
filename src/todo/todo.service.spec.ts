@@ -68,7 +68,7 @@ describe('TodoService', () => {
         fakeUserHas2Todos,
       );
       expect(res).toBeDefined();
-      expect(res.order).toEqual(1);
+      expect(res.order).toEqual(2);
     });
     it('카테고리가 5개 초과일 경우 BadRequest', async () => {
       await expect(
