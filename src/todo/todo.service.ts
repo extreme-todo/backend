@@ -221,22 +221,6 @@ export class TodoService {
     return this.repo.save(updated);
   }
 
-  /**
-   * todolist에 새로운 todo나 update된 날짜에 todo를 넣을 때 적절한 순서를 찾아주는 계산 메소드.
-   * newData와 같거나 이전 날짜에 todo가 없다면 0을 반환한다.
-   * 있다면 order를 기준으로 내림차순으로 정렬된 todolist를 받아서,
-   * updateOrder 기준으로 해당 todo가 들어가야 될 order를 반환한다.
-   * addTodo 할 때는 이 order의 +1을 해서 사용하면 된다.
-   */
-  searchOrder(reversedTodolist: Todo[], newDate: Date): number {
-    const searchData = reversedTodolist.find((todo) => todo.date <= newDate);
-    return searchData ? searchData.order : 0;
-  }
-
-  /**
-   * todolist 중에 plusOrder나 minusOrder이 필요한 곳을 slice한 배열을 받아서
-   * 해당 연산을 하는 계산 메소드.
-   */
   updateOrder(todos: Todo[], previousOrder: number, newOrder: number): Todo[] {
     const isPlus = previousOrder > newOrder;
     let calcTodos: Todo[];

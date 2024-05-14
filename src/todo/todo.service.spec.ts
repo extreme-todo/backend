@@ -180,13 +180,6 @@ describe('TodoService', () => {
     });
   });
 
-  describe('searchOrder', () => {
-    it('should return one if there are no todo that same or late date', () => {
-      // const searchResult = todoStub();
-    });
-    it('should return last todo order of reversedTodolist if there is todo that has same or late date', () => {});
-  });
-
   describe('updateOrder', () => {
     let stubs: Todo[];
     let todos: Todo[];
