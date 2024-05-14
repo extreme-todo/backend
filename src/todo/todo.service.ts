@@ -40,7 +40,6 @@ export class TodoService {
       );
     }
 
-    // todos.length가 0일 때 newTodoOrder은 1
     let newTodoOrder = 1;
 
     const todos = await this.repo.find({
@@ -49,23 +48,19 @@ export class TodoService {
     });
 
     if (todos.length !== 0) {
-      const orderResult = this.searchOrder(todos, addTodoDto.date);
-      let plusedTodos: Todo[] = undefined;
-      if (newTodoOrder === 0) {
-        // orderResult가 0이면 newTodoOrder은 1
+      const searchData = todos.find(
+        (todo) => new Date(todo.date) <= addTodoDto.date,
+      );
+      let plusedTodos: Todo[];
+      if (searchData === undefined) {
         plusedTodos = this.plusOrder(todos);
       } else {
-        // 아니면 newTodoOrder은 orderResult+1
-        newTodoOrder = orderResult + 1;
-        if (orderResult !== todos.length) {
-          // 마지막에 추가 되어야 하면 plusOrder 수행할 필요가 없기 때문에 분기처리
-          plusedTodos = this.plusOrder(
-            todos.slice(0, todos.length - orderResult),
-          );
-        }
+        newTodoOrder = searchData.order + 1;
+        plusedTodos = this.plusOrder(
+          todos.slice(0, todos.length - searchData.order),
+        );
       }
-      // 기존 todo에 update가 없다면 write를 하지 않아도 된다.
-      plusedTodos !== undefined && (await this.repo.save(plusedTodos));
+      await this.repo.save(plusedTodos);
     }
 
     const newTodoData = {
