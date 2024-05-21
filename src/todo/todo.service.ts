@@ -60,7 +60,7 @@ export class TodoService {
           todos.slice(0, todos.length - searchData.order),
         );
       }
-      await this.repo.save(plusedTodos);
+      plusedTodos !== undefined && (await this.repo.save(plusedTodos));
     }
 
     const newTodoData = {
