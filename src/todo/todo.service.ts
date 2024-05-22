@@ -189,16 +189,6 @@ export class TodoService {
     });
   }
 
-  groupByDate(todos: Todo[]) {
-    const todosMap = new Map<Date, Todo[]>();
-    for (const todo of todos) {
-      const group = todosMap.get(todo.date) || [];
-      group.push(todo);
-      todosMap.set(todo.date, group);
-    }
-    return todosMap;
-  }
-
   async reorderTodos(
     previousOrder: number,
     newOrder: number,
