@@ -173,13 +173,6 @@ describe('TodoService', () => {
     });
   });
 
-  describe('groupByDate', () => {
-    it('should make group based on the Date', () => {
-      const grouped = service.groupByDate(todoStub());
-      expect(grouped.size).toBe(8);
-    });
-  });
-
   describe('updateOrder', () => {
     let stubs: Todo[];
     let todos: Todo[];
