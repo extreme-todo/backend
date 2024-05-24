@@ -233,12 +233,11 @@ export class TodoService {
     return calcTodos;
   }
 
-  @Cron('0 0 5 * * 1')
-  async removeTodos() {
+  async removeTodos(currentDate: string) {
     const staleTodos = await this.repo
       .createQueryBuilder('todo')
       .select('*')
-      .where('todo.date < :date', { date: new Date() })
+      .where('todo.date < :date', { date: new Date(currentDate) })
       .getRawMany();
     return await this.repo.remove(staleTodos);
   }
