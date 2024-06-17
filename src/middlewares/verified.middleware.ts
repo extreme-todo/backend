@@ -4,15 +4,10 @@ import { IncomingHttpHeaders } from 'http';
 import { AuthService } from 'src/user/auth.service';
 import { User } from 'src/user/entities/user.entity';
 
-interface INewUserinfo {
-  userdata: User;
-  id_token: string;
-}
-
 declare global {
   namespace Express {
     interface Request {
-      userinfo?: INewUserinfo;
+      user?: User;
       headers?: IncomingHttpHeaders & {
         'extreme-token'?: string;
         'extreme-email'?: string;
@@ -32,7 +27,7 @@ export class VerifiedMiddleware implements NestMiddleware {
       req.headers['extreme-token'] as string,
     );
 
-    req.userinfo = verifiedResult;
+    req.user = verifiedResult.userdata;
 
     next();
   }
