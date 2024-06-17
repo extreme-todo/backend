@@ -112,7 +112,7 @@ export class AuthService {
       } else if (err.message.startsWith('Token used too late')) {
         // 토큰 재발급!
         const newUserInfo = await this.refreshTokens(email);
-        return newUserInfo;
+        return { ...newUserInfo, old_token: token };
       } else {
         // 그 외의 경우 에러처리(아예 권한이 없는 경우?.. 토큰이 없거나 등등)
         throw new UnauthorizedException('unauthorized user');

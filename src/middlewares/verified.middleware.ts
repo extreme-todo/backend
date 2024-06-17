@@ -29,6 +29,10 @@ export class VerifiedMiddleware implements NestMiddleware {
 
     req.user = verifiedResult.userdata;
 
+    if ('old_token' in verifiedResult) {
+      res.setHeader('extreme-token', verifiedResult.id_token);
+    }
+
     next();
   }
 }
