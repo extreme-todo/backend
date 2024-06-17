@@ -109,6 +109,12 @@ export class TodoService {
     return this.repo.save(updated);
   }
 
+  /**
+   * todo를 삭제하는 메소드
+   * @param {number} id
+   * @param {User} user
+   * @returns
+   */
   async deleteTodo(id: number, user: User) {
     const todo = await this.getOneTodo(id, user);
     if (!todo) {
@@ -233,6 +239,11 @@ export class TodoService {
     return calcTodos;
   }
 
+  /**
+   * date를 기준으로 현재 날짜 이전 todo를 삭제하는 메소드
+   * @param currentDate
+   * @returns
+   */
   async removeTodos(currentDate: string) {
     const staleTodos = await this.repo
       .createQueryBuilder('todo')
