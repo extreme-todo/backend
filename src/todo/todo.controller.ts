@@ -86,7 +86,12 @@ export default class TodoController {
 
   @Get('/')
   async getList(@Query('done') isDone: boolean, @CurrentUser() userdata: User) {
-    const getTodos = await this.todoService.getList(isDone, userdata);
-    return Object.fromEntries(this.todoService.groupByDate(getTodos));
+    return await this.todoService.getList(isDone, userdata);
+  }
+
+  @Delete('/')
+  async removeTodosBeforeToday(@CurrentUser() userdata: User, @Param('currentDate') currentDate: string) {
+    await this.todoService.removeTodos(currentDate);
+    return 'Successfully removed todos before today';
   }
 }
