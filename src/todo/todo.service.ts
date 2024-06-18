@@ -40,33 +40,27 @@ export class TodoService {
       );
     }
 
-    let newTodoOrder: number;
+    let newTodoOrder = 1;
 
     const todos = await this.repo.find({
       where: { done: false, user: { id: user.id } },
       order: { order: 'DESC' },
     });
 
-    if (todos.length === 0) {
-      newTodoOrder = 1;
-    } else {
+    if (todos.length !== 0) {
       const searchData = todos.find(
         (todo) => new Date(todo.date) <= addTodoDto.date,
       );
-
+      let plusedTodos: Todo[];
       if (searchData === undefined) {
-        newTodoOrder = 1;
-
-        const plusedTodos = this.plusOrder(todos);
-
-        await this.repo.save(plusedTodos);
+        plusedTodos = this.plusOrder(todos);
       } else {
         newTodoOrder = searchData.order + 1;
-        const plusedTodos = this.plusOrder(
+        plusedTodos = this.plusOrder(
           todos.slice(0, todos.length - searchData.order),
         );
-        await this.repo.save(plusedTodos);
       }
+      plusedTodos !== undefined && (await this.repo.save(plusedTodos));
     }
 
     const newTodoData = {
@@ -119,6 +113,7 @@ export class TodoService {
   }
 
   minusOrder(todos: Todo[]): Todo[] {
+    if (todos.length === 0) return;
     return todos.map((todo) => {
       todo.order -= 1;
       return todo;
@@ -126,6 +121,7 @@ export class TodoService {
   }
 
   plusOrder(todos: Todo[]): Todo[] {
+    if (todos.length === 0) return;
     return todos.map((todo) => {
       todo.order += 1;
       return todo;

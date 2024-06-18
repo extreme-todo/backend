@@ -68,7 +68,7 @@ describe('TodoService', () => {
         fakeUserHas2Todos,
       );
       expect(res).toBeDefined();
-      expect(res.order).toEqual(1);
+      expect(res.order).toEqual(2);
     });
     it('카테고리가 5개 초과일 경우 BadRequest', async () => {
       await expect(
@@ -207,6 +207,10 @@ describe('TodoService', () => {
       expect(minus[0].order).toEqual(2);
       expect(minus[1].order).toEqual(3);
     });
+    it('should return undefined when empty array comes to param', () => {
+      const result = service.minusOrder([]);
+      expect(result).toBe(undefined);
+    });
   });
 
   describe('plusOrder', () => {
@@ -219,9 +223,13 @@ describe('TodoService', () => {
       );
     });
     it('should plus one to order', () => {
-      const minus = service.plusOrder(todos);
-      expect(minus[0].order).toEqual(4);
-      expect(minus[1].order).toEqual(5);
+      const plus = service.plusOrder(todos);
+      expect(plus[0].order).toEqual(4);
+      expect(plus[1].order).toEqual(5);
+    });
+    it('should return undefined when empty array comes to param', () => {
+      const result = service.plusOrder([]);
+      expect(result).toBe(undefined);
     });
   });
 });
