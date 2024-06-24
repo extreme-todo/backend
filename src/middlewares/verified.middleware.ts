@@ -30,7 +30,9 @@ export class VerifiedMiddleware implements NestMiddleware {
     req.user = verifiedResult.userdata;
 
     if ('old_token' in verifiedResult) {
-      res.setHeader('extreme-token', verifiedResult.id_token);
+      const EXTREME_TOKEN = 'extreme-token';
+      res.setHeader(EXTREME_TOKEN, verifiedResult.id_token);
+      res.setHeader('Access-Control-Expose-Headers', EXTREME_TOKEN);
     }
 
     next();
