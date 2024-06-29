@@ -68,6 +68,9 @@ export class TodoService {
       categories,
       user,
       order: newTodoOrder,
+      id: `${new Date().getTime()}-${Math.random()
+        .toString(36)
+        .substring(2, 9)}`,
     };
 
     const newTodo = this.repo.create(newTodoData);
