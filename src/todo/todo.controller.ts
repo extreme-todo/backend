@@ -45,13 +45,13 @@ export default class TodoController {
   }
 
   @Get('/:id')
-  async getOneTodo(@Param('id') todoId: number, @CurrentUser() userdata: User) {
+  async getOneTodo(@Param('id') todoId: string, @CurrentUser() userdata: User) {
     const todo = await this.todoService.getOneTodo(todoId, userdata);
     return todo;
   }
 
   @Delete('/:id')
-  async deleteTodo(@Param('id') todoId: number, @CurrentUser() userdata: User) {
+  async deleteTodo(@Param('id') todoId: string, @CurrentUser() userdata: User) {
     const deleted = await this.todoService.deleteTodo(todoId, userdata);
     return this.todoService.removeTodoOrder(deleted.order, userdata.id);
   }
@@ -59,7 +59,7 @@ export default class TodoController {
   @Patch('/:id')
   @Serialize(TodoDto)
   async updateTodo(
-    @Param('id') todoId: number,
+    @Param('id') todoId: string,
     @Body() updateData: UpdateTodoDto,
     @CurrentUser() userdata: User,
   ) {
@@ -69,7 +69,7 @@ export default class TodoController {
   @Patch('/:id/done')
   @UseGuards(AuthGuard)
   async doTodo(
-    @Param('id') todoId: number,
+    @Param('id') todoId: string,
     @CurrentUser() userdata: User,
     @Query('focusTime') focusTime: string,
   ) {
@@ -90,7 +90,10 @@ export default class TodoController {
   }
 
   @Delete('/')
-  async removeTodosBeforeToday(@CurrentUser() userdata: User, @Param('currentDate') currentDate: string) {
+  async removeTodosBeforeToday(
+    @CurrentUser() userdata: User,
+    @Param('currentDate') currentDate: string,
+  ) {
     await this.todoService.removeTodos(currentDate);
     return 'Successfully removed todos before today';
   }
