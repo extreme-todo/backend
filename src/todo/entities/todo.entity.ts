@@ -10,12 +10,13 @@ import {
   JoinTable,
   CreateDateColumn,
   Index,
+  PrimaryColumn,
 } from 'typeorm';
 
 @Entity()
 export class Todo {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryColumn()
+  id: string;
 
   @CreateDateColumn()
   createdAt: Date;

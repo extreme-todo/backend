@@ -18,7 +18,7 @@ export class UpdateTodoDto {
 
   @IsOptional()
   @IsString({ each: true })
-  categories: string[];
+  categories: string[] | null;
 
   @IsOptional()
   @IsDate()

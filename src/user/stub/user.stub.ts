@@ -10,14 +10,18 @@ export const userStub = (): User[] => {
       access: 'asdf1234!@#$',
       todo: [
         {
-          id: 1,
+          id: `${new Date().getTime()}-${Math.random()
+            .toString(36)
+            .substring(2, 9)}`,
           date: new Date('Dec 27, 2022 18:00:30'),
           todo: 'Go to grocery store',
           duration: 60 * 60,
           done: true,
         },
         {
-          id: 2,
+          id: `${new Date().getTime()}-${Math.random()
+            .toString(36)
+            .substring(2, 9)}`,
           date: new Date('Dec 29, 2022 18:00:30'),
           todo: 'Go to Gym',
           duration: 60 * 60,
@@ -50,7 +54,9 @@ export const userStub = (): User[] => {
       access: 'asdf1234!@#$',
       todo: [
         {
-          id: 1,
+          id: `${new Date().getTime()}-${Math.random()
+            .toString(36)
+            .substring(2, 9)}`,
           date: new Date('Dec 27, 2022 18:00:30'),
           todo: 'Go to grocery store',
           duration: 60 * 60,
@@ -58,7 +64,9 @@ export const userStub = (): User[] => {
           category: '["chore", "family affair"]',
         },
         {
-          id: 2,
+          id: `${new Date().getTime()}-${Math.random()
+            .toString(36)
+            .substring(2, 9)}`,
           date: new Date('Dec 29, 2022 18:00:30'),
           todo: 'Go to Gym',
           duration: 60 * 60,
@@ -92,7 +100,9 @@ export const userStub = (): User[] => {
       access: 'asdf1234!@#$',
       todo: [
         {
-          id: 1,
+          id: `${new Date().getTime()}-${Math.random()
+            .toString(36)
+            .substring(2, 9)}`,
           date: new Date('Dec 27, 2022 18:00:30'),
           todo: 'Go to grocery store',
           duration: 60 * 60,
@@ -100,7 +110,9 @@ export const userStub = (): User[] => {
           category: '["chore", "family affair"]',
         },
         {
-          id: 2,
+          id: `${new Date().getTime()}-${Math.random()
+            .toString(36)
+            .substring(2, 9)}`,
           date: new Date('Dec 29, 2022 18:00:30'),
           todo: 'Go to Gym',
           duration: 60 * 60,
@@ -134,7 +146,9 @@ export const userStub = (): User[] => {
       access: 'asdf1234!@#$',
       todo: [
         {
-          id: 1,
+          id: `${new Date().getTime()}-${Math.random()
+            .toString(36)
+            .substring(2, 9)}`,
           date: new Date('Dec 27, 2022 18:00:30'),
           todo: 'Go to grocery store',
           duration: 60 * 60,
@@ -142,7 +156,9 @@ export const userStub = (): User[] => {
           category: '["chore", "family affair"]',
         },
         {
-          id: 2,
+          id: `${new Date().getTime()}-${Math.random()
+            .toString(36)
+            .substring(2, 9)}`,
           date: new Date('Dec 29, 2022 18:00:30'),
           todo: 'Go to Gym',
           duration: 60 * 60,
