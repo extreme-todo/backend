@@ -12,8 +12,6 @@ import { AddTodoDto } from './dto/add-todo.dto';
 import { UpdateTodoDto } from './dto/update-todo.dto';
 import { Todo } from './entities/todo.entity';
 import { RankingService } from 'src/ranking/ranking.service';
-import { Cron } from '@nestjs/schedule';
-import { find } from 'rxjs';
 import { Category } from 'src/category/entities/category.entity';
 
 const MAX_CATEGORY_LENGTH = 5;
@@ -243,12 +241,14 @@ export class TodoService {
    * @param currentDate
    * @returns
    */
-  async removeTodos(currentDate: string) {
+  async removeTodosBeforeDate(currentDate: string, user: User) {
     const staleTodos = await this.repo
       .createQueryBuilder('todo')
-      .select('*')
-      .where('todo.date < :date', { date: new Date(currentDate) })
-      .getRawMany();
+      .select()
+      .where('todo.userId = :userId', { userId: user.id })
+      .andWhere('todo.date < :date', { date: new Date(currentDate) })
+      .getMany();
+
     return await this.repo.remove(staleTodos);
   }
 
