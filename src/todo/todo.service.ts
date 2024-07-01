@@ -68,6 +68,9 @@ export class TodoService {
       categories,
       user,
       order: newTodoOrder,
+      id: `${new Date().getTime()}-${Math.random()
+        .toString(36)
+        .substring(2, 9)}`,
     };
 
     const newTodo = this.repo.create(newTodoData);
@@ -75,7 +78,7 @@ export class TodoService {
     return await this.repo.save(newTodo);
   }
 
-  async getOneTodo(id: number, user: User) {
+  async getOneTodo(id: string, user: User) {
     const todo = await this.repo.findOne({
       where: { id },
       relations: { user: true },
@@ -109,7 +112,7 @@ export class TodoService {
    * @param {User} user
    * @returns
    */
-  async deleteTodo(id: number, user: User) {
+  async deleteTodo(id: string, user: User) {
     const todo = await this.getOneTodo(id, user);
     if (!todo) {
       throw new NotFoundException('Todo not found');
@@ -134,7 +137,7 @@ export class TodoService {
     });
   }
 
-  async updateTodo(id: number, updateTodo: UpdateTodoDto, user: User) {
+  async updateTodo(id: string, updateTodo: UpdateTodoDto, user: User) {
     const todo = await this.getOneTodo(id, user);
     if (!todo) {
       throw new NotFoundException('Todo not found');
@@ -155,7 +158,7 @@ export class TodoService {
     return this.repo.save(todo);
   }
 
-  async doTodo(id: number, user: User, focusTime: number) {
+  async doTodo(id: string, user: User, focusTime: number) {
     const todo = await this.getOneTodo(id, user);
 
     if (!focusTime) {
