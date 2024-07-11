@@ -27,7 +27,9 @@ describe('TodoService', () => {
   };
   const existingId = todoStub()[0].id;
   const doneId = todoStub()[2].id;
-  const notExistingId = 123;
+  const notExistingId = `${new Date().getTime()}-${Math.random()
+    .toString(36)
+    .substring(2, 9)}`;
   let mockRepo;
 
   beforeEach(async () => {
