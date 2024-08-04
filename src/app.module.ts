@@ -55,7 +55,7 @@ import { Server } from 'node:http';
             TotalRestTime,
             Ranking,
           ],
-          synchronize: true,
+          synchronize: false,
           timezone: '+00:00',
           // url: process.env.DATABASE_URL,
           // migrationsRun: true,
