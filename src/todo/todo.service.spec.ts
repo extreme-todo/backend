@@ -211,7 +211,7 @@ describe('TodoService', () => {
     });
     it('should return empty array when empty array comes to param', () => {
       const result = service.minusOrder([]);
-      expect(result).toBe([]);
+      expect(result).toStrictEqual([]);
     });
   });
 
