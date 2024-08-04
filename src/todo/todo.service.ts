@@ -97,7 +97,7 @@ export class TodoService {
       .where('todo.order > :todoOrder', { todoOrder })
       .andWhere('todo.userId = :userId', { userId })
       .orderBy({ 'todo.order': 'ASC' })
-      .getRawMany();
+      .getMany();
 
     const updated = this.minusOrder(todos);
 
@@ -120,7 +120,7 @@ export class TodoService {
   }
 
   minusOrder(todos: Todo[]): Todo[] {
-    if (todos.length === 0) return;
+    if (todos.length === 0) return [];
     return todos.map((todo) => {
       todo.order -= 1;
       return todo;
