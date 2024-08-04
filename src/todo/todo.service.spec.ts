@@ -209,9 +209,9 @@ describe('TodoService', () => {
       expect(minus[0].order).toEqual(2);
       expect(minus[1].order).toEqual(3);
     });
-    it('should return undefined when empty array comes to param', () => {
+    it('should return empty array when empty array comes to param', () => {
       const result = service.minusOrder([]);
-      expect(result).toBe(undefined);
+      expect(result).toBe([]);
     });
   });
 
