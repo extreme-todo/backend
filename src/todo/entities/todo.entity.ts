@@ -10,17 +10,18 @@ import {
   JoinTable,
   CreateDateColumn,
   Index,
+  PrimaryColumn,
 } from 'typeorm';
 
 @Entity()
 export class Todo {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryColumn()
+  id: string;
 
   @CreateDateColumn()
   createdAt: Date;
 
-  @Column({ type: 'timestamp' })
+  @Column({ type: 'datetime' })
   date: Date;
 
   @Column()
@@ -49,6 +50,6 @@ export class Todo {
   categories: Category[];
 
   @Index()
-  @Column({default: null, nullable: true})
+  @Column({ default: null, nullable: true })
   order: number;
 }

@@ -1,4 +1,10 @@
-import { MiddlewareConsumer, Module, NestModule, OnApplicationBootstrap, ValidationPipe } from '@nestjs/common';
+import {
+  MiddlewareConsumer,
+  Module,
+  NestModule,
+  OnApplicationBootstrap,
+  ValidationPipe,
+} from '@nestjs/common';
 import { TodoModule } from './todo/todo.module';
 import { UserModule } from './user/user.module';
 import { AppController } from './app.controller';
@@ -50,6 +56,7 @@ import { Server } from 'node:http';
             Ranking,
           ],
           synchronize: true,
+          timezone: '+00:00',
           // url: process.env.DATABASE_URL,
           // migrationsRun: true,
           // ssl: {

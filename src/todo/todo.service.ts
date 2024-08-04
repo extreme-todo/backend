@@ -12,7 +12,7 @@ import { AddTodoDto } from './dto/add-todo.dto';
 import { UpdateTodoDto } from './dto/update-todo.dto';
 import { Todo } from './entities/todo.entity';
 import { RankingService } from 'src/ranking/ranking.service';
-import { Cron } from '@nestjs/schedule';
+import { Category } from 'src/category/entities/category.entity';
 
 const MAX_CATEGORY_LENGTH = 5;
 
@@ -25,22 +25,58 @@ export class TodoService {
   ) {}
 
   async addTodo(addTodoDto: AddTodoDto, user: User) {
-    if (addTodoDto.categories.length > MAX_CATEGORY_LENGTH) {
-      throw new BadRequestException(
-        `등록 가능한 카테고리 개수 ${MAX_CATEGORY_LENGTH}개를 초과했습니다.`,
+    let categories: Category[] = null;
+    if (addTodoDto.categories) {
+      if (addTodoDto.categories.length > MAX_CATEGORY_LENGTH) {
+        throw new BadRequestException(
+          `등록 가능한 카테고리 개수 ${MAX_CATEGORY_LENGTH}개를 초과했습니다.`,
+        );
+      }
+
+      categories = await this.categoryService.findOrCreateCategories(
+        addTodoDto.categories,
       );
     }
-    const categories = await this.categoryService.findOrCreateCategories(
-      addTodoDto.categories,
-    );
-    const newTodo = this.repo.create({ ...addTodoDto, categories, user });
 
-    // 새 todo의 order = 미완료 todo가 없을 경우 0, 있을 경우 제일 마지막 todo의 order값에 1을 더한다
-    newTodo.order = ((await this.getList(false, user))?.pop()?.order ?? -1) + 1;
+    let newTodoOrder = 1;
+
+    const todos = await this.repo.find({
+      where: { done: false, user: { id: user.id } },
+      order: { order: 'DESC' },
+    });
+
+    if (todos.length !== 0) {
+      const searchData = todos.find(
+        (todo) => new Date(todo.date) <= addTodoDto.date,
+      );
+      let plusedTodos: Todo[];
+      if (searchData === undefined) {
+        plusedTodos = this.plusOrder(todos);
+      } else {
+        newTodoOrder = searchData.order + 1;
+        plusedTodos = this.plusOrder(
+          todos.slice(0, todos.length - searchData.order),
+        );
+      }
+      plusedTodos !== undefined && (await this.repo.save(plusedTodos));
+    }
+
+    const newTodoData = {
+      ...addTodoDto,
+      categories,
+      user,
+      order: newTodoOrder,
+      id: `${new Date().getTime()}-${Math.random()
+        .toString(36)
+        .substring(2, 9)}`,
+    };
+
+    const newTodo = this.repo.create(newTodoData);
+
     return await this.repo.save(newTodo);
   }
 
-  async getOneTodo(id: number, user: User) {
+  async getOneTodo(id: string, user: User) {
     const todo = await this.repo.findOne({
       where: { id },
       relations: { user: true },
@@ -61,14 +97,20 @@ export class TodoService {
       .where('todo.order > :todoOrder', { todoOrder })
       .andWhere('todo.userId = :userId', { userId })
       .orderBy({ 'todo.order': 'ASC' })
-      .getRawMany();
+      .getMany();
 
     const updated = this.minusOrder(todos);
 
     return this.repo.save(updated);
   }
 
-  async deleteTodo(id: number, user: User) {
+  /**
+   * todo를 삭제하는 메소드
+   * @param {number} id
+   * @param {User} user
+   * @returns
+   */
+  async deleteTodo(id: string, user: User) {
     const todo = await this.getOneTodo(id, user);
     if (!todo) {
       throw new NotFoundException('Todo not found');
@@ -78,23 +120,32 @@ export class TodoService {
   }
 
   minusOrder(todos: Todo[]): Todo[] {
+    if (todos.length === 0) return [];
     return todos.map((todo) => {
       todo.order -= 1;
       return todo;
     });
   }
 
-  async updateTodo(id: number, updateTodo: UpdateTodoDto, user: User) {
+  plusOrder(todos: Todo[]): Todo[] {
+    if (todos.length === 0) return;
+    return todos.map((todo) => {
+      todo.order += 1;
+      return todo;
+    });
+  }
+
+  async updateTodo(id: string, updateTodo: UpdateTodoDto, user: User) {
     const todo = await this.getOneTodo(id, user);
     if (!todo) {
       throw new NotFoundException('Todo not found');
     }
-    if (updateTodo.categories.length > MAX_CATEGORY_LENGTH) {
-      throw new BadRequestException(
-        `등록 가능한 카테고리 개수 ${MAX_CATEGORY_LENGTH}개를 초과했습니다.`,
-      );
-    }
-    if (updateTodo?.categories) {
+    if (updateTodo.categories) {
+      if (updateTodo.categories.length > MAX_CATEGORY_LENGTH) {
+        throw new BadRequestException(
+          `등록 가능한 카테고리 개수 ${MAX_CATEGORY_LENGTH}개를 초과했습니다.`,
+        );
+      }
       const newCategories = await this.categoryService.findOrCreateCategories(
         updateTodo.categories,
       );
@@ -105,7 +156,7 @@ export class TodoService {
     return this.repo.save(todo);
   }
 
-  async doTodo(id: number, user: User, focusTime: number) {
+  async doTodo(id: string, user: User, focusTime: number) {
     const todo = await this.getOneTodo(id, user);
 
     if (!focusTime) {
@@ -136,9 +187,8 @@ export class TodoService {
 
   async getList(isDone: boolean, user: User): Promise<Todo[]> {
     return await this.repo.find({
-      relations: { categories: true },
       where: { done: isDone, user: { id: user.id } },
-      order: { order: 'ASC' },
+      order: { date: 'ASC', order: 'ASC' },
     });
   }
 
@@ -169,25 +219,36 @@ export class TodoService {
   }
 
   updateOrder(todos: Todo[], previousOrder: number, newOrder: number): Todo[] {
-    return todos.map((todo) => {
-      if (todo.order === Number(previousOrder)) {
-        todo.order = Number(newOrder);
-      } else {
-        const isShiftUp = previousOrder > newOrder;
-        const shiftAmount = isShiftUp ? 1 : -1;
-        todo.order += shiftAmount;
-      }
-      return todo;
-    });
+    const isPlus = previousOrder > newOrder;
+    let calcTodos: Todo[];
+    let idx: number;
+
+    if (isPlus) {
+      calcTodos = this.plusOrder(todos);
+      idx = calcTodos.findIndex((todo) => todo.order === previousOrder + 1);
+    } else {
+      calcTodos = this.minusOrder(todos);
+      idx = calcTodos.findIndex((todo) => todo.order === previousOrder - 1);
+    }
+
+    calcTodos[idx].order = newOrder;
+
+    return calcTodos;
   }
 
-  @Cron('0 0 5 * * 1')
-  async removeTodos() {
+  /**
+   * date를 기준으로 현재 날짜 이전 todo를 삭제하는 메소드
+   * @param currentDate
+   * @returns
+   */
+  async removeTodosBeforeDate(currentDate: string, user: User) {
     const staleTodos = await this.repo
       .createQueryBuilder('todo')
-      .select('*')
-      .where('todo.date < :date', { date: new Date() })
-      .getRawMany();
+      .select()
+      .where('todo.userId = :userId', { userId: user.id })
+      .andWhere('todo.date < :date', { date: new Date(currentDate) })
+      .getMany();
+
     return await this.repo.remove(staleTodos);
   }
 

@@ -27,7 +27,9 @@ describe('TodoService', () => {
   };
   const existingId = todoStub()[0].id;
   const doneId = todoStub()[2].id;
-  const notExistingId = 123;
+  const notExistingId = `${new Date().getTime()}-${Math.random()
+    .toString(36)
+    .substring(2, 9)}`;
   let mockRepo;
 
   beforeEach(async () => {
@@ -60,7 +62,7 @@ describe('TodoService', () => {
         fakeUserHasNoTodo,
       );
       expect(res).toBeDefined();
-      expect(res.order).toEqual(0);
+      expect(res.order).toEqual(1);
     });
     it('미완료 투두를 1개 가진 유저가 새로운 투두 생성', async () => {
       const res = await service.addTodo(
@@ -68,7 +70,7 @@ describe('TodoService', () => {
         fakeUserHas2Todos,
       );
       expect(res).toBeDefined();
-      expect(res.order).toEqual(1);
+      expect(res.order).toEqual(2);
     });
     it('카테고리가 5개 초과일 경우 BadRequest', async () => {
       await expect(
@@ -206,6 +208,30 @@ describe('TodoService', () => {
       const minus = service.minusOrder(todos);
       expect(minus[0].order).toEqual(2);
       expect(minus[1].order).toEqual(3);
+    });
+    it('should return empty array when empty array comes to param', () => {
+      const result = service.minusOrder([]);
+      expect(result).toBe([]);
+    });
+  });
+
+  describe('plusOrder', () => {
+    let stubs: Todo[];
+    let todos: Todo[];
+    beforeEach(() => {
+      stubs = todoStub();
+      todos = stubs.filter(
+        (todo) => todo.user.id === fakeUserHas5Todos.id && todo.order > 2,
+      );
+    });
+    it('should plus one to order', () => {
+      const plus = service.plusOrder(todos);
+      expect(plus[0].order).toEqual(4);
+      expect(plus[1].order).toEqual(5);
+    });
+    it('should return undefined when empty array comes to param', () => {
+      const result = service.plusOrder([]);
+      expect(result).toBe(undefined);
     });
   });
 });

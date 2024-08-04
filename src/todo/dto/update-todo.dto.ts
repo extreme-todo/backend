@@ -1,7 +1,8 @@
+import { Transform } from 'class-transformer';
 import {
   IsArray,
+  IsDate,
   IsNumber,
-  IsObject,
   IsOptional,
   IsString,
 } from 'class-validator';
@@ -17,9 +18,10 @@ export class UpdateTodoDto {
 
   @IsOptional()
   @IsString({ each: true })
-  categories: string[];
+  categories: string[] | null;
 
   @IsOptional()
-  @IsNumber()
-  order: number;
+  @IsDate()
+  @Transform(({ value }) => new Date(value))
+  date: Date;
 }

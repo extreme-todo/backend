@@ -64,7 +64,15 @@ export class FocusService {
     const { affected } = await this.repo
       .createQueryBuilder()
       .update()
-      .set({ today: 0, yesterday: 0, thisWeek: 0, lastWeek: 0, thisMonth: 0 })
+      .set({
+        total: 0,
+        today: 0,
+        yesterday: 0,
+        thisWeek: 0,
+        lastWeek: 0,
+        thisMonth: 0,
+        lastMonth: 0,
+      })
       .where('user = :userId', { userId })
       .execute();
     if (affected === 0) {

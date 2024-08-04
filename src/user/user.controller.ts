@@ -48,7 +48,7 @@ export class UserController {
     return user;
   }
 
-  @Post('/revoke')
+  @Delete('/revoke')
   async revokeUser(@CurrentUser() user: User) {
     return await this.authService.revokeToken(user);
   }

@@ -30,7 +30,9 @@ export const fakeUserHas5Todos = {
 export const todoStub = (): Todo[] => {
   return [
     {
-      id: 1,
+      id: '1719637016087-a58bpkm',
+      // DISCUSSION : date: new Date('Dec 27, 2022 18:00:30').toISOString().split('T')[0],
+      // 이렇게 할려고 하니 string 타입이 되어 에러가 발생하는데, 타입을 어떻게 해야할까?
       date: new Date('Dec 27, 2022 18:00:30'),
       todo: 'Go to grocery store',
       createdAt: new Date('Dec 26, 2022 18:00:30'),
@@ -42,7 +44,7 @@ export const todoStub = (): Todo[] => {
       order: 1,
     },
     {
-      id: 2,
+      id: '1719637016898-qldnydy',
       date: new Date('Dec 29, 2022 18:00:30'),
       todo: 'Go to Gym',
       createdAt: new Date('Dec 26, 2022 18:00:30'),
@@ -51,10 +53,10 @@ export const todoStub = (): Todo[] => {
       user: fakeUserHas2Todos,
       categories: null,
       focusTime: 0,
-      order: 0,
+      order: 1,
     },
     {
-      id: 3,
+      id: '1719637017482-azrcft7',
       date: new Date('Dec 30, 2022 18:00:30'),
       todo: 'Go to institute',
       createdAt: new Date('Dec 28, 2022 18:00:30'),
@@ -66,21 +68,9 @@ export const todoStub = (): Todo[] => {
       order: null,
     },
     {
-      id: 4,
+      id: '1719637018004-ah6j2y1',
       date: new Date('Dec 27, 2022 18:00:30'),
       todo: 'Go to grocery store',
-      createdAt: new Date('Dec 26, 2022 18:00:30'),
-      duration: 60 * 60,
-      done: false,
-      user: fakeUserHas5Todos,
-      categories: null,
-      focusTime: 0,
-      order: 0,
-    },
-    {
-      id: 5,
-      date: new Date('Dec 27, 2022 18:00:30'),
-      todo: 'write test code',
       createdAt: new Date('Dec 26, 2022 18:00:30'),
       duration: 60 * 60,
       done: false,
@@ -90,9 +80,9 @@ export const todoStub = (): Todo[] => {
       order: 1,
     },
     {
-      id: 6,
+      id: '1719637018499-97gq5yw',
       date: new Date('Dec 27, 2022 18:00:30'),
-      todo: 'work ET',
+      todo: 'write test code',
       createdAt: new Date('Dec 26, 2022 18:00:30'),
       duration: 60 * 60,
       done: false,
@@ -102,9 +92,9 @@ export const todoStub = (): Todo[] => {
       order: 2,
     },
     {
-      id: 7,
+      id: '1719637019004-3vvw35y',
       date: new Date('Dec 27, 2022 18:00:30'),
-      todo: 'go to gym',
+      todo: 'work ET',
       createdAt: new Date('Dec 26, 2022 18:00:30'),
       duration: 60 * 60,
       done: false,
@@ -114,7 +104,19 @@ export const todoStub = (): Todo[] => {
       order: 3,
     },
     {
-      id: 8,
+      id: '1719637019497-7t0lut2',
+      date: new Date('Dec 27, 2022 18:00:30'),
+      todo: 'go to gym',
+      createdAt: new Date('Dec 26, 2022 18:00:30'),
+      duration: 60 * 60,
+      done: false,
+      user: fakeUserHas5Todos,
+      categories: null,
+      focusTime: 0,
+      order: 4,
+    },
+    {
+      id: '1719637019991-wa8ku18',
       date: new Date('Dec 27, 2022 18:00:30'),
       todo: 'Go to grocery store',
       createdAt: new Date('Dec 26, 2022 18:00:30'),
@@ -123,7 +125,7 @@ export const todoStub = (): Todo[] => {
       user: fakeUserHas5Todos,
       categories: null,
       focusTime: 0,
-      order: 4,
+      order: 5,
     },
   ];
 };
@@ -145,6 +147,6 @@ export const updateTodoStub = (
     duration: 7000,
     todo: 'updated',
     categories: Array(categorycount ?? 1).fill('fakecategory'),
-    order: null,
+    date: new Date('2024-05-15'),
   };
 };

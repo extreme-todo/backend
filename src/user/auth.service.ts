@@ -47,7 +47,6 @@ export class AuthService {
     const { tokens } = await this.oauth2Client.getToken(authCode);
     // QUESTION : 'setCredentials' :: Sets the auth credentials. 이거 뭔지 찾아보기..
     this.oauth2Client.setCredentials(tokens);
-
     // token으로 로그인 처리해주기
     if (!tokens) {
       throw new BadRequestException('tokens not found');
@@ -113,7 +112,7 @@ export class AuthService {
       } else if (err.message.startsWith('Token used too late')) {
         // 토큰 재발급!
         const newUserInfo = await this.refreshTokens(email);
-        return newUserInfo;
+        return { ...newUserInfo, old_token: token };
       } else {
         // 그 외의 경우 에러처리(아예 권한이 없는 경우?.. 토큰이 없거나 등등)
         throw new UnauthorizedException('unauthorized user');
