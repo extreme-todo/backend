@@ -93,9 +93,9 @@ export class TodoService {
   async removeTodoOrder(todoOrder: number, userId: number): Promise<Todo[]> {
     const todos = await this.repo
       .createQueryBuilder('todo')
-      .select('*')
-      .where('todo.order > :todoOrder', { todoOrder })
-      .andWhere('todo.userId = :userId', { userId })
+      .select()
+      .where('todo.userId = :userId', { userId })
+      .andWhere('todo.order > :todoOrder', { todoOrder })
       .orderBy({ 'todo.order': 'ASC' })
       .getMany();
 
