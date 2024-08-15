@@ -119,10 +119,10 @@ export class TodoService {
     return this.repo.remove(todo);
   }
 
-  minusOrder(todos: Todo[]): Todo[] {
+  minusOrder(todos: Todo[], operand: number = 1): Todo[] {
     if (todos.length === 0) return [];
     return todos.map((todo) => {
-      todo.order -= 1;
+      todo.order -= operand;
       return todo;
     });
   }
