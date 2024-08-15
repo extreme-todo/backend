@@ -13,6 +13,7 @@ import { UpdateTodoDto } from './dto/update-todo.dto';
 import { Todo } from './entities/todo.entity';
 import { RankingService } from 'src/ranking/ranking.service';
 import { Category } from 'src/category/entities/category.entity';
+import { Cron } from '@nestjs/schedule';
 
 const MAX_CATEGORY_LENGTH = 5;
 
@@ -237,16 +238,20 @@ export class TodoService {
   }
 
   /**
-   * date를 기준으로 현재 날짜 이전 todo를 삭제하는 메소드
-   * @param currentDate
+   * 2달이 지난 Todo를 제거하는 메소드
+   * Cron을 적용해야 한다. Timer 도메인의 updateMonth를 참고
+   * execute every 1st day of the month 5am
    * @returns
    */
-  async removeTodosBeforeDate(currentDate: string, user: User) {
+  @Cron('0 0 5 1 * *')
+  async removeTodosBeforeOver2Months() {
+    const past2MonthDate = this.getPast2Months(new Date().toISOString());
     const staleTodos = await this.repo
       .createQueryBuilder('todo')
       .select()
-      .where('todo.userId = :userId', { userId: user.id })
-      .andWhere('todo.date < :date', { date: new Date(currentDate) })
+      .where('todo.date < :past2Month', {
+        past2Month: new Date(past2MonthDate),
+      })
       .getMany();
 
     return await this.repo.remove(staleTodos);
