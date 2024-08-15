@@ -252,6 +252,23 @@ export class TodoService {
     return await this.repo.remove(staleTodos);
   }
 
+  /**
+   * @param currentDate 프론트엔드에서 ISO 형식, 즉 2024-08-14T15:00:00.000Z 형태로 보내준다.
+   * 날짜의 2달 전 1일 날짜를 연.월.일 형식으로 계산해 준다.
+   * @returns
+   */
+  getPast2Months(currentDate: string) {
+    const today = new Date(currentDate);
+    const thisMonth = today.getMonth();
+    const thisYear = today.getFullYear();
+
+    const past2Month = String(
+      (thisMonth - 2 < 0 ? thisMonth - 2 + 12 : thisMonth - 2) + 1,
+    ).padStart(2, '0');
+    const pastYear = thisMonth - 2 < 0 ? thisYear - 1 : thisYear;
+    return `${pastYear}-${past2Month}-01`;
+  }
+
   async resetTodos(user: User) {
     const { id: userId } = user;
     const { affected } = await this.repo

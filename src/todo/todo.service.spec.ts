@@ -239,4 +239,11 @@ describe('TodoService', () => {
       expect(result).toBe(undefined);
     });
   });
+
+  describe('getPast2Months', () => {
+    it('should return string that represent first day of 2 months ago', () => {
+      const result = service.getPast2Months('2024-08-15T15:00:00Z');
+      expect(result).toBe('2024-06-01');
+    });
+  });
 });
