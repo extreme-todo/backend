@@ -258,6 +258,47 @@ export class TodoService {
   }
 
   /**
+   * date를 기준으로 현재 날짜 이전 todo 중 done이 false인 todo를 삭제하는 메소드
+   * @param currentDate 프론트엔드에서 ISO 형식, 즉 2024-08-14T15:00:00.000Z 형태로 보내준다.
+   * @param user
+   * @returns
+   */
+  async removeDidntDo(currentDate: string, user: User) {
+    const getTodos = await this.repo
+      .createQueryBuilder('todo')
+      .where('todo.userId = :userId', { userId: user.id })
+      .andWhere('todo.done = 0')
+      .orderBy({ 'todo.order': 'ASC' })
+      .getMany();
+    const staleTodos = getTodos.filter(
+      (todo) =>
+        new Date(todo.date) < new Date(currentDate) && todo.done === false,
+    );
+    const updatePivot = getTodos.findIndex(
+      (todo) => todo.date >= new Date(currentDate),
+    );
+
+    await this.repo.remove(staleTodos);
+
+    if (updatePivot > 0) {
+      let needToUpdateTodos = getTodos.slice(updatePivot);
+      const lastStaleTodos = staleTodos.reduce((acc, todo) =>
+        typeof todo.order === 'number'
+          ? todo.order > acc.order
+            ? todo
+            : acc
+          : acc,
+      );
+      needToUpdateTodos = this.minusOrder(
+        needToUpdateTodos,
+        lastStaleTodos.order,
+      );
+
+      await this.repo.save(needToUpdateTodos);
+    }
+  }
+
+  /**
    * @param currentDate 프론트엔드에서 ISO 형식, 즉 2024-08-14T15:00:00.000Z 형태로 보내준다.
    * 날짜의 2달 전 1일 날짜를 연.월.일 형식으로 계산해 준다.
    * @returns

@@ -90,12 +90,12 @@ export default class TodoController {
   }
 
   @Delete('/')
-  async removeTodosBeforeDate(
+  async removeDidntDo(
     @CurrentUser() userdata: User,
     @Query('currentDate') currentDate: string,
     // TODO : 고려할 점: 사용자가 date를 임의로 넣어서 api요청을 하는 경우를 막을 수 없음.
   ) {
-    await this.todoService.removeTodosBeforeDate(currentDate, userdata);
+    await this.todoService.removeDidntDo(currentDate, userdata);
     return 'Successfully removed todos before today';
   }
 }
