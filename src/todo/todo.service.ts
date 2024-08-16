@@ -13,6 +13,7 @@ import { UpdateTodoDto } from './dto/update-todo.dto';
 import { Todo } from './entities/todo.entity';
 import { RankingService } from 'src/ranking/ranking.service';
 import { Category } from 'src/category/entities/category.entity';
+import { Cron } from '@nestjs/schedule';
 
 const MAX_CATEGORY_LENGTH = 5;
 
@@ -93,9 +94,9 @@ export class TodoService {
   async removeTodoOrder(todoOrder: number, userId: number): Promise<Todo[]> {
     const todos = await this.repo
       .createQueryBuilder('todo')
-      .select('*')
-      .where('todo.order > :todoOrder', { todoOrder })
-      .andWhere('todo.userId = :userId', { userId })
+      .select()
+      .where('todo.userId = :userId', { userId })
+      .andWhere('todo.order > :todoOrder', { todoOrder })
       .orderBy({ 'todo.order': 'ASC' })
       .getMany();
 
@@ -119,10 +120,10 @@ export class TodoService {
     return this.repo.remove(todo);
   }
 
-  minusOrder(todos: Todo[]): Todo[] {
+  minusOrder(todos: Todo[], operand: number = 1): Todo[] {
     if (todos.length === 0) return [];
     return todos.map((todo) => {
-      todo.order -= 1;
+      todo.order -= operand;
       return todo;
     });
   }
@@ -237,19 +238,81 @@ export class TodoService {
   }
 
   /**
-   * date를 기준으로 현재 날짜 이전 todo를 삭제하는 메소드
-   * @param currentDate
+   * 2달이 지난 Todo를 제거하는 메소드
+   * Cron을 적용해야 한다. Timer 도메인의 updateMonth를 참고
+   * execute every 1st day of the month 5am
    * @returns
    */
-  async removeTodosBeforeDate(currentDate: string, user: User) {
+  @Cron('0 0 5 1 * *')
+  async removeTodosBeforeOver2Months() {
+    const past2MonthDate = this.getPast2Months(new Date().toISOString());
     const staleTodos = await this.repo
       .createQueryBuilder('todo')
       .select()
-      .where('todo.userId = :userId', { userId: user.id })
-      .andWhere('todo.date < :date', { date: new Date(currentDate) })
+      .where('todo.date < :past2Month', {
+        past2Month: new Date(past2MonthDate),
+      })
       .getMany();
 
     return await this.repo.remove(staleTodos);
+  }
+
+  /**
+   * date를 기준으로 현재 날짜 이전 todo 중 done이 false인 todo를 삭제하는 메소드
+   * @param currentDate 프론트엔드에서 ISO 형식, 즉 2024-08-14T15:00:00.000Z 형태로 보내준다.
+   * @param user
+   * @returns
+   */
+  async removeDidntDo(currentDate: string, user: User) {
+    const getTodos = await this.repo
+      .createQueryBuilder('todo')
+      .where('todo.userId = :userId', { userId: user.id })
+      .andWhere('todo.done = 0')
+      .orderBy({ 'todo.order': 'ASC' })
+      .getMany();
+    const staleTodos = getTodos.filter(
+      (todo) =>
+        new Date(todo.date) < new Date(currentDate) && todo.done === false,
+    );
+    const updatePivot = getTodos.findIndex(
+      (todo) => todo.date >= new Date(currentDate),
+    );
+
+    await this.repo.remove(staleTodos);
+
+    if (updatePivot > 0) {
+      let needToUpdateTodos = getTodos.slice(updatePivot);
+      const lastStaleTodos = staleTodos.reduce((acc, todo) =>
+        typeof todo.order === 'number'
+          ? todo.order > acc.order
+            ? todo
+            : acc
+          : acc,
+      );
+      needToUpdateTodos = this.minusOrder(
+        needToUpdateTodos,
+        lastStaleTodos.order,
+      );
+
+      await this.repo.save(needToUpdateTodos);
+    }
+  }
+
+  /**
+   * @param currentDate 프론트엔드에서 ISO 형식, 즉 2024-08-14T15:00:00.000Z 형태로 보내준다.
+   * 날짜의 2달 전 1일 날짜를 연.월.일 형식으로 계산해 준다.
+   * @returns
+   */
+  getPast2Months(currentDate: string) {
+    const today = new Date(currentDate);
+    const thisMonth = today.getMonth();
+    const thisYear = today.getFullYear();
+
+    const past2Month = String(
+      (thisMonth - 2 < 0 ? thisMonth - 2 + 12 : thisMonth - 2) + 1,
+    ).padStart(2, '0');
+    const pastYear = thisMonth - 2 < 0 ? thisYear - 1 : thisYear;
+    return `${pastYear}-${past2Month}-01`;
   }
 
   async resetTodos(user: User) {
