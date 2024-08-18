@@ -1,80 +1,66 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { FocusService } from './focus.service';
-import { RestService } from './rest.service';
+import { Injectable } from '@nestjs/common';
 import { User } from 'src/user/entities/user.entity';
-import { Cron } from '@nestjs/schedule';
 import { GetProgressResponse } from './dto/get-progress-response.dto';
+import { TodoService } from 'src/todo/todo.service';
 
 @Injectable()
 export class TimerService {
-  constructor(
-    private focusService: FocusService,
-    private restService: RestService,
-  ) {}
+  constructor(private todoService: TodoService) {}
 
-  async initTimer(user: User) {
-    await this.focusService.init(user);
-    await this.restService.init(user);
-  }
+  async getProgress(user: User, currentTime: string) {
+    const doneTodos = await this.todoService.getList(true, user);
+    console.log(doneTodos);
 
-  async getTotalFocusTime(user: User) {
-    const focusTime = await this.focusService.getTime(user);
-    if (!focusTime)
-      throw new NotFoundException(
-        '집중시간이 존재하지 않습니다. 초기화가 필요합니다.',
-      );
-    return focusTime;
-  }
+    const focusTime = {
+      today: 0,
+      yesterday: 0,
+      thisWeek: 0,
+      lastWeek: 0,
+      thisMonth: 0,
+      lastMonth: 0,
+    };
 
-  async getTotalRestTime(user: User) {
-    const restTime = await this.restService.getTime(user);
-    if (!restTime)
-      throw new NotFoundException(
-        '집중시간이 존재하지 않습니다. 초기화가 필요합니다.',
-      );
-    return restTime;
-  }
+    const currentAsDate = new Date(currentTime);
+    const [currentYear, currentMonth, currentDate] = [
+      currentAsDate.getFullYear(),
+      currentAsDate.getMonth(),
+      currentAsDate.getDate(),
+    ];
 
-  async updateFocusTime(focused: number, user: User) {
-    return await this.focusService.addTime(user, focused);
-  }
+    doneTodos.forEach((todo) => {
+      const todoAsDate = new Date(todo.date);
+      const [todoYear, todoMonth, todoDate] = [
+        todoAsDate.getFullYear(),
+        todoAsDate.getMonth(),
+        todoAsDate.getDate(),
+      ];
+      const timeDiff = currentAsDate.getTime() - todoAsDate.getTime();
 
-  async updateRestTime(rest: number, user: User) {
-    return await this.restService.addTime(user, rest);
-  }
+      console.log(currentAsDate, todoAsDate);
 
-  async getProgress(user: User) {
-    const focusTime = await this.focusService.getTime(user);
+      if (todoYear === currentYear) {
+        if (todoMonth === currentMonth) {
+          if (todoDate === currentDate) focusTime.today += todo.focusTime;
+          if (todoDate === currentDate - 1)
+            focusTime.yesterday += todo.focusTime;
+          focusTime.thisMonth += todo.focusTime;
+        }
+        if (todoMonth === currentMonth - 1)
+          focusTime.lastMonth += todo.focusTime;
+        if (timeDiff < 1000 * 60 * 60 * 24 * 7) {
+          focusTime.thisWeek += todo.focusTime;
+        } else if (timeDiff < 1000 * 60 * 60 * 24 * 7 * 2) {
+          focusTime.lastWeek += todo.focusTime;
+        }
+      }
+    });
+
+    console.table();
+
     return {
       daily: focusTime.today - focusTime.yesterday,
       weekly: focusTime.thisWeek - focusTime.lastWeek,
       monthly: focusTime.thisMonth - focusTime.lastMonth,
     } as GetProgressResponse;
-  }
-
-  // execute every 5am
-  @Cron('0 0 5 * * *')
-  async updateDay() {
-    await this.focusService.updateDay();
-    await this.restService.updateDay();
-  }
-
-  // execute every monday 5am
-  @Cron('0 0 5 * * 1')
-  async updateWeek() {
-    await this.focusService.updateWeek();
-    await this.restService.updateWeek();
-  }
-
-  // execute every 1st day of the month 5am
-  @Cron('0 0 5 1 * *')
-  async updateMonth() {
-    await this.focusService.updateMonth();
-    await this.restService.updateMonth();
-  }
-
-  resetTimer(user: User) {
-    this.focusService.resetFocus(user);
-    this.restService.resetRest(user);
   }
 }
