@@ -270,12 +270,14 @@ export class TodoService {
       .andWhere('todo.done = 0')
       .orderBy({ 'todo.order': 'ASC' })
       .getMany();
+    if (getTodos.length === 0) return;
+
     const staleTodos = getTodos.filter(
       (todo) =>
         new Date(todo.date) < new Date(currentDate) && todo.done === false,
     );
     const updatePivot = getTodos.findIndex(
-      (todo) => todo.date >= new Date(currentDate),
+      (todo) => new Date(todo.date) >= new Date(currentDate),
     );
 
     await this.repo.remove(staleTodos);
