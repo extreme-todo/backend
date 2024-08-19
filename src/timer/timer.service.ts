@@ -7,9 +7,8 @@ import { TodoService } from 'src/todo/todo.service';
 export class TimerService {
   constructor(private todoService: TodoService) {}
 
-  async getProgress(user: User, currentTime: string) {
+  async getProgress(user: User, currentTime: string, offset: number) {
     const doneTodos = await this.todoService.getList(true, user);
-    console.log(doneTodos);
 
     const focusTime = {
       today: 0,
@@ -20,7 +19,10 @@ export class TimerService {
       lastMonth: 0,
     };
 
-    const currentAsDate = new Date(currentTime);
+    const currentAsDate = new Date(
+      new Date(currentTime).getTime() - offset * 60000,
+    );
+
     const [currentYear, currentMonth, currentDate] = [
       currentAsDate.getFullYear(),
       currentAsDate.getMonth(),
@@ -28,15 +30,15 @@ export class TimerService {
     ];
 
     doneTodos.forEach((todo) => {
-      const todoAsDate = new Date(todo.date);
+      const todoAsDate = new Date(
+        new Date(todo.date).getTime() - offset * 60000,
+      );
       const [todoYear, todoMonth, todoDate] = [
         todoAsDate.getFullYear(),
         todoAsDate.getMonth(),
         todoAsDate.getDate(),
       ];
       const timeDiff = currentAsDate.getTime() - todoAsDate.getTime();
-
-      console.log(currentAsDate, todoAsDate);
 
       if (todoYear === currentYear) {
         if (todoMonth === currentMonth) {
@@ -54,8 +56,6 @@ export class TimerService {
         }
       }
     });
-
-    console.table();
 
     return {
       daily: focusTime.today - focusTime.yesterday,

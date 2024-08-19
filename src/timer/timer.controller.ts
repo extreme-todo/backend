@@ -13,7 +13,8 @@ export class TimerController {
   getProgress(
     @CurrentUser() user: User,
     @Query('currentDate') currentDate: string,
+    @Query('offset') offset: string,
   ) {
-    return this.timerService.getProgress(user, currentDate);
+    return this.timerService.getProgress(user, currentDate, parseInt(offset));
   }
 }
