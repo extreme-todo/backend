@@ -51,24 +51,24 @@ describe('TimerService', () => {
   });
 
   describe('KST 8월 30일까지 60일동안 매일 1000ms 씩 집중한 경우', () => {
-    it('오늘이 KST 8월 30일인 경우 daily, weekly, monthly가 모두 0이다.', async () => {
+    it('오늘이 KST 8월 30일인 경우 daily, monthly가 0이다. 월요일이 한 주의 시작이며, 8월 30일은 수요일이므로 저번주에 7000, 이번주에 3000만큼 집중하여 weekly=-4000이 된다.', async () => {
       const res = await service.getProgress(
         fakeUser,
         currentDate.toISOString(),
         -540, // KST offset
       );
       expect(res.daily).toEqual(0);
-      expect(res.weekly).toEqual(0);
+      expect(res.weekly).toEqual(-4000);
       expect(res.monthly).toEqual(0);
     });
-    it('오늘이 KST 9월 1일인 경우 오늘과 어제 한 일이 없으므로 daily=0, weekly=-2000, monthly=-30000', async () => {
+    it('오늘이 KST 9월 1일인 경우 오늘과 어제 한 일이 없으므로 daily=0, weekly=-4000, monthly=-30000', async () => {
       const res = await service.getProgress(
         fakeUser,
         '2023-08-31T15:00:00Z', // KST 9월 1일 0시
         -540, // KST offset
       );
       expect(res.daily).toEqual(0);
-      expect(res.weekly).toEqual(-2000);
+      expect(res.weekly).toEqual(-4000);
       expect(res.monthly).toEqual(-30000);
     });
   });

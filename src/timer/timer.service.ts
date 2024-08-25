@@ -2,6 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { User } from 'src/user/entities/user.entity';
 import { GetProgressResponse } from './dto/get-progress-response.dto';
 import { TodoService } from 'src/todo/todo.service';
+import {
+  differenceInCalendarDays,
+  differenceInCalendarMonths,
+  differenceInCalendarWeeks,
+} from 'date-fns';
 
 @Injectable()
 export class TimerService {
@@ -23,35 +28,35 @@ export class TimerService {
       new Date(currentTime).getTime() - offset * 60000,
     );
 
-    const [currentYear, currentMonth, currentDate] = [
-      currentAsDate.getFullYear(),
-      currentAsDate.getMonth(),
-      currentAsDate.getDate(),
-    ];
-
     doneTodos.forEach((todo) => {
       const todoAsDate = new Date(
         new Date(todo.date).getTime() - offset * 60000,
       );
-      const [todoYear, todoMonth, todoDate] = [
-        todoAsDate.getFullYear(),
-        todoAsDate.getMonth(),
-        todoAsDate.getDate(),
-      ];
-      const timeDiff = currentAsDate.getTime() - todoAsDate.getTime();
 
-      if (todoYear === currentYear) {
-        if (todoMonth === currentMonth) {
-          if (todoDate === currentDate) focusTime.today += todo.focusTime;
-          if (todoDate === currentDate - 1)
-            focusTime.yesterday += todo.focusTime;
+      if (currentAsDate >= todoAsDate) {
+        const [diffDays, diffWeeks, diffMonths] = [
+          differenceInCalendarDays(currentAsDate, todoAsDate),
+          differenceInCalendarWeeks(currentAsDate, todoAsDate, {
+            weekStartsOn: 1,
+          }),
+          differenceInCalendarMonths(currentAsDate, todoAsDate),
+        ];
+        if (diffDays === 0) {
+          focusTime.today += todo.focusTime;
+        }
+        if (diffMonths === 0) {
           focusTime.thisMonth += todo.focusTime;
         }
-        if (todoMonth === currentMonth - 1)
-          focusTime.lastMonth += todo.focusTime;
-        if (timeDiff < 1000 * 60 * 60 * 24 * 7) {
+        if (diffWeeks === 0) {
           focusTime.thisWeek += todo.focusTime;
-        } else if (timeDiff < 1000 * 60 * 60 * 24 * 7 * 2) {
+        }
+        if (diffDays === 1) {
+          focusTime.yesterday += todo.focusTime;
+        }
+        if (diffMonths === 1) {
+          focusTime.lastMonth += todo.focusTime;
+        }
+        if (diffWeeks === 1) {
           focusTime.lastWeek += todo.focusTime;
         }
       }
