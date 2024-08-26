@@ -1,16 +1,10 @@
 import { Module } from '@nestjs/common';
 import { TimerService } from './timer.service';
 import { TimerController } from './timer.controller';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { TotalFocusTime } from './entities/total-focus-time.entity';
-import { TotalRestTime } from './entities/total-rest-time.entity';
-import { FocusService } from './focus.service';
-import { RestService } from './rest.service';
-
+import { TodoModule } from 'src/todo/todo.module';
 @Module({
-  imports: [TypeOrmModule.forFeature([TotalFocusTime, TotalRestTime])],
-  providers: [TimerService, FocusService, RestService],
+  imports: [TodoModule],
+  providers: [TimerService],
   controllers: [TimerController],
-  exports: [TimerService],
 })
 export class TimerModule {}

@@ -10,7 +10,6 @@ import { User } from './entities/user.entity';
 export class UserService {
   constructor(
     @InjectRepository(User) private repo: Repository<User>,
-    private timerService: TimerService,
     private settingService: SettingService,
   ) {}
 
@@ -23,7 +22,6 @@ export class UserService {
   async createUser(userinfo: CreateUserDto) {
     const newUser = this.repo.create(userinfo);
     await this.repo.save(newUser);
-    await this.timerService.initTimer(newUser);
     await this.settingService.init(newUser);
     return newUser;
   }

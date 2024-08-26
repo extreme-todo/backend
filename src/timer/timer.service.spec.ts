@@ -1,62 +1,45 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { TimerService } from './timer.service';
-import { NotFoundException } from '@nestjs/common';
+import { TodoService } from 'src/todo/todo.service';
+import { Todo } from 'src/todo/entities/todo.entity';
 import { User } from 'src/user/entities/user.entity';
-import { FocusService } from './focus.service';
-import { userFocusStub } from './stubs/focusTime.stub';
-import { RestService } from './rest.service';
-import { userRestStub } from './stubs/restTime.stub';
+import { fakeUserHasNoTodo } from 'src/todo/stubs/todo.stub';
 
 describe('TimerService', () => {
   let service: TimerService;
-  let fakeFocusService: Partial<FocusService>;
-  let fakeRestService: Partial<RestService>;
-  const fakeUser = { id: 1, email: 'asd@asd.asd', username: 'asd' } as User;
+  let currentDate = new Date('2023-08-29T15:00:00Z'); // Client timezone이 KST일 경우 자정은 UTC 15시이다. KST 8월 30일
+  let fakeUser: User = fakeUserHasNoTodo;
 
   beforeEach(async () => {
-    fakeFocusService = {
-      init: (user: User) => {
-        return Promise.resolve(userFocusStub(user));
-      },
-      getTime: (user: User) => {
-        return Promise.resolve(userFocusStub(user));
-      },
-      addTime: (user: User, time: number) => {
-        const fakeData = userFocusStub(user);
-        fakeData.total += time;
-        fakeData.today += time;
-        fakeData.thisWeek += time;
-        fakeData.thisMonth += time;
-        return Promise.resolve(fakeData);
-      },
-      updateDay: () => Promise.resolve(),
-      updateWeek: () => Promise.resolve(),
-      updateMonth: () => Promise.resolve(),
-    };
-    fakeRestService = {
-      init: (user: User) => {
-        return Promise.resolve(userRestStub(user));
-      },
-      getTime: (user: User) => {
-        return Promise.resolve(userRestStub(user));
-      },
-      addTime: (user: User, time: number) => {
-        const fakeData = userRestStub(user);
-        fakeData.total += time;
-        fakeData.today += time;
-        fakeData.thisWeek += time;
-        fakeData.thisMonth += time;
-        return Promise.resolve(fakeData);
-      },
-      updateDay: () => Promise.resolve(),
-      updateWeek: () => Promise.resolve(),
-      updateMonth: () => Promise.resolve(),
-    };
     const module: TestingModule = await Test.createTestingModule({
+      imports: [],
       providers: [
         TimerService,
-        { provide: FocusService, useValue: fakeFocusService },
-        { provide: RestService, useValue: fakeRestService },
+        {
+          provide: TodoService,
+          useValue: {
+            getList: jest.fn(() => {
+              const todos: Todo[] = [];
+              for (let i = 0; i < 60; i++) {
+                todos.push({
+                  id: i.toString(),
+                  createdAt: new Date(),
+                  date: new Date(
+                    currentDate.getTime() - 1000 * 60 * 60 * 24 * i,
+                  ),
+                  todo: `fakeTodo${i}`,
+                  duration: 0,
+                  done: true,
+                  focusTime: 1000,
+                  user: fakeUser,
+                  categories: [],
+                  order: null,
+                });
+              }
+              return todos;
+            }),
+          },
+        },
       ],
     }).compile();
 
@@ -67,65 +50,26 @@ describe('TimerService', () => {
     expect(service).toBeDefined();
   });
 
-  describe('init Timers', () => {
-    it('특정 fakeUser에 대해 새로운 타이머 정보 추가', async () => {
-      const res = await service.initTimer(fakeUser);
-      expect(res).toBeUndefined();
-    });
-  });
-
-  describe('get TotalFocusTime', () => {
-    it('특정 fakeUser에 대한 TotalFocusTime', async () => {
-      const res = await service.getTotalFocusTime(fakeUser);
-      expect(res).toBeDefined();
-      expect(res.user).toEqual(fakeUser);
-    });
-    it('fakeUser에 대한 TotalFocusTime이 존재하지 않을 경우', async () => {
-      fakeFocusService.getTime = () => null;
-      await expect(service.getTotalFocusTime(fakeUser)).rejects.toThrow(
-        NotFoundException,
+  describe('KST 8월 30일까지 60일동안 매일 1000ms 씩 집중한 경우', () => {
+    it('오늘이 KST 8월 30일인 경우 daily, monthly가 0이다. 월요일이 한 주의 시작이며, 8월 30일은 수요일이므로 저번주에 7000, 이번주에 3000만큼 집중하여 weekly=-4000이 된다.', async () => {
+      const res = await service.getProgress(
+        fakeUser,
+        currentDate.toISOString(),
+        -540, // KST offset
       );
+      expect(res.daily).toEqual(0);
+      expect(res.weekly).toEqual(-4000);
+      expect(res.monthly).toEqual(0);
     });
-  });
-
-  describe('get TotalRestTime', () => {
-    it('특정 fakeUser에 대한 TotalRestTime', async () => {
-      const res = await service.getTotalRestTime(fakeUser);
-      expect(res).toBeDefined();
-    });
-    it('fakeUser에 대한 TotalRestTime이 존재하지 않을 경우', async () => {
-      fakeRestService.getTime = () => null;
-      await expect(service.getTotalRestTime(fakeUser)).rejects.toThrow(
-        NotFoundException,
+    it('오늘이 KST 9월 1일인 경우 오늘과 어제 한 일이 없으므로 daily=0, weekly=-4000, monthly=-30000', async () => {
+      const res = await service.getProgress(
+        fakeUser,
+        '2023-08-31T15:00:00Z', // KST 9월 1일 0시
+        -540, // KST offset
       );
-    });
-  });
-
-  describe('update FocusTime', () => {
-    it('특정 fakeUser가 오늘 1분 더 집중한 경우', async () => {
-      const focused = 60000;
-      const res = await service.updateFocusTime(focused, fakeUser);
-      expect(res.today).toEqual(focused);
-    });
-  });
-
-  describe('update RestTime', () => {
-    it('특정 fakeUser가 오늘 1분 더 휴식한 경우', async () => {
-      const focused = 60000;
-      const res = await service.updateFocusTime(focused, fakeUser);
-      expect(res.today).toEqual(focused);
-    });
-  });
-
-  describe('update All', () => {
-    it('오전 5시마다 업데이트', async () => {
-      expect(await service.updateDay()).toBeUndefined();
-    });
-    it('매주 월요일 오전 5시 업데이트', async () => {
-      expect(await service.updateWeek()).toBeUndefined();
-    });
-    it('매달 1일 오전 5시 업데이트', async () => {
-      expect(await service.updateMonth()).toBeUndefined();
+      expect(res.daily).toEqual(0);
+      expect(res.weekly).toEqual(-4000);
+      expect(res.monthly).toEqual(-30000);
     });
   });
 });
