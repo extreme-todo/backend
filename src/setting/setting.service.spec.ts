@@ -42,7 +42,7 @@ describe('SettingService', () => {
     it('다크 모드, 익스트림모드 on', async () => {
       const currMode = await service.update(fakeUser, {
         colorMode: 'dark',
-        extremeMode: true
+        extremeMode: true,
       });
       expect(currMode.colorMode).toEqual('dark');
       expect(currMode.extremeMode).toEqual(true);
@@ -50,7 +50,7 @@ describe('SettingService', () => {
     it('라이트모드, 익스트림모드 off', async () => {
       const currMode = await service.update(fakeUser, {
         colorMode: 'light',
-        extremeMode: false
+        extremeMode: false,
       });
       expect(currMode.colorMode).toEqual('light');
       expect(currMode.extremeMode).toEqual(false);
@@ -58,7 +58,7 @@ describe('SettingService', () => {
     it('자동색상, 익스트림모드 on', async () => {
       const currMode = await service.update(fakeUser, {
         colorMode: 'auto',
-        extremeMode: true
+        extremeMode: true,
       });
       expect(currMode.colorMode).toEqual('auto');
       expect(currMode.extremeMode).toEqual(true);
@@ -75,6 +75,18 @@ describe('SettingService', () => {
       const currMode = await service.reset(fakeUser);
       expect(currMode.extremeMode).toEqual(true);
       expect(currMode.colorMode).toEqual('auto');
+    });
+  });
+
+  describe('설정삭제', () => {
+    it('설정 데이터 추가', async () => {
+      const currMode = await service.init(fakeUser);
+      expect(currMode.extremeMode).toEqual(true);
+      expect(currMode.colorMode).toEqual('auto');
+    });
+    it('설정삭제', async () => {
+      fakeSettingRepo.findOne = () => undefined;
+      await expect(service.remove(fakeUser)).rejects.toThrow(NotFoundException);
     });
   });
 });

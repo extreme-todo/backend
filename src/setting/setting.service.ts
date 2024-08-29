@@ -36,4 +36,9 @@ export class SettingService {
     setting.extremeMode = data.extremeMode;
     return await this.repo.save(setting);
   }
+
+  async remove(user: User): Promise<void> {
+    const setting = await this.find(user);
+    await this.repo.remove(setting);
+  }
 }
