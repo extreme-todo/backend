@@ -37,5 +37,6 @@ export class UserService {
 
   async removeUser(user: User) {
     await this.repo.remove(user);
+    await this.settingService.remove(user);
   }
 }
