@@ -10,5 +10,6 @@ import { TodoService } from './todo.service';
   imports: [CategoryModule, TypeOrmModule.forFeature([Todo]), RankingModule],
   controllers: [TodoController],
   providers: [TodoService],
+  exports: [TodoService],
 })
 export class TodoModule {}

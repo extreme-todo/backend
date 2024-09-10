@@ -204,10 +204,15 @@ describe('TodoService', () => {
         (todo) => todo.user.id === fakeUserHas5Todos.id && todo.order > 2,
       );
     });
-    it('should take out order', () => {
+    it('should subtract order just one if we didn‘t pass the second parameter', () => {
       const minus = service.minusOrder(todos);
       expect(minus[0].order).toEqual(2);
       expect(minus[1].order).toEqual(3);
+    });
+    it('should subtract order as much as we pass to the second parameter', () => {
+      const minus = service.minusOrder(todos, 2);
+      expect(minus[0].order).toEqual(1);
+      expect(minus[1].order).toEqual(2);
     });
     it('should return empty array when empty array comes to param', () => {
       const result = service.minusOrder([]);
@@ -232,6 +237,13 @@ describe('TodoService', () => {
     it('should return undefined when empty array comes to param', () => {
       const result = service.plusOrder([]);
       expect(result).toBe(undefined);
+    });
+  });
+
+  describe('getPast2Months', () => {
+    it('should return string that represent first day of 2 months ago', () => {
+      const result = service.getPast2Months('2024-08-15T15:00:00Z');
+      expect(result).toBe('2024-06-01');
     });
   });
 });

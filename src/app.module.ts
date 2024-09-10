@@ -18,8 +18,6 @@ import { User } from './user/entities/user.entity';
 import { Setting } from './setting/entities/setting.entity';
 import { TimerModule } from './timer/timer.module';
 import { ScheduleModule } from '@nestjs/schedule';
-import { TotalFocusTime } from './timer/entities/total-focus-time.entity';
-import { TotalRestTime } from './timer/entities/total-rest-time.entity';
 import { CategoryModule } from './category/category.module';
 import { Category } from './category/entities/category.entity';
 import { RankingModule } from './ranking/ranking.module';
@@ -46,15 +44,7 @@ import { Server } from 'node:http';
           username: config.get('DB_USERNAME'),
           password: config.get('DB_PASSWORD'),
           database: config.get('DB_DATABASE'),
-          entities: [
-            Todo,
-            User,
-            Setting,
-            Category,
-            TotalFocusTime,
-            TotalRestTime,
-            Ranking,
-          ],
+          entities: [Todo, User, Setting, Category, Ranking],
           synchronize: false,
           timezone: '+00:00',
           // url: process.env.DATABASE_URL,
