@@ -54,6 +54,7 @@ export class AuthService {
 
     const idtoken = await this.oauth2Client.verifyIdToken({
       idToken: tokens.id_token,
+      audience: this.CLIENT_ID,
     });
     const userinfo = idtoken.getPayload();
 
@@ -100,8 +101,17 @@ export class AuthService {
   // id_tokens 토큰 검증
   async verifiedIdToken(email: string, token: string) {
     try {
-      await this.oauth2Client.verifyIdToken({ idToken: token });
+      const ticket = await this.oauth2Client.verifyIdToken({
+        idToken: token,
+        audience: this.CLIENT_ID,
+      });
+      const payload = ticket.getPayload();
+      if (!payload) {
+        throw new UnauthorizedException('Invalid token payload');
+      }
+
       const user = await this.userService.findUser(email);
+
       return {
         userdata: user,
         id_token: token,
@@ -113,6 +123,10 @@ export class AuthService {
         // 토큰 재발급!
         const newUserInfo = await this.refreshTokens(email);
         return { ...newUserInfo, old_token: token };
+      } else if (err.message.includes('No pem found for envelope')) {
+        // 인증서 캐시 문제 : 새로 인증서 가져오기
+        await this.oauth2Client.getFederatedSignonCertsAsync(); // 인증서 강제 갱신
+        throw new UnauthorizedException('Invalid certificate for token');
       } else {
         // 그 외의 경우 에러처리(아예 권한이 없는 경우?.. 토큰이 없거나 등등)
         throw new UnauthorizedException('unauthorized user');
