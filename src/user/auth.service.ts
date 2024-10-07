@@ -49,7 +49,8 @@ export class AuthService {
     this.oauth2Client.setCredentials(tokens);
     // token으로 로그인 처리해주기
     if (!tokens) {
-      throw new BadRequestException('tokens not found');
+      console.error('Tokens undefined in callback');
+      throw new BadRequestException('Tokens undefined in callback');
     }
 
     const idtoken = await this.oauth2Client.verifyIdToken({
@@ -107,7 +108,10 @@ export class AuthService {
       });
       const payload = ticket.getPayload();
       if (!payload) {
-        throw new UnauthorizedException('Invalid token payload');
+        console.error('payload undefined in verified function');
+        throw new UnauthorizedException(
+          'payload undefined in verified function',
+        );
       }
 
       const user = await this.userService.findUser(email);
@@ -118,7 +122,8 @@ export class AuthService {
       };
     } catch (err) {
       if (err.message.startsWith('Invalid token signature')) {
-        throw new BadRequestException('invalid id tokens');
+        console.error('Invalid id tokens', err.response.data);
+        throw new BadRequestException('Invalid id tokens', err.response.data);
       } else if (err.message.startsWith('Token used too late')) {
         // 토큰 재발급!
         const newUserInfo = await this.refreshTokens(email);
@@ -126,10 +131,18 @@ export class AuthService {
       } else if (err.message.includes('No pem found for envelope')) {
         // 인증서 캐시 문제 : 새로 인증서 가져오기
         await this.oauth2Client.getFederatedSignonCertsAsync(); // 인증서 강제 갱신
-        throw new UnauthorizedException('Invalid certificate for token');
+        console.error(
+          'No pem found for envelope. Invalid certificate for token.',
+          err.response.data,
+        );
+        throw new UnauthorizedException(
+          'Invalid certificate for token',
+          err.response.data,
+        );
       } else {
         // 그 외의 경우 에러처리(아예 권한이 없는 경우?.. 토큰이 없거나 등등)
-        throw new UnauthorizedException('unauthorized user');
+        console.error('Unauthorized user', err.response.data);
+        throw new UnauthorizedException('Unauthorized user', err.response.data);
       }
     }
   }
@@ -148,16 +161,18 @@ export class AuthService {
       };
       return userinfo;
     } catch (err) {
-      throw new BadRequestException('invalid refreshTokens');
+      console.error('Invalid refreshTokens', err.response.data);
+      throw new BadRequestException('Invalid refreshTokens', err.response.data);
     }
   }
 
   async revokeToken(user: User) {
     try {
       await this.userService.removeUser(user);
-      const res2 = await this.oauth2Client.revokeToken(user.access);
+      await this.oauth2Client.revokeToken(user.access);
     } catch (err) {
-      throw new BadRequestException(err.message);
+      console.error('Revoke failed', err.response.data);
+      throw new BadRequestException('Revoke failed', err.response.data);
     }
   }
 }
