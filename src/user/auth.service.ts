@@ -148,7 +148,7 @@ export class AuthService {
       };
       return userinfo;
     } catch (err) {
-      throw new BadRequestException('invalid refreshTokens', err);
+      throw new BadRequestException('invalid refreshTokens');
     }
   }
 
