@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   Injectable,
+  InternalServerErrorException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -32,7 +33,6 @@ export class AuthService {
       'https://www.googleapis.com/auth/userinfo.email',
       'https://www.googleapis.com/auth/userinfo.profile',
     ];
-
     const url = this.oauth2Client.generateAuthUrl({
       access_type: 'offline',
       scope: scopes,
@@ -44,59 +44,70 @@ export class AuthService {
 
   // authCode를 token으로 바꾸기
   async googleCallback(authCode: string) {
-    const { tokens } = await this.oauth2Client.getToken(authCode);
-    // QUESTION : 'setCredentials' :: Sets the auth credentials. 이거 뭔지 찾아보기..
-    this.oauth2Client.setCredentials(tokens);
-    // token으로 로그인 처리해주기
-    if (!tokens) {
-      console.error('Tokens undefined in callback');
-      throw new BadRequestException('Tokens undefined in callback');
-    }
+    try {
+      const { tokens } = await this.oauth2Client.getToken(authCode);
 
-    const idtoken = await this.oauth2Client.verifyIdToken({
-      idToken: tokens.id_token,
-      audience: this.CLIENT_ID,
-    });
-    const userinfo = idtoken.getPayload();
-
-    // 기존 유저인가요?
-    const isExistUser = await this.userService.findUser(userinfo.email);
-
-    const loginUser = {
-      username: userinfo.name,
-      email: userinfo.email,
-      token: tokens.id_token,
-    };
-
-    const params = new URLSearchParams(loginUser);
-    const client = `${this.CLIENT_URL}?${params}`;
-
-    // 기존 유저이면 로그인 처리 끝
-    if (isExistUser) {
-      if (tokens.refresh_token) {
-        this.userService.updateUser(userinfo.email, {
-          refresh: tokens.refresh_token,
-        });
+      // QUESTION : 'setCredentials' :: Sets the auth credentials. 이거 뭔지 찾아보기..
+      this.oauth2Client.setCredentials(tokens);
+      // token으로 로그인 처리해주기
+      if (!tokens) {
+        console.error('Tokens undefined in callback in googleCallback');
+        throw new BadRequestException('Tokens undefined in callback');
       }
-      if (tokens.access_token) {
-        this.userService.updateUser(userinfo.email, {
-          access: tokens.access_token,
-        });
+
+      const idtoken = await this.oauth2Client.verifyIdToken({
+        idToken: tokens.id_token,
+        audience: this.CLIENT_ID,
+      });
+      const userinfo = idtoken.getPayload();
+
+      // 기존 유저인가요?
+      const isExistUser = await this.userService.findUser(userinfo.email);
+
+      const loginUser = {
+        username: userinfo.name,
+        email: userinfo.email,
+        token: tokens.id_token,
+      };
+
+      const params = new URLSearchParams(loginUser);
+      const client = `${this.CLIENT_URL}?${params}`;
+
+      // 기존 유저이면 로그인 처리 끝
+      if (isExistUser) {
+        if (tokens.refresh_token) {
+          this.userService.updateUser(userinfo.email, {
+            refresh: tokens.refresh_token,
+          });
+        }
+        if (tokens.access_token) {
+          this.userService.updateUser(userinfo.email, {
+            access: tokens.access_token,
+          });
+        }
+        return client;
       }
+
+      // 기존 유저가 아니라면 DB 새로 등록하기
+      const newUserInfo = {
+        username: userinfo.name,
+        email: userinfo.email,
+        refresh: tokens.refresh_token,
+        access: tokens.access_token,
+      };
+
+      this.userService.createUser(newUserInfo);
+
       return client;
+    } catch (err) {
+      if (
+        err.response?.data &&
+        err.response?.data.error === 'invalid_request'
+      ) {
+        console.error('Invalid request in googleCallback ::: ', err);
+        throw new InternalServerErrorException('Invalid request');
+      }
     }
-
-    // 기존 유저가 아니라면 DB 새로 등록하기
-    const newUserInfo = {
-      username: userinfo.name,
-      email: userinfo.email,
-      refresh: tokens.refresh_token,
-      access: tokens.access_token,
-    };
-
-    this.userService.createUser(newUserInfo);
-
-    return client;
   }
 
   // id_tokens 토큰 검증
@@ -108,7 +119,7 @@ export class AuthService {
       });
       const payload = ticket.getPayload();
       if (!payload) {
-        console.error('payload undefined in verified function');
+        console.error('payload undefined in verified function verifiedIdToken');
         throw new UnauthorizedException(
           'payload undefined in verified function',
         );
@@ -122,8 +133,8 @@ export class AuthService {
       };
     } catch (err) {
       if (err.message.startsWith('Invalid token signature')) {
-        console.error('Invalid id tokens', err.response.data);
-        throw new BadRequestException('Invalid id tokens', err.response.data);
+        console.error('Invalid id tokens verifiedIdToken ::: ', err);
+        throw new BadRequestException('Invalid id tokens');
       } else if (err.message.startsWith('Token used too late')) {
         // 토큰 재발급!
         const newUserInfo = await this.refreshTokens(email);
@@ -132,17 +143,14 @@ export class AuthService {
         // 인증서 캐시 문제 : 새로 인증서 가져오기
         await this.oauth2Client.getFederatedSignonCertsAsync(); // 인증서 강제 갱신
         console.error(
-          'No pem found for envelope. Invalid certificate for token.',
-          err.response.data,
+          'No pem found for envelope. Invalid certificate for token ::: ',
+          err,
         );
-        throw new UnauthorizedException(
-          'Invalid certificate for token',
-          err.response.data,
-        );
+        throw new UnauthorizedException('Invalid certificate for token');
       } else {
         // 그 외의 경우 에러처리(아예 권한이 없는 경우?.. 토큰이 없거나 등등)
-        console.error('Unauthorized user', err.response.data);
-        throw new UnauthorizedException('Unauthorized user', err.response.data);
+        console.error('Unauthorized user in verifiedIdToken ::: ', err);
+        throw new UnauthorizedException('Unauthorized user');
       }
     }
   }
@@ -161,8 +169,8 @@ export class AuthService {
       };
       return userinfo;
     } catch (err) {
-      console.error('Invalid refreshTokens', err.response.data);
-      throw new BadRequestException('Invalid refreshTokens', err.response.data);
+      console.error('Invalid refreshTokens in refreshTokens ::: ', err);
+      throw new BadRequestException('Invalid refreshTokens');
     }
   }
 
@@ -171,8 +179,8 @@ export class AuthService {
       await this.userService.removeUser(user);
       await this.oauth2Client.revokeToken(user.access);
     } catch (err) {
-      console.error('Revoke failed', err.response.data);
-      throw new BadRequestException('Revoke failed', err.response.data);
+      console.error('Revoke failed in revokeToken ::: ', err);
+      throw new BadRequestException('Revoke failed');
     }
   }
 }
