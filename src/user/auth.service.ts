@@ -105,9 +105,7 @@ export class AuthService {
         idToken: token,
         audience: this.CLIENT_ID,
       });
-      console.log('debug1 verifiedIdToken ticket :: ', ticket);
       const payload = ticket.getPayload();
-      console.log('debug2 verifiedIdToken payload :: ', payload);
       if (!payload) {
         throw new UnauthorizedException('Invalid token payload');
       }
@@ -124,7 +122,6 @@ export class AuthService {
       } else if (err.message.startsWith('Token used too late')) {
         // 토큰 재발급!
         const newUserInfo = await this.refreshTokens(email);
-        console.log('debug3 verifiedIdToken newUserInfo :: ', newUserInfo);
         return { ...newUserInfo, old_token: token };
       } else if (err.message.includes('No pem found for envelope')) {
         // 인증서 캐시 문제 : 새로 인증서 가져오기
@@ -139,13 +136,10 @@ export class AuthService {
 
   // 토큰 재발급받기
   private async refreshTokens(email: string) {
-    console.log('debug4 refreshTokens email :: ', email);
     const user = await this.userService.findUser(email);
-    console.log('debug5 refreshTokens user :: ', user);
     this.oauth2Client.setCredentials({ refresh_token: user.refresh });
     try {
       const { credentials } = await this.oauth2Client.refreshAccessToken();
-      console.log('debug6 refreshTokens credentials :: ', credentials);
       user.access = credentials.access_token;
       this.userService.updateUser(email, { access: user.access });
       const userinfo = {
@@ -154,7 +148,6 @@ export class AuthService {
       };
       return userinfo;
     } catch (err) {
-      console.error('debug6 refreshTokens err :: ', err);
       throw new BadRequestException('invalid refreshTokens', err);
     }
   }
