@@ -34,8 +34,13 @@ export class UserController {
   @Get('/callback/google/finish')
   @Redirect('', 302)
   async googleCallback(@Query() authCode: string) {
-    const url = await this.authService.googleCallback(authCode);
-    return { url };
+    try {
+      const url = await this.authService.googleCallback(authCode);
+      return { url };
+    } catch (err) {
+      if (err.response.statusCode === 500)
+        return { url: 'https://extreme-frontend.fly.dev/' };
+    }
   }
 
   @Serialize(UserDto)
