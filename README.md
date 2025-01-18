@@ -7,25 +7,17 @@
 
 </aside>
 
-🍺 **SERVICE LINK**
+📖 **NOTION** https://www.notion.so/hjnoh/EXTREME-TODO-7c3557af91bf42f782de7c85102df4c0?pvs=4
 
-💻 **DEMO VIDEO**
+🍺 **SERVICE LINK** https://extreme-frontend.fly.dev/
 
-🐙 **GITHUB**
-
-https://extreme-frontend.fly.dev/
-
-https://github.com/extreme-todo
+🐙 **GITHUB** https://github.com/extreme-todo
 
 # —— TEAM
 
-🧩 **BE, FE**
+🧩 **FE, BE** 안동규, 노희정
 
-🦜 **DESIGN**
-
-안동규, 노희정
-
-도경림 (24.09~)
+🦜 **DESIGN** 도경림 (24.09~)
 
 # —— PERIOD
 
