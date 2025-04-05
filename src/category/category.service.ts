@@ -47,6 +47,11 @@ export class CategoryService {
     }
   }
 
+  async findById(id: number): Promise<Category> | null {
+    const category = await this.repo.findOne({ where: { id } });
+    return category;
+  }
+
   @Cron('0 0 5 * * 1')
   private async removeCategories() {
     const stale = await this.repo.query(`

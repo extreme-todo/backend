@@ -24,6 +24,7 @@ import { RankingModule } from './ranking/ranking.module';
 import { Ranking } from './ranking/entities/ranking.entity';
 import { VerifiedMiddleware } from './middlewares/verified.middleware';
 import { Server } from 'node:http';
+import { FocusedTime } from './timer/entities/focused-time.entity';
 
 @Module({
   imports: [
@@ -44,9 +45,9 @@ import { Server } from 'node:http';
           username: config.get('DB_USERNAME'),
           password: config.get('DB_PASSWORD'),
           database: config.get('DB_DATABASE'),
-          entities: [Todo, User, Setting, Category, Ranking],
+          entities: [Todo, User, Setting, Category, Ranking, FocusedTime],
           synchronize: false,
-          timezone: '+00:00',
+          timezone: 'Z',
           // url: process.env.DATABASE_URL,
           // migrationsRun: true,
           // ssl: {
