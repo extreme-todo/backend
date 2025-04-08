@@ -125,8 +125,7 @@ describe('TimerService', () => {
     });
 
     it('일 단위로 조회할 경우 2시간 간격으로 12개의 구간이 반환되어야 한다', async () => {
-      const result = await service.getFocusedTimeByUnit(fakeUser, 1, TimeUnit.DAY, +540);
-      console.log(result);
+      const result = await service.getFocusedTimeByUnit(fakeUser, TimeUnit.DAY, +540, 1);
 
       expect(result).toHaveLength(12);
       // 첫 번째 구간 (0-2시)에는 0분의 집중 시간이 있다
@@ -156,7 +155,7 @@ describe('TimerService', () => {
     });
 
     it('주 단위로 조회할 경우 일요일부터 토요일까지 7개의 구간이 반환되어야 한다', async () => {
-      const result = await service.getFocusedTimeByUnit(fakeUser, 1, TimeUnit.WEEK, +540);
+      const result = await service.getFocusedTimeByUnit(fakeUser, TimeUnit.WEEK, +540, 1);
 
       expect(result).toHaveLength(7);
       // 요일은 일요일부터 토요일까지 순서대로 정렬된다
@@ -170,7 +169,7 @@ describe('TimerService', () => {
     });
 
     it('월 단위로 조회할 경우 5개의 주가 반환되어야 한다', async () => {
-      const result = await service.getFocusedTimeByUnit(fakeUser, 1, TimeUnit.MONTH, +540);
+      const result = await service.getFocusedTimeByUnit(fakeUser, TimeUnit.MONTH, +540, 1);
 
       expect(result).toHaveLength(5);
       expect(result[0]).toEqual({ week: 1, focused: 240 });

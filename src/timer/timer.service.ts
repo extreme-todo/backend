@@ -106,29 +106,16 @@ export class TimerService {
     return this.focusedTimeRepository.save(focusedTime);
   }
 
-  async getFocusedTimeByCategory(user: User, categoryId: number) {
-    return await this.focusedTimeRepository
-      .createQueryBuilder('focusedTime')
-      .leftJoinAndSelect('focusedTime.category', 'category')
-      .where('focusedTime.user.id = :userId', { userId: user.id })
-      .andWhere('focusedTime.category.id = :categoryId', { categoryId: categoryId })
-      .orderBy('focusedTime.createdAt', 'ASC')
-      .getMany();
-  }
-
   async getFocusedTimeByUnit(
     user: User,
-    categoryId: number,
     unit: TimeUnit,
     timezoneOffset: number,
+    categoryId?: number,
   ): Promise<FocusedTimeResponse[]> {
-    const category = await this.categoryService.findById(categoryId);
-    if (!category) {
-      throw new NotFoundException('Category not found');
-    }
+    const category = categoryId ? await this.categoryService.findById(categoryId) : null;
 
-    // Create a date object with the timezone offset applied
     const now = new Date();
+    // 현재시각을 timezoneOffset 만큼 조정
     const adjustedNow = addMinutes(now, timezoneOffset);
 
     let startDate: Date;
@@ -136,17 +123,16 @@ export class TimerService {
 
     switch (unit) {
       case TimeUnit.DAY:
-        // For day unit, use the current day in the user's timezone
         startDate = startOfDay(adjustedNow);
         endDate = endOfDay(adjustedNow);
         break;
       case TimeUnit.WEEK:
-        // For week unit, use the current week in the user's timezone
+        // 현재주를 timezoneOffset 만큼 조정
         startDate = startOfWeek(adjustedNow, { weekStartsOn: 0 }); // 0 = Sunday
         endDate = endOfWeek(adjustedNow, { weekStartsOn: 0 });
         break;
       case TimeUnit.MONTH:
-        // For month unit, use the current month in the user's timezone
+        // 현재달을 timezoneOffset 만큼 조정
         startDate = startOfMonth(adjustedNow);
         endDate = endOfMonth(adjustedNow);
         break;
@@ -154,21 +140,35 @@ export class TimerService {
         throw new BadRequestException('Invalid time unit');
     }
 
-    // Convert back to UTC for database query
+    // timezoneOffset 만큼 조정된 시각을 UTC로 변환
     const utcStartDate = addMinutes(startDate, -timezoneOffset);
     const utcEndDate = addMinutes(endDate, -timezoneOffset);
 
-    const records = await this.focusedTimeRepository
+    const getFocusedTimeRecords = async () => {
+      if(category){
+        
+        return await this.focusedTimeRepository
+        .createQueryBuilder('focusedTime')
+        .leftJoinAndSelect('focusedTime.category', 'category')
+        .where('focusedTime.user.id = :userId', { userId: user.id })
+        .andWhere('focusedTime.category.id = :categoryId', {
+            categoryId: categoryId,
+        })
+        .andWhere('focusedTime.createdAt >= :startDate', { startDate: utcStartDate })
+        .andWhere('focusedTime.createdAt <= :endDate', { endDate: utcEndDate })
+        .orderBy('focusedTime.createdAt', 'ASC')
+        .getMany()
+      }
+        return await this.focusedTimeRepository
       .createQueryBuilder('focusedTime')
-      .leftJoinAndSelect('focusedTime.category', 'category')
       .where('focusedTime.user.id = :userId', { userId: user.id })
-      .andWhere('focusedTime.category.id = :categoryId', {
-          categoryId: categoryId,
-      })
       .andWhere('focusedTime.createdAt >= :startDate', { startDate: utcStartDate })
       .andWhere('focusedTime.createdAt <= :endDate', { endDate: utcEndDate })
       .orderBy('focusedTime.createdAt', 'ASC')
-      .getMany();
+      .getMany()
+    }
+
+    const records = await getFocusedTimeRecords();
 
     return this.formatFocusedTimeRecords(records, unit, timezoneOffset);
   }
@@ -196,7 +196,7 @@ export class TimerService {
   ): FocusedTimeResponse[] {
     const intervals: FocusedTimeResponse[] = [];
 
-    // Initialize all intervals with 0
+    // 모든 구간의 집중 시간을 0으로 초기화
     for (let i = 0; i < 12; i++) {
       const startTime = i * 2;
       intervals.push({
@@ -206,18 +206,15 @@ export class TimerService {
       });
     }
 
-    // Group records by interval
+    // 각 구간별 집중 시간 계산
     records.forEach(record => {
-      // Adjust the date by timezone offset before getting the hour
+      // timezoneOffset 만큼 조정된 시각을 UTC로 변환
       const adjustedDate = addMinutes(record.createdAt, timezoneOffset);
-      console.log(adjustedDate);
       
       const hour = adjustedDate.getUTCHours();
       const duration = record.duration;
       intervals.forEach(interval => {
           if(hour >= interval.start && hour < interval.end){
-            console.log(interval.start, interval.end, hour);
-            
             interval.focused += duration;
           }
       })
@@ -233,14 +230,14 @@ export class TimerService {
     const days: FocusedTimeResponse[] = [];
     const dayNames = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
 
-    // Initialize all days with 0
+    // 모든 요일의 집중 시간을 0으로 초기화
     dayNames.forEach(day => {
       days.push({ day, focused: 0 });
     });
 
-    // Group records by day
+    // 각 요일별 집중 시간 계산
     records.forEach(record => {
-      // Adjust the date by timezone offset before getting the day
+      // timezoneOffset 만큼 조정된 시각을 UTC로 변환
       const adjustedDate = addMinutes(record.createdAt, timezoneOffset);
       const dayIndex = adjustedDate.getUTCDay(); // 0 = Sunday, 1 = Monday, etc.
       days[dayIndex].focused += record.duration;
@@ -255,14 +252,14 @@ export class TimerService {
   ): FocusedTimeResponse[] {
     const weeks: FocusedTimeResponse[] = [];
 
-    // Initialize all weeks with 0
+    // 모든 주의 집중 시간을 0으로 초기화
     for (let i = 1; i <= 5; i++) {
       weeks.push({ week: i, focused: 0 });
     }
 
-    // Group records by week
+    // 각 주별 집중 시간 계산
     records.forEach(record => {
-      // Adjust the date by timezone offset before getting the week
+      // timezoneOffset 만큼 조정된 시각을 UTC로 변환
       const adjustedDate = addMinutes(record.createdAt, timezoneOffset);
       const weekNumber = Math.ceil(adjustedDate.getUTCDate() / 7);
       if (weekNumber >= 1 && weekNumber <= 5) {

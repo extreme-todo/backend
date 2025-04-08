@@ -30,15 +30,15 @@ export class TimerController {
   @Get('focused-time')
   async getFocusedTime(
     @CurrentUser() user: User,
-    @Query('categoryId') categoryId: number,
     @Query('unit') unit: TimeUnit,
     @Query('timezoneOffset') timezoneOffset: number,
+    @Query('categoryId') categoryId?: number,
   ) {
     return await this.timerService.getFocusedTimeByUnit(
       user,
-      categoryId,
       unit,
       timezoneOffset,
+      categoryId,
     );
   }
 }
