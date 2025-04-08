@@ -23,7 +23,7 @@ import { FocusedTime } from './entities/focused-time.entity';
 import { RecordFocusedTimeDto } from './dto/record-focused-time.dto';
 import { CategoryService } from 'src/category/category.service';
 import { GetFocusedTimeDto, TimeUnit } from './dto/get-focused-time.dto';
-import { FocusedTimeResponse } from './dto/focused-time-response.dto';
+import { FocusedTimeResponse, FocusedTimeTotalResponse } from './dto/focused-time-response.dto';
 
 @Injectable()
 export class TimerService {
@@ -111,7 +111,7 @@ export class TimerService {
     unit: TimeUnit,
     timezoneOffset: number,
     categoryId?: number,
-  ): Promise<FocusedTimeResponse[]> {
+  ): Promise<FocusedTimeTotalResponse> {
     const category = categoryId ? await this.categoryService.findById(categoryId) : null;
 
     const now = new Date();
@@ -170,7 +170,24 @@ export class TimerService {
 
     const records = await getFocusedTimeRecords();
 
-    return this.formatFocusedTimeRecords(records, unit, timezoneOffset);
+    // Calculate total focused time
+    const totalFocusedTime = records.reduce((sum, record) => sum + record.duration, 0);
+    
+    // Format the start and end dates with timezone offset
+    const formattedStartDate = format(addMinutes(startDate, timezoneOffset), "yyyy-MM-dd'T'HH:mm:ssxxx");
+    const formattedEndDate = format(addMinutes(endDate, timezoneOffset), "yyyy-MM-dd'T'HH:mm:ssxxx");
+    
+    // Get the interval values
+    const values = this.formatFocusedTimeRecords(records, unit, timezoneOffset);
+    
+    return {
+      total: {
+        start: formattedStartDate,
+        end: formattedEndDate,
+        focused: totalFocusedTime
+      },
+      values
+    };
   }
 
   private formatFocusedTimeRecords(
