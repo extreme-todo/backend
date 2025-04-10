@@ -10,15 +10,6 @@ import { TimeUnit } from './dto/get-focused-time.dto';
 export class TimerController {
   constructor(private readonly timerService: TimerService) {}
 
-  @Get('progress')
-  async getProgress(
-    @CurrentUser() user: User,
-    @Query('currentTime') currentTime: string,
-    @Query('offset') offset: number,
-  ) {
-    return await this.timerService.getProgress(user, currentTime, offset);
-  }
-
   @Post('focused-time')
   async recordFocusedTime(
     @CurrentUser() user: User,

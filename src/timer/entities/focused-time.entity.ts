@@ -16,9 +16,9 @@ export class FocusedTime {
   @Column()
   duration: number; // duration in minutes
 
-  @CreateDateColumn({ type: 'timestamp', default: () => "now()" })
+  @CreateDateColumn()
   createdAt: Date;
 
-  @UpdateDateColumn({ type: 'timestamp', default: () => "now()" })
+  @UpdateDateColumn()
   updatedAt: Date;
 } 

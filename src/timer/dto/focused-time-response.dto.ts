@@ -11,6 +11,7 @@ export interface FocusedTimeTotalResponse {
     start: string;
     end: string;
     focused: number;
+    prevFocused: number;
   };
   values: FocusedTimeResponse[];
 } 

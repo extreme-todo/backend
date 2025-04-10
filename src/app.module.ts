@@ -39,7 +39,7 @@ import { FocusedTime } from './timer/entities/focused-time.entity';
       // useFactory는 환경변수 정보를 포함하고 있는 configService의 인스턴스를 가진다.
       useFactory: (config: ConfigService) => {
         return {
-          type: 'mysql',
+          type: 'mariadb',
           host: config.get('DB_HOST'),
           port: config.get('DB_PORT'),
           username: config.get('DB_USERNAME'),
