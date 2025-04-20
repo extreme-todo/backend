@@ -330,4 +330,19 @@ export class TodoService {
       throw new NotFoundException('db delete failed');
     }
   }
+
+  async deleteOldTodos() {
+    const threeMonthsAgo = new Date();
+    threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
+    
+    const result = await this.repo
+      .createQueryBuilder()
+      .delete()
+      .from(Todo)
+      .where('createdAt < :threeMonthsAgo', { threeMonthsAgo })
+      .andWhere('done = :done', { done: true })
+      .execute();
+    
+    return result;
+  }
 }
