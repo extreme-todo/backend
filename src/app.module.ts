@@ -24,6 +24,7 @@ import { RankingModule } from './ranking/ranking.module';
 import { Ranking } from './ranking/entities/ranking.entity';
 import { VerifiedMiddleware } from './middlewares/verified.middleware';
 import { Server } from 'node:http';
+import { FocusedTime } from './timer/entities/focused-time.entity';
 
 @Module({
   imports: [
@@ -38,15 +39,15 @@ import { Server } from 'node:http';
       // useFactory는 환경변수 정보를 포함하고 있는 configService의 인스턴스를 가진다.
       useFactory: (config: ConfigService) => {
         return {
-          type: 'mysql',
+          type: 'mariadb',
           host: config.get('DB_HOST'),
           port: config.get('DB_PORT'),
           username: config.get('DB_USERNAME'),
           password: config.get('DB_PASSWORD'),
           database: config.get('DB_DATABASE'),
-          entities: [Todo, User, Setting, Category, Ranking],
+          entities: [Todo, User, Setting, Category, Ranking, FocusedTime],
           synchronize: false,
-          timezone: '+00:00',
+          timezone: 'Z',
           // url: process.env.DATABASE_URL,
           // migrationsRun: true,
           // ssl: {
