@@ -8,13 +8,14 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { CategoryService } from '../category/category.service';
 import { User } from '../user/entities/user.entity';
-import { Repository } from 'typeorm';
+import { Between, Repository } from 'typeorm';
 import { AddTodoDto } from './dto/add-todo.dto';
 import { UpdateTodoDto } from './dto/update-todo.dto';
 import { Todo } from './entities/todo.entity';
 import { RankingService } from 'src/ranking/ranking.service';
 import { Category } from 'src/category/entities/category.entity';
 import { Cron } from '@nestjs/schedule';
+import { addMinutes, endOfDay, setHours, setMinutes, setSeconds, startOfDay, subMinutes } from 'date-fns';
 
 const MAX_CATEGORY_LENGTH = 5;
 
@@ -26,7 +27,7 @@ export class TodoService {
     @InjectRepository(Todo) private repo: Repository<Todo>,
     private categoryService: CategoryService,
     private rankingService: RankingService,
-  ) {}
+  ) { }
 
   @Cron('0 5 * * *', {
     timeZone: 'Asia/Seoul', // KST timezone
@@ -350,7 +351,7 @@ export class TodoService {
   async deleteOldTodos() {
     const threeMonthsAgo = new Date();
     threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
-    
+
     const result = await this.repo
       .createQueryBuilder()
       .delete()
@@ -358,9 +359,21 @@ export class TodoService {
       .where('createdAt < :threeMonthsAgo', { threeMonthsAgo })
       .andWhere('done = :done', { done: true })
       .execute();
-    
+
     return result;
   }
 
-  
+  async getTodayDoneTodos(user: User, timezoneOffset: number): Promise<Todo[]> {
+    const startDay = subMinutes(startOfDay(new Date(new Date().valueOf() - timezoneOffset * 60000)), timezoneOffset);
+    const endDay = subMinutes(endOfDay(new Date(new Date().valueOf() - timezoneOffset * 60000)), timezoneOffset);
+
+    return this.repo.find({
+      where: {
+        user: { id: user.id },
+        done: true,
+        date: Between(startDay, endDay),
+      },
+      order: { date: 'ASC', order: 'ASC' },
+    });
+  }
 }
