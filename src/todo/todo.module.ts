@@ -6,7 +6,6 @@ import { Todo } from './entities/todo.entity';
 import TodoController from './todo.controller';
 import { TodoService } from './todo.service';
 import { ScheduleModule } from '@nestjs/schedule';
-import { TodoSchedulerService } from './todo-scheduler.service';
 
 @Module({
   imports: [
@@ -16,7 +15,7 @@ import { TodoSchedulerService } from './todo-scheduler.service';
     ScheduleModule.forRoot(),
   ],
   controllers: [TodoController],
-  providers: [TodoService, TodoSchedulerService],
+  providers: [TodoService],
   exports: [TodoService],
 })
 export class TodoModule {}

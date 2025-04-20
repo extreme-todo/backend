@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   Injectable,
+  Logger,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -19,11 +20,26 @@ const MAX_CATEGORY_LENGTH = 5;
 
 @Injectable()
 export class TodoService {
+  private readonly logger = new Logger(TodoService.name);
+
   constructor(
     @InjectRepository(Todo) private repo: Repository<Todo>,
     private categoryService: CategoryService,
     private rankingService: RankingService,
   ) {}
+
+  @Cron('0 5 * * *', {
+    timeZone: 'Asia/Seoul', // KST timezone
+  })
+  async handleDeleteOldTodos() {
+    this.logger.log('Running scheduled task: deleteOldTodos');
+    try {
+      const result = await this.deleteOldTodos();
+      this.logger.log(`Successfully deleted ${result.affected} old todos`);
+    } catch (error) {
+      this.logger.error('Failed to delete old todos', error.stack);
+    }
+  }
 
   async addTodo(addTodoDto: AddTodoDto, user: User) {
     let categories: Category[] = null;
@@ -345,4 +361,6 @@ export class TodoService {
     
     return result;
   }
+
+  
 }
