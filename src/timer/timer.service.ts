@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, Logger } from '@nestjs/common';
 import { User } from 'src/user/entities/user.entity';
 import { GetProgressResponse } from './dto/get-progress-response.dto';
 import { TodoService } from 'src/todo/todo.service';
@@ -27,9 +27,12 @@ import { RecordFocusedTimeDto } from './dto/record-focused-time.dto';
 import { CategoryService } from 'src/category/category.service';
 import { GetFocusedTimeDto, TimeUnit } from './dto/get-focused-time.dto';
 import { FocusedTimeResponse, FocusedTimeTotalResponse } from './dto/focused-time-response.dto';
+import { Cron } from '@nestjs/schedule';
 
 @Injectable()
 export class TimerService {
+  private readonly logger = new Logger(TimerService.name);
+
   constructor(
     private todoService: TodoService,
     @InjectRepository(FocusedTime)
@@ -243,5 +246,32 @@ export class TimerService {
     });
 
     return weeks;
+  }
+
+  private async deleteOldFocusedTime() {
+    const threeMonthsAgo = new Date();
+    threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
+    
+    const result = await this.focusedTimeRepository
+      .createQueryBuilder()
+      .delete()
+      .from(FocusedTime)
+      .where('createdAt < :threeMonthsAgo', { threeMonthsAgo })
+      .execute();
+    
+    return result;
+  }
+
+  @Cron('0 5 * * *', {
+    timeZone: 'Asia/Seoul', // KST timezone
+  })
+  async handleDeleteOldFocusedTime() {
+    this.logger.log('Running scheduled task: deleteOldFocusedTime');
+    try {
+      const result = await this.deleteOldFocusedTime();
+      this.logger.log(`Successfully deleted ${result.affected} old focusedTime`);
+    } catch (error) {
+      this.logger.error('Failed to delete old focusedTime', error.stack);
+    }
   }
 }
