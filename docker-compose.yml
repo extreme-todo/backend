@@ -17,6 +17,7 @@ services:
       OAUTH_ID: ${OAUTH_ID}
       OAUTH_PW: ${OAUTH_PW}
       REDIRECT_URL: ${REDIRECT_URL}
+      TZ: UTC
     ports:
       - '8080:8080'
     networks:
@@ -31,6 +32,7 @@ services:
       MYSQL_USER: ${DB_USERNAME}
       MYSQL_PASSWORD: ${DB_PASSWORD}
       MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      TZ: UTC
     volumes:
       - dbdata:/var/lib/mysql
     networks:
