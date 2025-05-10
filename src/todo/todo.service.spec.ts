@@ -14,9 +14,9 @@ import {
 } from './stubs/todo.stub';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { CategoryService } from '../category/category.service';
-import { User } from '../user/entities/user.entity';
 import { Category } from 'src/category/entities/category.entity';
 import { RankingService } from 'src/ranking/ranking.service';
+import { TimerService } from 'src/timer/timer.service';
 
 describe('TodoService', () => {
   let service: TodoService;
@@ -37,6 +37,12 @@ describe('TodoService', () => {
     const module = await Test.createTestingModule({
       providers: [
         TodoService,
+        {
+          provide: TimerService,
+          useValue: {
+            recordFocusedTime: jest.fn().mockResolvedValue({}),
+          },
+        },
         { provide: CategoryService, useValue: fakeCategoryService },
         { provide: getRepositoryToken(Todo), useValue: mockRepo },
         {

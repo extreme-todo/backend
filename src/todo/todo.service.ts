@@ -15,7 +15,8 @@ import { Todo } from './entities/todo.entity';
 import { RankingService } from 'src/ranking/ranking.service';
 import { Category } from 'src/category/entities/category.entity';
 import { Cron } from '@nestjs/schedule';
-import { addMinutes, endOfDay, setHours, setMinutes, setSeconds, startOfDay, subMinutes } from 'date-fns';
+import { endOfDay, startOfDay, subMinutes } from 'date-fns';
+import { TimerService } from 'src/timer/timer.service';
 
 const MAX_CATEGORY_LENGTH = 5;
 
@@ -27,7 +28,8 @@ export class TodoService {
     @InjectRepository(Todo) private repo: Repository<Todo>,
     private categoryService: CategoryService,
     private rankingService: RankingService,
-  ) { }
+    private timerService: TimerService,
+  ) {}
 
   @Cron('0 5 * * *', {
     timeZone: 'Asia/Seoul', // KST timezone
@@ -177,10 +179,10 @@ export class TodoService {
   async doTodo(id: string, user: User, focusTime: number) {
     const todo = await this.getOneTodo(id, user);
 
-    if (!focusTime) {
+    if (focusTime == null) {
       throw new BadRequestException('집중시간을 찾을 수 없습니다.');
     }
-    if (!todo) {
+    if (todo == null) {
       throw new NotFoundException('Todo not found');
     }
     if (todo.done) {
@@ -196,6 +198,7 @@ export class TodoService {
     if (todo?.categories) {
       todo.categories.forEach(async (category) => {
         await this.rankingService.updateRank(category, user, focusTime);
+        await this.timerService.recordFocusedTime(user, category, focusTime);
       });
     }
 
@@ -252,26 +255,6 @@ export class TodoService {
     calcTodos[idx].order = newOrder;
 
     return calcTodos;
-  }
-
-  /**
-   * 2달이 지난 Todo를 제거하는 메소드
-   * Cron을 적용해야 한다. Timer 도메인의 updateMonth를 참고
-   * execute every 1st day of the month 5am
-   * @returns
-   */
-  @Cron('0 0 5 1 * *')
-  async removeTodosBeforeOver2Months() {
-    const past2MonthDate = this.getPast2Months(new Date().toISOString());
-    const staleTodos = await this.repo
-      .createQueryBuilder('todo')
-      .select()
-      .where('todo.date < :past2Month', {
-        past2Month: new Date(past2MonthDate),
-      })
-      .getMany();
-
-    return await this.repo.remove(staleTodos);
   }
 
   /**
@@ -349,23 +332,29 @@ export class TodoService {
   }
 
   async deleteOldTodos() {
-    const threeMonthsAgo = new Date();
-    threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
 
+    // 어제 날짜 투두 완료 여부와 상관없이 삭제(기준: 서버시간)
     const result = await this.repo
       .createQueryBuilder()
       .delete()
       .from(Todo)
-      .where('createdAt < :threeMonthsAgo', { threeMonthsAgo })
-      .andWhere('done = :done', { done: true })
+      .where('createdAt < :yesterday', { yesterday })
       .execute();
 
     return result;
   }
 
   async getTodayDoneTodos(user: User, timezoneOffset: number): Promise<Todo[]> {
-    const startDay = subMinutes(startOfDay(new Date(new Date().valueOf() - timezoneOffset * 60000)), timezoneOffset);
-    const endDay = subMinutes(endOfDay(new Date(new Date().valueOf() - timezoneOffset * 60000)), timezoneOffset);
+    const startDay = subMinutes(
+      startOfDay(new Date(new Date().valueOf() - timezoneOffset * 60000)),
+      timezoneOffset,
+    );
+    const endDay = subMinutes(
+      endOfDay(new Date(new Date().valueOf() - timezoneOffset * 60000)),
+      timezoneOffset,
+    );
 
     return this.repo.find({
       where: {
