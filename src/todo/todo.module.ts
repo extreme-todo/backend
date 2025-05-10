@@ -6,6 +6,7 @@ import { Todo } from './entities/todo.entity';
 import TodoController from './todo.controller';
 import { TodoService } from './todo.service';
 import { ScheduleModule } from '@nestjs/schedule';
+import { TimerModule } from 'src/timer/timer.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     TypeOrmModule.forFeature([Todo]),
     RankingModule,
     ScheduleModule.forRoot(),
+    TimerModule,
   ],
   controllers: [TodoController],
   providers: [TodoService],
