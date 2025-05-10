@@ -1,9 +1,9 @@
 import { IsNumber, IsString } from 'class-validator';
 
 export class RecordFocusedTimeDto {
-  @IsNumber()
-  categoryId: number;
+  @IsString()
+  category: string;
 
   @IsNumber()
   duration: number; // in minutes
-} 
+}

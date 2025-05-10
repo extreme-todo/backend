@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, UseGuards, Req, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  UseGuards,
+  Req,
+  Query,
+} from '@nestjs/common';
 import { TimerService } from './timer.service';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { RecordFocusedTimeDto } from './dto/record-focused-time.dto';
@@ -23,13 +31,13 @@ export class TimerController {
     @CurrentUser() user: User,
     @Query('unit') unit: TimeUnit,
     @Query('timezoneOffset') timezoneOffset: number,
-    @Query('categoryId') categoryId?: number,
+    @Query('category') category?: string,
   ) {
     return await this.timerService.getFocusedTimeByUnit(
       user,
       unit,
       timezoneOffset,
-      categoryId,
+      category,
     );
   }
 }

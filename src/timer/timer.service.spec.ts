@@ -31,7 +31,7 @@ describe('TimerService', () => {
     };
 
     mockCategoryService = {
-      findById: jest.fn(),
+      find: jest.fn(),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -81,30 +81,34 @@ describe('TimerService', () => {
     expect(service).toBeDefined();
   });
 
-
   describe('카테고리별 집중 시간 조회', () => {
     const mockCategory = { id: 1, name: 'Test Category' };
     const mockFocusedTimeRecords = [
       {
         createdAt: new Date('2025-04-04T18:30:00Z'), // KST 4월 5일 3시
-        updatedAt: new Date('2025-04-04T18:30:00Z'), 
-        duration: 120,  
+        updatedAt: new Date('2025-04-04T18:30:00Z'),
+        duration: 120,
       },
       {
         createdAt: new Date('2025-04-05T05:00:00Z'), // KST 4월 5일  14시
-        updatedAt: new Date('2025-04-05T05:00:00Z'), 
-        duration: 120,      
+        updatedAt: new Date('2025-04-05T05:00:00Z'),
+        duration: 120,
       },
     ];
 
     beforeEach(() => {
-      mockCategoryService.findById.mockResolvedValue(mockCategory);
+      mockCategoryService.find.mockResolvedValue(mockCategory);
       mockQueryBuilder.getMany.mockResolvedValue(mockFocusedTimeRecords);
     });
 
     it('일 단위로 조회할 경우 2시간 간격으로 12개의 구간이 반환되어야 한다', async () => {
-      const {values, total} = await service.getFocusedTimeByUnit(fakeUser, TimeUnit.DAY, +540, 1);
-      
+      const { values, total } = await service.getFocusedTimeByUnit(
+        fakeUser,
+        TimeUnit.DAY,
+        +540,
+        'Test Category',
+      );
+
       expect(total.focused).toEqual(240);
 
       expect(values).toHaveLength(12);
@@ -124,7 +128,7 @@ describe('TimerService', () => {
       expect(values[6]).toEqual({ start: 12, end: 14, focused: 0 });
       // 여덟 번째 구간 (14-16시)에는 120분의 집중 시간이 있다
       expect(values[7]).toEqual({ start: 14, end: 16, focused: 120 });
-      // 아홉 번째 구간 (16-18시)에는 0분의 집중 시간이 있다    
+      // 아홉 번째 구간 (16-18시)에는 0분의 집중 시간이 있다
       expect(values[8]).toEqual({ start: 16, end: 18, focused: 0 });
       // 열 번째 구간 (18-20시)에는 0분의 집중 시간이 있다
       expect(values[9]).toEqual({ start: 18, end: 20, focused: 0 });
@@ -135,7 +139,12 @@ describe('TimerService', () => {
     });
 
     it('주 단위로 조회할 경우 일요일부터 토요일까지 7개의 구간이 반환되어야 한다', async () => {
-      const {values, total} = await service.getFocusedTimeByUnit(fakeUser, TimeUnit.WEEK, +540, 1);
+      const { values, total } = await service.getFocusedTimeByUnit(
+        fakeUser,
+        TimeUnit.WEEK,
+        +540,
+        'Test Category',
+      );
 
       expect(total.focused).toEqual(240);
 
@@ -151,7 +160,12 @@ describe('TimerService', () => {
     });
 
     it('월 단위로 조회할 경우 5개의 주가 반환되어야 한다', async () => {
-      const {values, total} = await service.getFocusedTimeByUnit(fakeUser, TimeUnit.MONTH, +540, 1);
+      const { values, total } = await service.getFocusedTimeByUnit(
+        fakeUser,
+        TimeUnit.MONTH,
+        +540,
+        'Test Category',
+      );
 
       expect(total.focused).toEqual(240);
 
