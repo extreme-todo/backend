@@ -314,6 +314,23 @@ export class TodoService {
     }
   }
 
+  /**
+   * 2달이 지난 Todo를 제거하는 메소드
+   * Cron을 적용해야 한다. Timer 도메인의 updateMonth를 참고
+   * execute every 1st day of the month 5am
+   * @returns
+   */
+  @Cron('0 0 5 1 * *')
+  async removeTodosBeforeOver2Months() {
+    const past2MonthDate = this.getPast2Months(new Date().toISOString());
+    const staleTodos = await this.repo
+      .createQueryBuilder('todo')
+      .select()
+      .where('todo.date < :past2Month', {
+        past2Month: new Date(past2MonthDate),
+      })
+      .getMany();
 
+    return await this.repo.remove(staleTodos);
   }
 }
