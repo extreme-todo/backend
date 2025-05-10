@@ -24,15 +24,6 @@ import { ReorderDto } from './dto/reorder.dto';
 export default class TodoController {
   constructor(private todoService: TodoService) {}
 
-  @Get('/done-today')
-  getDoneToday(
-    @CurrentUser() userdata: User,
-    @Query('timezoneOffset') offset: string,
-  ) {
-    const timezoneOffset = parseInt(offset, 10); // in minutes
-    return this.todoService.getTodayDoneTodos(userdata, timezoneOffset);
-  }
-
   @Post('/')
   async addTodo(@Body() todoData: AddTodoDto, @CurrentUser() userdata: User) {
     await this.todoService.addTodo(todoData, userdata);

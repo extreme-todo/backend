@@ -48,7 +48,7 @@ export class TimerService {
     if (!focusedCategory) {
       throw new NotFoundException('Category not found');
     }
- 
+
     const focusedTime = this.focusedTimeRepository.create({
       user,
       category: focusedCategory,
@@ -137,9 +137,6 @@ export class TimerService {
     };
 
     const records = await getFocusedTimeRecords(utcStartDate, utcEndDate);
-
-    console.log(records);
-
     const prevRecords = await getFocusedTimeRecords(
       utcPrevStartDate,
       utcPrevEndDate,
