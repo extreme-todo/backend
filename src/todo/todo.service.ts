@@ -250,37 +250,25 @@ export class TodoService {
     const getTodos = await this.repo
       .createQueryBuilder('todo')
       .where('todo.userId = :userId', { userId: user.id })
-      .andWhere('todo.done = 0')
       .orderBy({ 'todo.order': 'ASC' })
       .getMany();
     if (getTodos.length === 0) return;
 
     const staleTodos = getTodos.filter(
-      (todo) =>
-        new Date(todo.date) < new Date(currentDate) && todo.done === false,
+      (todo) => new Date(todo.date) < new Date(currentDate),
     );
-    const updatePivot = getTodos.findIndex(
-      (todo) => new Date(todo.date) >= new Date(currentDate),
-    );
+    const staleTodoIds = new Set(staleTodos.map((todo) => todo.id));
 
     await this.repo.remove(staleTodos);
 
-    if (updatePivot > 0) {
-      let needToUpdateTodos = getTodos.slice(updatePivot);
-      const lastStaleTodos = staleTodos.reduce((acc, todo) =>
-        typeof todo.order === 'number'
-          ? todo.order > acc.order
-            ? todo
-            : acc
-          : acc,
-      );
-      needToUpdateTodos = this.minusOrder(
-        needToUpdateTodos,
-        lastStaleTodos.order,
-      );
+    const remainingUndoneTodos = getTodos.filter(
+      (todo) => !staleTodoIds.has(todo.id) && !todo.done,
+    );
+    remainingUndoneTodos.forEach((todo, index) => {
+      todo.order = index + 1;
+    });
 
-      await this.repo.save(needToUpdateTodos);
-    }
+    await this.repo.save(remainingUndoneTodos);
   }
 
   /**
