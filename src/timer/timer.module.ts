@@ -7,11 +7,7 @@ import { FocusedTime } from './entities/focused-time.entity';
 import { CategoryModule } from 'src/category/category.module';
 
 @Module({
-  imports: [
-    TodoModule,
-    CategoryModule,
-    TypeOrmModule.forFeature([FocusedTime]),
-  ],
+  imports: [CategoryModule, TypeOrmModule.forFeature([FocusedTime])],
   controllers: [TimerController],
   providers: [TimerService],
   exports: [TimerService],

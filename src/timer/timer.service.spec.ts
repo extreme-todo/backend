@@ -31,7 +31,7 @@ describe('TimerService', () => {
     };
 
     mockCategoryService = {
-      find: jest.fn(),
+      findById: jest.fn(),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -97,7 +97,7 @@ describe('TimerService', () => {
     ];
 
     beforeEach(() => {
-      mockCategoryService.find.mockResolvedValue(mockCategory);
+      mockCategoryService.findById.mockResolvedValue(mockCategory);
       mockQueryBuilder.getMany.mockResolvedValue(mockFocusedTimeRecords);
     });
 
@@ -106,35 +106,35 @@ describe('TimerService', () => {
         fakeUser,
         TimeUnit.DAY,
         +540,
-        'Test Category',
+        1,
       );
 
       expect(total.focused).toEqual(240);
 
       expect(values).toHaveLength(12);
-      // 첫 번째 구간 (0-2시)에는 0분의 집중 시간이 있다
+      // 첫 번째 구간 (0-2시)에는 0ms의 집중 시간이 있다
       expect(values[0]).toEqual({ start: 0, end: 2, focused: 0 });
-      // 두 번째 구간 (2-4시)에는 0분의 집중 시간이 있다
+      // 두 번째 구간 (2-4시)에는 120ms의 집중 시간이 있다
       expect(values[1]).toEqual({ start: 2, end: 4, focused: 120 });
-      // 세 번째 구간 (4-6시)에는 0분의 집중 시간이 있다
+      // 세 번째 구간 (4-6시)에는 0ms의 집중 시간이 있다
       expect(values[2]).toEqual({ start: 4, end: 6, focused: 0 });
-      // 네 번째 구간 (6-8시)에는 0분의 집중 시간이 있다
+      // 네 번째 구간 (6-8시)에는 0ms의 집중 시간이 있다
       expect(values[3]).toEqual({ start: 6, end: 8, focused: 0 });
-      // 다섯 번째 구간 (8-10시)에는 0분의 집중 시간이 있다
+      // 다섯 번째 구간 (8-10시)에는 0ms의 집중 시간이 있다
       expect(values[4]).toEqual({ start: 8, end: 10, focused: 0 });
-      // 여섯 번째 구간 (10-12시)에는 0분의 집중 시간이 있다
+      // 여섯 번째 구간 (10-12시)에는 0ms의 집중 시간이 있다
       expect(values[5]).toEqual({ start: 10, end: 12, focused: 0 });
-      // 일곱 번째 구간 (12-14시)에는 120분의 집중 시간이 있다
+      // 일곱 번째 구간 (12-14시)에는 120ms의 집중 시간이 있다
       expect(values[6]).toEqual({ start: 12, end: 14, focused: 0 });
-      // 여덟 번째 구간 (14-16시)에는 120분의 집중 시간이 있다
+      // 여덟 번째 구간 (14-16시)에는 120ms의 집중 시간이 있다
       expect(values[7]).toEqual({ start: 14, end: 16, focused: 120 });
-      // 아홉 번째 구간 (16-18시)에는 0분의 집중 시간이 있다
+      // 아홉 번째 구간 (16-18시)에는 0ms의 집중 시간이 있다
       expect(values[8]).toEqual({ start: 16, end: 18, focused: 0 });
-      // 열 번째 구간 (18-20시)에는 0분의 집중 시간이 있다
+      // 열 번째 구간 (18-20시)에는 0ms의 집중 시간이 있다
       expect(values[9]).toEqual({ start: 18, end: 20, focused: 0 });
-      // 열한 번째 구간 (20-22시)에는 0분의 집중 시간이 있다
+      // 열한 번째 구간 (20-22시)에는 0ms의 집중 시간이 있다
       expect(values[10]).toEqual({ start: 20, end: 22, focused: 0 });
-      // 열두 번째 구간 (22-24시)에는 0분의 집중 시간이 있다
+      // 열두 번째 구간 (22-24시)에는 0ms의 집중 시간이 있다
       expect(values[11]).toEqual({ start: 22, end: 24, focused: 0 });
     });
 
@@ -143,7 +143,7 @@ describe('TimerService', () => {
         fakeUser,
         TimeUnit.WEEK,
         +540,
-        'Test Category',
+        1,
       );
 
       expect(total.focused).toEqual(240);
@@ -153,7 +153,7 @@ describe('TimerService', () => {
       expect(values[0]).toEqual({ day: 'sun', focused: 0 });
       expect(values[1]).toEqual({ day: 'mon', focused: 0 });
       expect(values[2]).toEqual({ day: 'tue', focused: 0 });
-      expect(values[3]).toEqual({ day: 'wed', focused: 0 }); // 120 + 120분
+      expect(values[3]).toEqual({ day: 'wed', focused: 0 }); // 120 + 120ms
       expect(values[4]).toEqual({ day: 'thu', focused: 0 });
       expect(values[5]).toEqual({ day: 'fri', focused: 0 });
       expect(values[6]).toEqual({ day: 'sat', focused: 240 });
@@ -164,7 +164,7 @@ describe('TimerService', () => {
         fakeUser,
         TimeUnit.MONTH,
         +540,
-        'Test Category',
+        1,
       );
 
       expect(total.focused).toEqual(240);
@@ -174,7 +174,7 @@ describe('TimerService', () => {
       expect(values[1]).toEqual({ week: 2, focused: 0 });
       expect(values[2]).toEqual({ week: 3, focused: 0 });
       expect(values[3]).toEqual({ week: 4, focused: 0 }); // 집중 시간은 5주차에 있다
-      expect(values[4]).toEqual({ week: 5, focused: 0 }); // 120 + 120분
+      expect(values[4]).toEqual({ week: 5, focused: 0 }); // 120 + 120ms
     });
   });
 });

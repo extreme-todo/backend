@@ -22,7 +22,7 @@ import { ReorderDto } from './dto/reorder.dto';
 @Controller('api/todos')
 @UseGuards(AuthGuard)
 export default class TodoController {
-  constructor(private todoService: TodoService) { }
+  constructor(private todoService: TodoService) {}
 
   @Get('/done-today')
   getDoneToday(
@@ -107,7 +107,4 @@ export default class TodoController {
     await this.todoService.removeDidntDo(currentDate, userdata);
     return 'Successfully removed todos before today';
   }
-
-
-
 }

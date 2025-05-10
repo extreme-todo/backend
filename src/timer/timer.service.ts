@@ -5,14 +5,7 @@ import {
   Logger,
 } from '@nestjs/common';
 import { User } from 'src/user/entities/user.entity';
-import { GetProgressResponse } from './dto/get-progress-response.dto';
-import { TodoService } from 'src/todo/todo.service';
 import {
-  differenceInCalendarDays,
-  differenceInCalendarMonths,
-  differenceInCalendarWeeks,
-  startOfHour,
-  addHours,
   startOfDay,
   endOfDay,
   startOfWeek,
@@ -28,36 +21,38 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { FocusedTime } from './entities/focused-time.entity';
-import { RecordFocusedTimeDto } from './dto/record-focused-time.dto';
 import { CategoryService } from 'src/category/category.service';
-import { GetFocusedTimeDto, TimeUnit } from './dto/get-focused-time.dto';
+import { TimeUnit } from './dto/get-focused-time.dto';
 import {
   FocusedTimeResponse,
   FocusedTimeTotalResponse,
 } from './dto/focused-time-response.dto';
 import { Cron } from '@nestjs/schedule';
+import { Category } from 'src/category/entities/category.entity';
 
 @Injectable()
 export class TimerService {
   private readonly logger = new Logger(TimerService.name);
 
   constructor(
-    private todoService: TodoService,
     @InjectRepository(FocusedTime)
     private focusedTimeRepository: Repository<FocusedTime>,
     private categoryService: CategoryService,
   ) {}
 
-  async recordFocusedTime(user: User, dto: RecordFocusedTimeDto) {
-    const category = await this.categoryService.find(dto.category);
-    if (!category) {
+  async recordFocusedTime(
+    user: User,
+    focusedCategory: Category,
+    duration: number,
+  ) {
+    if (!focusedCategory) {
       throw new NotFoundException('Category not found');
     }
-
+ 
     const focusedTime = this.focusedTimeRepository.create({
       user,
-      category,
-      duration: dto.duration,
+      category: focusedCategory,
+      duration: duration,
     });
 
     return this.focusedTimeRepository.save(focusedTime);
@@ -67,12 +62,12 @@ export class TimerService {
     user: User,
     unit: TimeUnit,
     timezoneOffset: number,
-    categoryName?: string,
+    categoryId?: number,
   ): Promise<FocusedTimeTotalResponse> {
-    const category = categoryName
-      ? await this.categoryService.find(categoryName)
+    const category = categoryId
+      ? await this.categoryService.findById(categoryId)
       : null;
-    if (categoryName && !category) {
+    if (categoryId && !category) {
       throw new NotFoundException('Category not found');
     }
 
@@ -142,6 +137,9 @@ export class TimerService {
     };
 
     const records = await getFocusedTimeRecords(utcStartDate, utcEndDate);
+
+    console.log(records);
+
     const prevRecords = await getFocusedTimeRecords(
       utcPrevStartDate,
       utcPrevEndDate,
