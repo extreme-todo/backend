@@ -168,7 +168,7 @@ describe('TodoService', () => {
 
     it('focusTime이 없을 경우 BadRequest', async () => {
       await expect(
-        service.doTodo(existingId, fakeUserHasATodo, parseInt(undefined)),
+        service.doTodo(existingId, fakeUserHasATodo, undefined),
       ).rejects.toThrow(BadRequestException);
     });
   });
