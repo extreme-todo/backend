@@ -1,48 +1,31 @@
 import {
   BadRequestException,
   Injectable,
-  Logger,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CategoryService } from '../category/category.service';
 import { User } from '../user/entities/user.entity';
-import { Between, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { AddTodoDto } from './dto/add-todo.dto';
 import { UpdateTodoDto } from './dto/update-todo.dto';
 import { Todo } from './entities/todo.entity';
 import { RankingService } from 'src/ranking/ranking.service';
 import { Category } from 'src/category/entities/category.entity';
 import { Cron } from '@nestjs/schedule';
-import { endOfDay, startOfDay, subMinutes } from 'date-fns';
 import { TimerService } from 'src/timer/timer.service';
 
 const MAX_CATEGORY_LENGTH = 5;
 
 @Injectable()
 export class TodoService {
-  private readonly logger = new Logger(TodoService.name);
-
   constructor(
     @InjectRepository(Todo) private repo: Repository<Todo>,
     private categoryService: CategoryService,
     private rankingService: RankingService,
     private timerService: TimerService,
   ) {}
-
-  @Cron('0 5 * * *', {
-    timeZone: 'Asia/Seoul', // KST timezone
-  })
-  async handleDeleteOldTodos() {
-    this.logger.log('Running scheduled task: deleteOldTodos');
-    try {
-      const result = await this.deleteOldTodos();
-      this.logger.log(`Successfully deleted ${result.affected} old todos`);
-    } catch (error) {
-      this.logger.error('Failed to delete old todos', error.stack);
-    }
-  }
 
   async addTodo(addTodoDto: AddTodoDto, user: User) {
     let categories: Category[] = null;
@@ -263,41 +246,19 @@ export class TodoService {
    * @param user
    * @returns
    */
-  async removeDidntDo(currentDate: string, user: User) {
+  async removeStaleToDo(currentDate: string, user: User) {
     const getTodos = await this.repo
       .createQueryBuilder('todo')
       .where('todo.userId = :userId', { userId: user.id })
-      .andWhere('todo.done = 0')
       .orderBy({ 'todo.order': 'ASC' })
       .getMany();
     if (getTodos.length === 0) return;
 
     const staleTodos = getTodos.filter(
-      (todo) =>
-        new Date(todo.date) < new Date(currentDate) && todo.done === false,
-    );
-    const updatePivot = getTodos.findIndex(
-      (todo) => new Date(todo.date) >= new Date(currentDate),
+      (todo) => new Date(todo.date) < new Date(currentDate),
     );
 
     await this.repo.remove(staleTodos);
-
-    if (updatePivot > 0) {
-      let needToUpdateTodos = getTodos.slice(updatePivot);
-      const lastStaleTodos = staleTodos.reduce((acc, todo) =>
-        typeof todo.order === 'number'
-          ? todo.order > acc.order
-            ? todo
-            : acc
-          : acc,
-      );
-      needToUpdateTodos = this.minusOrder(
-        needToUpdateTodos,
-        lastStaleTodos.order,
-      );
-
-      await this.repo.save(needToUpdateTodos);
-    }
   }
 
   /**
@@ -331,38 +292,23 @@ export class TodoService {
     }
   }
 
-  async deleteOldTodos() {
-    const yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 1);
+  /**
+   * 2달이 지난 Todo를 제거하는 메소드
+   * Cron을 적용해야 한다. Timer 도메인의 updateMonth를 참고
+   * execute every 1st day of the month 5am
+   * @returns
+   */
+  @Cron('0 0 5 1 * *')
+  async removeTodosBeforeOver2Months() {
+    const past2MonthDate = this.getPast2Months(new Date().toISOString());
+    const staleTodos = await this.repo
+      .createQueryBuilder('todo')
+      .select()
+      .where('todo.date < :past2Month', {
+        past2Month: new Date(past2MonthDate),
+      })
+      .getMany();
 
-    // 어제 날짜 투두 완료 여부와 상관없이 삭제(기준: 서버시간)
-    const result = await this.repo
-      .createQueryBuilder()
-      .delete()
-      .from(Todo)
-      .where('createdAt < :yesterday', { yesterday })
-      .execute();
-
-    return result;
-  }
-
-  async getTodayDoneTodos(user: User, timezoneOffset: number): Promise<Todo[]> {
-    const startDay = subMinutes(
-      startOfDay(new Date(new Date().valueOf() - timezoneOffset * 60000)),
-      timezoneOffset,
-    );
-    const endDay = subMinutes(
-      endOfDay(new Date(new Date().valueOf() - timezoneOffset * 60000)),
-      timezoneOffset,
-    );
-
-    return this.repo.find({
-      where: {
-        user: { id: user.id },
-        done: true,
-        date: Between(startDay, endDay),
-      },
-      order: { date: 'ASC', order: 'ASC' },
-    });
+    return await this.repo.remove(staleTodos);
   }
 }
