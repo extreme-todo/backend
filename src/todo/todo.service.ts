@@ -246,7 +246,7 @@ export class TodoService {
    * @param user
    * @returns
    */
-  async removeDidntDo(currentDate: string, user: User) {
+  async removeStaleToDo(currentDate: string, user: User) {
     const getTodos = await this.repo
       .createQueryBuilder('todo')
       .where('todo.userId = :userId', { userId: user.id })
@@ -257,18 +257,8 @@ export class TodoService {
     const staleTodos = getTodos.filter(
       (todo) => new Date(todo.date) < new Date(currentDate),
     );
-    const staleTodoIds = new Set(staleTodos.map((todo) => todo.id));
 
     await this.repo.remove(staleTodos);
-
-    const remainingUndoneTodos = getTodos.filter(
-      (todo) => !staleTodoIds.has(todo.id) && !todo.done,
-    );
-    remainingUndoneTodos.forEach((todo, index) => {
-      todo.order = index + 1;
-    });
-
-    await this.repo.save(remainingUndoneTodos);
   }
 
   /**
