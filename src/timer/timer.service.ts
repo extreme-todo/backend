@@ -287,6 +287,19 @@ export class TimerService {
     return result;
   }
 
+  async resetFocusedTime(user: User) {
+    const { id: userId } = user;
+    const { affected } = await this.focusedTimeRepository
+      .createQueryBuilder()
+      .delete()
+      .from(FocusedTime)
+      .where('user = :userId', { userId })
+      .execute();
+    if (affected === 0) {
+      throw new NotFoundException('db delete failed');
+    }
+  }
+
   @Cron('0 5 * * *', {
     timeZone: 'Asia/Seoul', // KST timezone
   })
