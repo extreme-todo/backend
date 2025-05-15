@@ -6,6 +6,7 @@ import {
   UseGuards,
   Req,
   Query,
+  Delete,
 } from '@nestjs/common';
 import { TimerService } from './timer.service';
 import { AuthGuard } from 'src/guards/auth.guard';
@@ -30,5 +31,10 @@ export class TimerController {
       timezoneOffset,
       categoryId,
     );
+  }
+
+  @Delete('focused-time')
+  async resetFocusedTime(@CurrentUser() user: User) {
+    return await this.timerService.resetFocusedTime(user);
   }
 }
