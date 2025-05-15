@@ -24,15 +24,6 @@ import { ReorderDto } from './dto/reorder.dto';
 export default class TodoController {
   constructor(private todoService: TodoService) {}
 
-  @Get('/done-today')
-  getDoneToday(
-    @CurrentUser() userdata: User,
-    @Query('timezoneOffset') offset: string,
-  ) {
-    const timezoneOffset = parseInt(offset, 10); // in minutes
-    return this.todoService.getTodayDoneTodos(userdata, timezoneOffset);
-  }
-
   @Post('/')
   async addTodo(@Body() todoData: AddTodoDto, @CurrentUser() userdata: User) {
     await this.todoService.addTodo(todoData, userdata);
@@ -99,12 +90,12 @@ export default class TodoController {
   }
 
   @Delete('/')
-  async removeDidntDo(
+  async removeStaleToDo(
     @CurrentUser() userdata: User,
     @Query('currentDate') currentDate: string,
     // TODO : 고려할 점: 사용자가 date를 임의로 넣어서 api요청을 하는 경우를 막을 수 없음.
   ) {
-    await this.todoService.removeDidntDo(currentDate, userdata);
+    await this.todoService.removeStaleToDo(currentDate, userdata);
     return 'Successfully removed todos before today';
   }
 }

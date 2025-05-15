@@ -48,7 +48,7 @@ export class TimerService {
     if (!focusedCategory) {
       throw new NotFoundException('Category not found');
     }
- 
+
     const focusedTime = this.focusedTimeRepository.create({
       user,
       category: focusedCategory,
@@ -137,9 +137,6 @@ export class TimerService {
     };
 
     const records = await getFocusedTimeRecords(utcStartDate, utcEndDate);
-
-    console.log(records);
-
     const prevRecords = await getFocusedTimeRecords(
       utcPrevStartDate,
       utcPrevEndDate,
@@ -288,6 +285,19 @@ export class TimerService {
       .execute();
 
     return result;
+  }
+
+  async resetFocusedTime(user: User) {
+    const { id: userId } = user;
+    const { affected } = await this.focusedTimeRepository
+      .createQueryBuilder()
+      .delete()
+      .from(FocusedTime)
+      .where('user = :userId', { userId })
+      .execute();
+    if (affected === 0) {
+      throw new NotFoundException('db delete failed');
+    }
   }
 
   @Cron('0 5 * * *', {
