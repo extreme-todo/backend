@@ -44,6 +44,12 @@ export default class TodoController {
     return this.todoService.resetTodos(user);
   }
 
+  @Delete('/undone/all')
+  async deleteAllUndoneTodos(@CurrentUser() userdata: User) {
+    const removed = await this.todoService.removeAllUndoneTodos(userdata);
+    return `Successfully deleted ${removed.length} undone todos`;
+  }
+
   @Get('/:id')
   async getOneTodo(@Param('id') todoId: string, @CurrentUser() userdata: User) {
     const todo = await this.todoService.getOneTodo(todoId, userdata);
