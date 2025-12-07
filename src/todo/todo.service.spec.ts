@@ -253,7 +253,7 @@ describe('TodoService', () => {
     });
   });
 
-  describe('removeUndoneTodos', () => {
+  describe('removeAllUndoneTodos', () => {
     it('should remove all undone todos of the user', async () => {
       const removedTodos = await service.removeAllUndoneTodos(
         fakeUserHas6Todos,
