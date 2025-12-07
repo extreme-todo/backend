@@ -6,7 +6,7 @@ import { TodoService } from './todo.service';
 import {
   addTodoStub,
   fakeUserHas2Todos,
-  fakeUserHas5Todos,
+  fakeUserHas6Todos,
   fakeUserHasATodo,
   fakeUserHasNoTodo,
   todoStub,
@@ -188,7 +188,7 @@ describe('TodoService', () => {
       stubs = todoStub();
       todos = stubs.filter(
         (todo) =>
-          todo.user.id === fakeUserHas5Todos.id &&
+          todo.user.id === fakeUserHas6Todos.id &&
           todo.order <= 3 &&
           todo.order >= 1,
       );
@@ -207,7 +207,7 @@ describe('TodoService', () => {
     beforeEach(() => {
       stubs = todoStub();
       todos = stubs.filter(
-        (todo) => todo.user.id === fakeUserHas5Todos.id && todo.order > 2,
+        (todo) => todo.user.id === fakeUserHas6Todos.id && todo.order > 2,
       );
     });
     it('should subtract order just one if we didn‘t pass the second parameter', () => {
@@ -232,7 +232,7 @@ describe('TodoService', () => {
     beforeEach(() => {
       stubs = todoStub();
       todos = stubs.filter(
-        (todo) => todo.user.id === fakeUserHas5Todos.id && todo.order > 2,
+        (todo) => todo.user.id === fakeUserHas6Todos.id && todo.order > 2,
       );
     });
     it('should plus one to order', () => {
@@ -250,6 +250,18 @@ describe('TodoService', () => {
     it('should return string that represent first day of 2 months ago', () => {
       const result = service.getPast2Months('2024-08-15T15:00:00Z');
       expect(result).toBe('2024-06-01');
+    });
+  });
+
+  describe('removeAllUndoneTodos', () => {
+    it('should remove all undone todos of the user', async () => {
+      const removedTodos = await service.removeAllUndoneTodos(
+        fakeUserHas6Todos,
+      );
+      const undoneTodos = todoStub().filter(
+        (todo) => todo.user.id === fakeUserHas6Todos.id && !todo.done,
+      );
+      expect(removedTodos.length).toEqual(undoneTodos.length);
     });
   });
 });

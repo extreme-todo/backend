@@ -24,7 +24,7 @@ export class User {
   @Column()
   refresh: string;
 
-  @Column()
+  @Column({ type: 'varchar', length: 2048 })
   access: string;
 
   @OneToMany(() => Todo, (todo) => todo.user)

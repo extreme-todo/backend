@@ -262,6 +262,20 @@ export class TodoService {
   }
 
   /**
+   * user의 모든 미완료 todo를 삭제하는 메소드
+   * @param user  삭제할 todo의 소유자
+   * @returns
+   */
+  async removeAllUndoneTodos(user: User) {
+    const undoneTodos = await this.repo.find({
+      where: { done: false, user: { id: user.id } },
+    });
+    if (undoneTodos.length === 0) return Promise.resolve([]);
+
+    return await this.repo.remove(undoneTodos);
+  }
+
+  /**
    * @param currentDate 프론트엔드에서 ISO 형식, 즉 2024-08-14T15:00:00.000Z 형태로 보내준다.
    * 날짜의 2달 전 1일 날짜를 연.월.일 형식으로 계산해 준다.
    * @returns
