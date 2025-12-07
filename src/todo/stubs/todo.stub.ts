@@ -21,7 +21,7 @@ export const fakeUserHas2Todos = {
   username: 'fakeUser2',
 } as User;
 
-export const fakeUserHas5Todos = {
+export const fakeUserHas6Todos = {
   id: 3,
   email: 'fakeUser3@email.com',
   username: 'fakeUser3',
@@ -74,7 +74,7 @@ export const todoStub = (): Todo[] => {
       createdAt: new Date('Dec 26, 2022 18:00:30'),
       duration: 60 * 60,
       done: false,
-      user: fakeUserHas5Todos,
+      user: fakeUserHas6Todos,
       categories: null,
       focusTime: 0,
       order: 1,
@@ -86,7 +86,7 @@ export const todoStub = (): Todo[] => {
       createdAt: new Date('Dec 26, 2022 18:00:30'),
       duration: 60 * 60,
       done: false,
-      user: fakeUserHas5Todos,
+      user: fakeUserHas6Todos,
       categories: null,
       focusTime: 0,
       order: 2,
@@ -98,7 +98,7 @@ export const todoStub = (): Todo[] => {
       createdAt: new Date('Dec 26, 2022 18:00:30'),
       duration: 60 * 60,
       done: false,
-      user: fakeUserHas5Todos,
+      user: fakeUserHas6Todos,
       categories: null,
       focusTime: 0,
       order: 3,
@@ -110,7 +110,7 @@ export const todoStub = (): Todo[] => {
       createdAt: new Date('Dec 26, 2022 18:00:30'),
       duration: 60 * 60,
       done: false,
-      user: fakeUserHas5Todos,
+      user: fakeUserHas6Todos,
       categories: null,
       focusTime: 0,
       order: 4,
@@ -122,10 +122,22 @@ export const todoStub = (): Todo[] => {
       createdAt: new Date('Dec 26, 2022 18:00:30'),
       duration: 60 * 60,
       done: false,
-      user: fakeUserHas5Todos,
+      user: fakeUserHas6Todos,
       categories: null,
       focusTime: 0,
       order: 5,
+    },
+    {
+      id: '1719637019991-wa8ku19',
+      date: new Date('Dec 27, 2022 18:00:30'),
+      todo: 'Go to grocery store',
+      createdAt: new Date('Dec 26, 2022 18:00:30'),
+      duration: 60 * 60,
+      done: true,
+      user: fakeUserHas6Todos,
+      categories: null,
+      focusTime: 0,
+      order: 6,
     },
   ];
 };
