@@ -5,10 +5,10 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { Response } from 'express';
 import { google } from 'googleapis';
 import { User } from './entities/user.entity';
 import { UserService } from './user.service';
-import { URLSearchParams } from 'node:url';
 
 @Injectable()
 export class AuthService {
@@ -26,6 +26,21 @@ export class AuthService {
     this.CLIENT_PW,
     this.REDIRECT_URL,
   );
+
+  private COOKIE_OPTIONS = {
+    httpOnly: true,
+    sameSite: 'lax' as const,
+    secure: this.config.get('NODE_ENV') === 'production',
+    path: '/',
+  };
+
+  setTokenCookie(res: Response, token: string) {
+    res.cookie('extreme-token', token, this.COOKIE_OPTIONS);
+  }
+
+  clearTokenCookie(res: Response) {
+    res.clearCookie('extreme-token', this.COOKIE_OPTIONS);
+  }
 
   // google oauth2 flow start
   googleLoginApi() {
@@ -64,15 +79,6 @@ export class AuthService {
       // 기존 유저인가요?
       const isExistUser = await this.userService.findUser(userinfo.email);
 
-      const loginUser = {
-        username: userinfo.name,
-        email: userinfo.email,
-        token: tokens.id_token,
-      };
-
-      const params = new URLSearchParams(loginUser);
-      const client = `${this.CLIENT_URL}?${params}`;
-
       // 기존 유저이면 로그인 처리 끝
       if (isExistUser) {
         if (tokens.refresh_token) {
@@ -85,7 +91,7 @@ export class AuthService {
             access: tokens.access_token,
           });
         }
-        return client;
+        return tokens.id_token;
       }
 
       // 기존 유저가 아니라면 DB 새로 등록하기
@@ -98,7 +104,7 @@ export class AuthService {
 
       this.userService.createUser(newUserInfo);
 
-      return client;
+      return tokens.id_token;
     } catch (err) {
       if (
         err.response?.data &&
@@ -111,7 +117,7 @@ export class AuthService {
   }
 
   // id_tokens 토큰 검증
-  async verifiedIdToken(email: string, token: string) {
+  async verifiedIdToken(token: string) {
     try {
       const ticket = await this.oauth2Client.verifyIdToken({
         idToken: token,
@@ -125,7 +131,7 @@ export class AuthService {
         );
       }
 
-      const user = await this.userService.findUser(email);
+      const user = await this.userService.findUser(payload.email);
 
       return {
         userdata: user,
@@ -134,9 +140,19 @@ export class AuthService {
     } catch (err) {
       if (err.message.startsWith('Invalid token signature')) {
         console.error('Invalid id tokens verifiedIdToken ::: ', err);
-        throw new BadRequestException('Invalid id tokens');
+        throw new UnauthorizedException('Invalid id tokens');
       } else if (err.message.startsWith('Token used too late')) {
         // 토큰 재발급!
+        const payloadBase64 = token?.split('.')?.[1];
+        if (!payloadBase64) {
+          throw new UnauthorizedException('Invalid token format');
+        }
+
+        const payload = JSON.parse(
+          Buffer.from(payloadBase64, 'base64').toString(),
+        );
+        const email = payload?.email;
+
         const newUserInfo = await this.refreshTokens(email);
         return { ...newUserInfo, old_token: token };
       } else if (err.message.includes('No pem found for envelope')) {
@@ -170,7 +186,7 @@ export class AuthService {
       return userinfo;
     } catch (err) {
       console.error('Invalid refreshTokens in refreshTokens ::: ', err);
-      throw new BadRequestException('Invalid refreshTokens');
+      throw new UnauthorizedException('Invalid refreshTokens');
     }
   }
 
