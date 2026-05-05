@@ -29,7 +29,10 @@ export class AuthService {
 
   private COOKIE_OPTIONS = {
     httpOnly: true,
-    sameSite: 'lax' as const,
+    sameSite:
+      this.config.get('NODE_ENV') === 'production'
+        ? ('none' as const)
+        : ('lax' as const),
     secure: this.config.get('NODE_ENV') === 'production',
     path: '/',
   };
