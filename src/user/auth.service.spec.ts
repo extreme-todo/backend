@@ -5,8 +5,9 @@ import { UserService } from './user.service';
 import { userStub } from './stub/user.stub';
 import { ConfigService } from '@nestjs/config';
 import { CreateUserDto } from './dto/create-user.dto';
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, UnauthorizedException } from '@nestjs/common';
 import { google } from 'googleapis';
+
 jest.mock('googleapis', () => {
   return {
     google: {
@@ -208,25 +209,26 @@ describe('AuthService', () => {
 
   describe('verifiedTokens', () => {
     it('should return userinfo', async () => {
-      const userinfo = await service.verifiedIdToken(
-        'exampleTwo@ex.com',
-        'Token used',
-      );
+      const userinfo = await service.verifiedIdToken('oldOne');
       expect(userinfo).toBeDefined();
     });
 
     it('should refresh id_token tokens and return userinfo', async () => {
+      const payload = Buffer.from(
+        JSON.stringify({ email: 'exampleTwo@ex.com' }),
+      ).toString('base64');
+      const expiredToken = `header.${payload}.signature`;
+
       const oldTokens = await service.verifiedIdToken(
-        'exampleTwo@ex.com',
-        'Token used',
+        `Token used ${expiredToken}`,
       );
       expect(oldTokens).toBeDefined();
     });
 
-    it('should throw BadRequestException', async () => {
-      await expect(
-        service.verifiedIdToken('exampleTwo@ex.com', 'Invalid'),
-      ).rejects.toThrow(BadRequestException);
+    it('should throw UnauthorizedException', async () => {
+      await expect(service.verifiedIdToken('Invalid')).rejects.toThrow(
+        UnauthorizedException,
+      );
     });
   });
 

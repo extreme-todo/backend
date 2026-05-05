@@ -1,0 +1,41 @@
+services:
+  db:
+    image: mysql:latest
+    restart: on-failure
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_DATABASE}
+      # MYSQL_USER: ${DB_USERNAME} nest에서 root유저로 접근하기 때문에
+      # MYSQL_PASSWORD: ${DB_PASSWORD} 생성할 필요가 없음
+      TZ: UTC
+    ports:
+      - "3306:3306"
+    volumes:
+      - dbdata:/var/lib/mysql
+  backend:
+    build:
+      context: .
+      dockerfile: dev.Dockerfile
+    env_file:
+      - .env.development
+    depends_on:
+      - db
+    ports:
+      - "8080:8080"
+    volumes:
+      - .:/app
+      - /app/node_modules
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: dev.Dockerfile
+    env_file: ../frontend/.env
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    volumes:
+      - ../frontend:/app
+      - /app/node_modules
+volumes:
+  dbdata:
