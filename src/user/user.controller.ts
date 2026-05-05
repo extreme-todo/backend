@@ -3,6 +3,7 @@ import {
   Delete,
   Get,
   HttpCode,
+  InternalServerErrorException,
   NotFoundException,
   Param,
   Post,
@@ -43,12 +44,16 @@ export class UserController {
   ) {
     try {
       const token = await this.authService.googleCallback(authCode);
+      if (!token) {
+        throw new InternalServerErrorException(
+          'Missing id_token from Google callback',
+        );
+      }
       this.authService.setTokenCookie(res, token);
       res.redirect(this.CLIENT_URL);
     } catch (err) {
-      if (err.response?.statusCode === 500) {
-        res.redirect(this.CLIENT_URL);
-      }
+      console.error('Google Auth Error:', err);
+      res.redirect(this.CLIENT_URL);
     }
   }
 
